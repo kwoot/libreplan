@@ -106,11 +106,5 @@
            columnDataType="BOOLEAN" />
     </changeSet>
 
-    <changeSet id="set-allow_to_gather_usage_stats-to-true"
-        author="jeroen">
-        <update tableName="configuration">
-            <column name="allow_to_gather_usage_stats_enabled" value="TRUE" />
-        </update>
-    </changeSet>
 
 </databaseChangeLog>

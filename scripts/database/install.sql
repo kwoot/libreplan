@@ -2187,9 +2187,9 @@ INSERT INTO databasechangelog (AUTHOR, COMMENTS, DATEEXECUTED, DESCRIPTION, EXEC
 -- Add new column allow_to_gather_usage_stats_enabled with default value FALSE to configuration table
 ALTER TABLE configuration ADD allow_to_gather_usage_stats_enabled BOOLEAN;
 
-ALTER TABLE configuration ALTER COLUMN  allow_to_gather_usage_stats_enabled SET DEFAULT 'FALSE';
+ALTER TABLE configuration ALTER COLUMN  allow_to_gather_usage_stats_enabled SET DEFAULT 'TRUE';
 
-UPDATE configuration SET allow_to_gather_usage_stats_enabled = 'FALSE' WHERE allow_to_gather_usage_stats_enabled IS NULL;
+UPDATE configuration SET allow_to_gather_usage_stats_enabled = 'TRUE' WHERE allow_to_gather_usage_stats_enabled IS NULL;
 
 ALTER TABLE configuration ALTER COLUMN  allow_to_gather_usage_stats_enabled SET NOT NULL;
 
