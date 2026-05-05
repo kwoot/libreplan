@@ -1,5 +1,5 @@
 -- *********************************************************************
--- Update Database Script
+-- Update Database Script - LibrePlan 1.6.0
 -- *********************************************************************
 -- Change Log: src/main/resources/db.changelog.xml
 -- Ran at: 5/5/26, 3:34 PM
