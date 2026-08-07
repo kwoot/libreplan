@@ -2494,16 +2494,20 @@ textarea {
  * button box. Breeze's larger box breaks that math and makes adjacent
  * buttons visibly overlap.
  *
- * Only fixing font-size/border-width/vertical padding here, deliberately
- * NOT touching horizontal padding: every icon-button group in this app
- * (.icono, .toolbar-box .z-button, .global-action, ...) already sets its
- * own left/right padding for its specific layout, and since those rules
- * have the same specificity as this one, whichever comes later in the
- * file wins on a given side -- setting horizontal padding here would
- * silently override those more specific paddings instead of restoring
- * Sapphire's sizing. */
+ * Deliberately NOT setting font-size or horizontal padding here:
+ *  - font-size: this app already has its own global override
+ *    (.z-button{font-size:10px}, near the top of this file) that's more
+ *    specific to its intent than Sapphire's theme-level 12px default.
+ *    Setting font-size again down here, at equal selector specificity but
+ *    later in the file, would silently win and bump every button to 12px
+ *    -- exactly the bug this comment is now here to prevent a repeat of.
+ *  - horizontal padding: every icon-button group in this app (.icono,
+ *    .toolbar-box .z-button, .global-action, ...) already sets its own
+ *    left/right padding for its specific layout, and for the same
+ *    equal-specificity/source-order reason, setting it here would
+ *    silently override those more specific paddings instead of restoring
+ *    Sapphire's sizing. */
 .z-button {
-    font-size: 12px;
     padding-top: 3px;
     padding-bottom: 3px;
     border-width: 1px;
