@@ -2449,6 +2449,17 @@ textarea {
     color: #00547a;
 }
 
+/* Same Sapphire source (font-family:Arial,Sans-serif;font-size:12px;...)
+ * also sets font-size:12px for these three header-content classes, vs
+ * Breeze's 16px default. Data cells (.z-listcell-content etc.) already
+ * have their own pre-existing 11px override elsewhere and don't need this. */
+.z-listheader-content,
+.z-column-content,
+.z-treecol-content {
+    font-size: 12px;
+    padding: 4px 5px 3px;
+}
+
 /* Breeze's base menu/tab widgets assume a spacious modern UI:
  *  - .z-menu-text,.z-menuitem-text share one rule at font-size:18px; our
  *    earlier fix only covered .z-menu-text (top nav), leaving dropdown
@@ -2547,4 +2558,13 @@ textarea {
     padding-top: 3px;
     padding-bottom: 3px;
     padding-left: 6px;
+}
+
+/* Breeze's base .z-treecol-content is padding:12px 16px, vs Sapphire's
+ * padding:4px 5px 3px (top/left-right/bottom shorthand: top=4, right=5,
+ * bottom=3, left=5). No prior override existed for this, so every tree
+ * column header (e.g. the "Name"/"Start"/"End" columns in the planner's
+ * project tree) was rendered with Breeze's much larger inset. */
+.z-treecol-content {
+    padding: 4px 5px 3px;
 }
