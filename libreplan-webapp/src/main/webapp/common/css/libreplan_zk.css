@@ -2064,6 +2064,10 @@ select {
     border: 1px solid #9ECAD8;
 }
 
+.z-center-noborder {
+    border: 0;
+}
+
 .z-radio{
     padding: 3px;
 }
@@ -2346,4 +2350,189 @@ textarea {
 
 .expenses-sheet-code-wide-table table{
     width: 60%;
+}
+
+/* ----- Breeze theme compatibility fixes -----
+ * Breeze's base widget CSS (zul-*.jar, unthemed default) makes assumptions
+ * that clash with these Sapphire-era overrides:
+ *  - .z-button always sets color:#fff, assuming a saturated background.
+ *    Our pale custom button backgrounds (add-button/global-action, #E4F3D9)
+ *    need a dark text color or the label is invisible.
+ *  - .z-menu-content (the inner <a> of each top-nav item) paints its own
+ *    opaque white background, hiding the colored pill we set on the <li>.
+ */
+.add-button.z-button,
+.global-action.z-button,
+.create-button.z-button,
+.save-button.z-button,
+.saveandcontinue-button.z-button,
+.cancel-button.z-button {
+    color: #33512b;
+}
+
+.add-button.z-button:hover,
+.global-action.z-button:hover,
+.create-button.z-button:hover,
+.save-button.z-button:hover,
+.saveandcontinue-button.z-button:hover,
+.cancel-button.z-button:hover,
+.add-button.z-button:focus,
+.global-action.z-button:focus,
+.create-button.z-button:focus,
+.save-button.z-button:focus,
+.saveandcontinue-button.z-button:focus,
+.cancel-button.z-button:focus {
+    color: #33512b;
+    background-color: #d3ecc0;
+}
+
+.z-menubar-horizontal .z-menu-content {
+    background-color: transparent;
+}
+
+.current-section .z-menu-content {
+    background-color: #2a83b4;
+    border-radius: 10px 10px 0 0;
+}
+
+.z-menubar-horizontal li:not(.current-section) .z-menu-content:hover {
+    background-color: #d4e1ef;
+}
+
+/* Breeze's default text inputs are height:34px/font-size:16px (assumes a
+ * spacious modern form). This app's layout was built compact/dense
+ * (buttons run ~11-16px), matching Sapphire's own min-height:24px/font-size:12px
+ * inputs. Restoring that sizing so inputs line up with buttons and fit
+ * fixed-height toolbars instead of overflowing them. */
+.z-textbox,
+.z-decimalbox,
+.z-intbox,
+.z-longbox,
+.z-doublebox,
+.z-bandbox-input,
+.z-combobox-input,
+.z-datebox-input,
+.z-timebox-input {
+    height: 22px;
+    font-size: 12px;
+    padding: 2px 5px;
+}
+
+.z-combobox,
+.z-bandbox,
+.z-datebox,
+.z-timebox {
+    height: 24px;
+}
+
+/* Breeze's default grid/list header is a solid saturated blue (#0093f9)
+ * with white text. Restoring Sapphire's pale gradient + navy text so
+ * tables read as data (light) rather than as a heavy UI chrome band. */
+.z-listheader,
+.z-column,
+.z-treecol {
+    background: #e7f6fd;
+    background: linear-gradient(to bottom, #e7f6fd 0%, #c6e9fa 100%);
+    border-left: 1px solid #8fb9d0;
+    border-bottom: 1px solid #8fb9d0;
+}
+
+.z-listheader-content,
+.z-listheader-sorticon,
+.z-listheader-sorticon i,
+.z-column-content,
+.z-column-sorticon,
+.z-column-sorticon i,
+.z-treecol-content,
+.z-treecol-sorticon,
+.z-treecol-sorticon i {
+    color: #00547a;
+}
+
+/* Breeze's base menu/tab widgets assume a spacious modern UI:
+ *  - .z-menu-text,.z-menuitem-text share one rule at font-size:18px; our
+ *    earlier fix only covered .z-menu-text (top nav), leaving dropdown
+ *    submenu items (.z-menuitem-text) oversized.
+ *  - .z-tab is font-size:18px/min-height:48px/padding:10px 16px, vs
+ *    Sapphire's font-size:12px/line-height:30px/padding-top:1px. That's
+ *    also why the narrow vertical tab strip in the scheduling-graphics
+ *    panel (forced to width:60px above) clipped/garbled its labels —
+ *    Breeze's larger text simply didn't fit the column Sapphire's did. */
+.z-menuitem-text {
+    font-size: 11px;
+}
+
+.z-tab {
+    font-size: 12px;
+    min-height: 0;
+    padding: 4px 10px;
+    line-height: 20px;
+}
+
+/* Breeze's native <select> mold (.z-select, used e.g. by "Show progress")
+ * is font-size:16px vs Sapphire's 12px. */
+.z-select {
+    font-size: 12px;
+}
+
+/* Breeze's base .z-button box (font-size:16px, padding:8px 16px, border:2px)
+ * is much larger than Sapphire's (font-size:12px, padding:3px 12px, border:1px).
+ * Several icon-button groups in this app (.icono, .planner-command, etc.) use
+ * a negative margin (e.g. .icono{margin:-8px}) to pack same-size buttons
+ * edge-to-edge with no gap -- a trick calibrated against Sapphire's compact
+ * button box. Breeze's larger box breaks that math and makes adjacent
+ * buttons visibly overlap.
+ *
+ * Only fixing font-size/border-width/vertical padding here, deliberately
+ * NOT touching horizontal padding: every icon-button group in this app
+ * (.icono, .toolbar-box .z-button, .global-action, ...) already sets its
+ * own left/right padding for its specific layout, and since those rules
+ * have the same specificity as this one, whichever comes later in the
+ * file wins on a given side -- setting horizontal padding here would
+ * silently override those more specific paddings instead of restoring
+ * Sapphire's sizing. */
+.z-button {
+    font-size: 12px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-width: 1px;
+    line-height: 14px;
+}
+
+/* .icono buttons each sit alone in their own <td> and use a negative
+ * margin to bleed out of that cell so adjacent icon buttons touch with
+ * no gap. That -8px pull-in was tuned against some other box model
+ * (table auto-layout resolves negative-margined cell width differently
+ * than a plain inline-block would) and now leaves neighboring icons
+ * overlapping under Breeze. Reducing just the horizontal pull-in. */
+.icono {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* .planner-command / .planner-icon buttons (the gantt toolbar's
+ * show/hide-labels/progress/reported-hours icons) get a server- or
+ * ZK-JS-computed inline style (e.g. style="width:46px; margin-right:-5px")
+ * sized against Sapphire's narrower button box. That inline width no
+ * longer matches Breeze's rendering and the negative margin then pulls
+ * each button into its neighbor. Not !important in the inline style, so
+ * a !important rule here can safely override it and let the button size
+ * itself naturally from its (now-compact) padding/border/icon content. */
+.planner-command.z-button,
+.planner-icon.z-button {
+    width: auto !important;
+    margin-right: 0 !important;
+}
+
+/* Breeze's borderlayout region bodies (the content area of every <north>/
+ * <south>/<west>/<center>/<east>, e.g. the main page content, sidebars,
+ * toolbars) add padding:16px; Sapphire's had none. This app's layouts
+ * assume children fill 100% of the region with no inset, so that padding
+ * shows up as unexpected extra spacing/framing throughout the site. */
+.z-north-body,
+.z-south-body,
+.z-west-body,
+.z-center-body,
+.z-east-body {
+    padding: 0;
 }
