@@ -2559,3 +2559,22 @@ textarea {
     padding-bottom: 3px;
     padding-left: 6px;
 }
+
+/* Sapphire groups .z-combobox-button/.z-bandbox-button/.z-datebox-button/
+ * .z-timebox-button/.z-spinner-button/.z-doublespinner-button (the little
+ * dropdown/calendar/search trigger button glued to the right edge of these
+ * inputs) under one rule: padding:4px, min-width:24px, height:24px (with
+ * border-box sizing that gives a 14x14 interior). Breeze's equivalent is
+ * padding:6px 8px 0 (later bumped to padding-top:8px), min-width:40px,
+ * height:34px -- a much bigger button that no longer matches the compact
+ * 22-24px inputs restored earlier in this file. */
+.z-combobox-button,
+.z-bandbox-button,
+.z-datebox-button,
+.z-timebox-button,
+.z-spinner-button,
+.z-doublespinner-button {
+    padding: 4px;
+    min-width: 24px;
+    height: 24px;
+}
