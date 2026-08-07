@@ -2536,3 +2536,15 @@ textarea {
 .z-east-body {
     padding: 0;
 }
+
+/* Breeze's base .z-menu-content is padding:6px 12px (then padding-right
+ * bumped to 32px). The existing padding-right:10px override above already
+ * restores the right side to Sapphire's value, but top/bottom/left still
+ * fall through to Breeze's larger defaults (6px/6px/12px) instead of
+ * Sapphire's (3px/3px/6px), making every top-level menu item taller and
+ * wider than it should be. */
+.z-menu-content {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 6px;
+}
