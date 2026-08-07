@@ -2559,12 +2559,3 @@ textarea {
     padding-bottom: 3px;
     padding-left: 6px;
 }
-
-/* Breeze's base .z-treecol-content is padding:12px 16px, vs Sapphire's
- * padding:4px 5px 3px (top/left-right/bottom shorthand: top=4, right=5,
- * bottom=3, left=5). No prior override existed for this, so every tree
- * column header (e.g. the "Name"/"Start"/"End" columns in the planner's
- * project tree) was rendered with Breeze's much larger inset. */
-.z-treecol-content {
-    padding: 4px 5px 3px;
-}
