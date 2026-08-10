@@ -2531,12 +2531,75 @@ textarea {
 
 .z-tab {
     font-size: 12px;
+    height: auto;
     min-height: 0;
-    padding: 4px 10px;
-    line-height: 20px;
+    padding: 0;
+    padding-top: 1px;
+    line-height: 30px;
     border: 1px solid #8fb9d0;
     border-width: 1px 1px 0 1px;
     border-radius: 4px 4px 0 0;
+    background: #e7f6fd;
+    background: linear-gradient(to bottom, #e7f6fd 0%, #c6e9fa 100%);
+}
+
+/* This app's own pre-existing rule (.z-tabpanel,.z-tabbox-ver
+ * .z-tabpanels{padding:5px;border-bottom:1px solid #7EAAC6} above)
+ * already wins over Breeze for the bottom edge, but never set
+ * border-top/left/right, so Breeze's own .z-tabpanel{border-top:1px
+ * solid #d9d9d9} was left unopposed (a top border neither Sapphire
+ * -- whose .z-tabpanel is border:1px solid #8fb9d0;border-top:0 --
+ * nor this app's own rule intended), and left/right were plain
+ * missing. Zero the Breeze top border and add left/right using the
+ * same shade this app's own rule already uses for the bottom edge. */
+.z-tabpanel {
+    border-top: 0;
+    border-left: 1px solid #7EAAC6;
+    border-right: 1px solid #7EAAC6;
+}
+
+/* Breeze's .z-tabbox (the outer wrapper around .z-tabs + .z-tabpanels)
+ * adds its own border:1px solid #d9d9d9, border-radius:4px and
+ * background:#fff -- Sapphire's .z-tabbox rule is only
+ * {position:relative;overflow:hidden}, no border/radius/background at
+ * all. That extra Breeze border is what showed up as a stray gray line
+ * above (and around) the tab row. */
+.z-tabbox {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+/* Breeze's .z-tabs-content is display:flex with min-height:48px, and
+ * flexbox defaults align-items to stretch -- so every .z-tab (a flex
+ * item) gets stretched to fill that 48px regardless of its own content
+ * height, no matter what height/min-height/padding is set directly on
+ * .z-tab itself (confirmed: none of those fixes above budged the
+ * rendered height). Sapphire's .z-tabs-content is display:table, which
+ * has no such stretching behavior. Overriding align-items here is a
+ * smaller change than replicating table layout and gets the same
+ * result: each tab sized to its own (now-correct, ~32px) content
+ * height instead of being force-stretched. */
+.z-tabs-content {
+    align-items: flex-start;
+    border-bottom: 1px solid #8fb9d0;
+    min-height: 0;
+}
+
+/* .z-tabs (the outer wrapper around .z-tabs-content) has its own
+ * separate Breeze min-height:48px too -- fixing .z-tabs-content alone
+ * left this one still forcing the same empty gap below the now-correct
+ * ~32px tabs. */
+.z-tabs {
+    min-height: 0;
+}
+
+/* Inactive tabs should not change color on hover (a deliberate choice
+ * for this app, not a Sapphire restoration -- Sapphire's own
+ * .z-tab:hover actually does shift to a lighter blue gradient). Winning
+ * over Breeze's own .z-tab:hover{background:#fff} needs the same
+ * specificity re-declared with the tab's normal (non-hover) background. */
+.z-tab:not(.z-tab-selected):hover {
     background: #e7f6fd;
     background: linear-gradient(to bottom, #e7f6fd 0%, #c6e9fa 100%);
 }
@@ -2720,4 +2783,65 @@ textarea {
 .z-messagebox-window.z-window-highlighted .z-window-content {
     padding: 17px;
     padding-bottom: 15px;
+}
+
+/* Checkboxes have never had any theme or app CSS controlling their
+ * appearance -- Sapphire never shipped a checkbox.css.dsp (confirmed
+ * against the live reference deployment too, not just this repo's
+ * copy), so they've always rendered as bare native
+ * <input type="checkbox">, picking up whatever the OS/browser defaults
+ * to. Attempts this session to pin color/size/checkmark position via
+ * CSS kept fighting the browser's own native rendering (Chrome's
+ * accent-color checkmark doesn't rescale cleanly with width/height, its
+ * vertical centering isn't adjustable, and it draws even alongside a
+ * custom ::after checkmark meant to replace it, producing a double
+ * checkmark). Reverting to a genuinely native, unstyled checkbox:
+ * appearance:auto overrides Breeze's own appearance:none reset (Breeze
+ * sets that regardless of this file, so simply not setting our own
+ * appearance:none isn't enough to get native rendering back). Whatever
+ * this renders as is intentionally OS/browser-dependent. */
+input[type="checkbox"] {
+    -webkit-appearance: checkbox;
+    appearance: auto;
+}
+
+/* Sapphire's window.css.dsp sets .z-label{color:#00547a} (unqualified,
+ * so it applies broadly -- effectively everywhere given this app's
+ * border-layout/window-based page structure). Breeze has no equivalent
+ * override, so labels fall through to its own generic text color
+ * (rgba(0,0,0,0.9), near-black) instead. */
+.z-label {
+    color: #00547a;
+}
+
+/* Sapphire's tabbox.css.dsp sets .z-tab-selected .z-tab-text{font-weight:
+ * bold} (only the selected tab, not the other three) -- Breeze's tab
+ * text has no font-weight override at all, so it renders at its
+ * inherited normal weight instead. */
+.z-tab-selected .z-tab-text {
+    font-weight: bold;
+    color: #00547a;
+}
+
+/* Sapphire's tabbox.css.dsp sets .z-tab-text{padding:4px 12px 2px;
+ * color:#00547a} (all four tabs, not just the selected one). Breeze has
+ * no equivalent padding (falls through to 0) and its own text color
+ * varies by tab state (blue when selected, gray otherwise) instead of
+ * this app's single consistent teal used for labels/headers elsewhere. */
+.z-tab-text {
+    padding: 4px 12px 2px;
+    color: #00547a;
+}
+
+/* Breeze's .z-tab-text:hover{color:rgba(0,0,0,0.9)} (and, for the
+ * selected tab, .z-tab-selected .z-tab-text:hover{color:#0064ed}) both
+ * change the text color on hover. Matching those selectors' specificity
+ * to keep the color unchanged, consistent with disabling the hover
+ * background change on inactive tabs already done above. */
+.z-tab-text:hover {
+    color: #00547a;
+}
+
+.z-tab-selected .z-tab-text:hover {
+    color: #00547a;
 }
