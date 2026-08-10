@@ -2695,29 +2695,77 @@ textarea {
     background: linear-gradient(to right, #e2f4fc 0%, #cbeafb 100%);
 }
 
-/* .icono buttons each sit alone in their own <td> and use a negative
- * margin to bleed out of that cell so adjacent icon buttons touch with
- * no gap. That -8px pull-in was tuned against some other box model
- * (table auto-layout resolves negative-margined cell width differently
- * than a plain inline-block would) and now leaves neighboring icons
- * overlapping under Breeze. Reducing just the horizontal pull-in.
+/* This app's own original .icono rule (margin:-8px; padding:10px 10px;
+ * above) is a deliberate, working design: at padding:10px each icono
+ * button renders 42px wide (1px border + 10px padding + 20px icon +
+ * 10px padding + 1px border), and margin:-8px on ALL sides pulls each
+ * button's mostly-empty outer box 16px into its neighbor's -- verified
+ * pixel-for-pixel against the genuine Sapphire reference deployment,
+ * including its tightest case: Resources > Criteria > [a criterion
+ * type] > Criteria list has FIVE icono buttons (down/up/indent-right/
+ * indent-left/delete) per row in a width:150px Operations column,
+ * measured on the reference as 5*42px overlapped down to exactly 146px
+ * -- fits with 4px to spare, and the 16px overlap never touches the
+ * actual 20px icon graphics (each centered in its own 42px box, so
+ * only ~11px of transparent padding on each side ever overlaps).
  *
- * Also shrinking the app's own padding-left/right:10px (set alongside
- * that margin, above in this file) to 6px each. These icon buttons are
- * commonly laid out in fixed-width columns (e.g. the "Operations"
- * treecol on Resources > Calendars is width:150px, sized to fit 4 of
- * them). Each button's rendered width is border(2px, from this app's
- * own .icono{border:1px solid transparent}) + padding + a fixed 20px
- * icon image -- at the original 10px padding that's 42px/button, and
- * 4 no longer fit in 150px once .z-treecell-content's own padding was
- * restored above (12px 16px under Breeze down to Sapphire's 4px 2px),
- * so the 4th button wrapped onto a second, overlapping row. 6px brings
- * it to 34px/button (136px for 4), fitting with room to spare. */
-.icono {
-    margin-left: 0;
-    margin-right: 0;
-    padding-left: 6px;
-    padding-right: 6px;
+ * An earlier compat rule here (removed) shrank padding to 6px and
+ * zeroed the horizontal margin instead, misdiagnosed as a button-width
+ * problem. The real cause of that day's symptom (Resources > Calendars
+ * icons wrapping) was .z-treecell-content still carrying Breeze's
+ * oversized padding:12px 16px, fixed separately above (now Sapphire's
+ * 4px 2px). With that actually fixed, this app's original -8px/10px
+ * icono sizing already fits every known case without modification --
+ * the compat rule was not only unnecessary but broke the 5-icon case
+ * above (34px/button * 5 = 170px > 150px, wrapping the 5th button onto
+ * a visually overlapping second line via the still-present -8px
+ * vertical margin). Deleted rather than re-tuned. */
+
+/* That same 16px negative-margin overlap only looks seamless if the
+ * button itself has no opaque background to show a seam with -- and on
+ * the Sapphire reference, .icono's resting background is genuinely
+ * background:none (verified via getComputedStyle). This app's own
+ * .icono rule never set a background at all, relying on Sapphire's
+ * trendy-mold buttons rendering their actual chrome in a nested
+ * <table><tbody> that a separate app rule (.z-button.icono tbody
+ * above) already forces transparent -- so the outer element's
+ * background was always irrelevant under Sapphire. Breeze has no such
+ * tbody structure, so the plain .z-button compat rule's opaque
+ * gray/white gradient background (above, needed for normal buttons)
+ * now paints directly on .icono too, and each 16px-overlapped button
+ * shows a visible rectangular seam over its neighbor's icon.
+ * .icono.z-button (two classes) outranks the plain .z-button rule
+ * regardless of source order. */
+.icono.z-button {
+    background: transparent;
+}
+
+/* Breeze's own base .z-button:hover sets background-color:#4fb7ff (a
+ * vivid blue), part of a theme-wide assumption that buttons are
+ * prominent call-to-actions. Sapphire's trendy-mold buttons instead
+ * swapped a background-IMAGE on hover, which is why this app's own
+ * .icono:hover rule above only neutralizes background-image, not
+ * background-color -- under Sapphire there was never a background-color
+ * to neutralize. Under Breeze that leaves the vivid blue box showing
+ * through on every hover, making these small icon buttons look much
+ * larger/heavier than Sapphire ever did (where hovering just darkened
+ * the icon itself slightly, no background box at all). */
+.icono:hover {
+    background-color: transparent;
+}
+
+/* Breeze's own .z-grid-odd rule sets background:#fff (removing the
+ * alternating-row tint entirely, a flat-design choice), vs Sapphire's
+ * .z-grid-odd>.z-row-inner,.z-grid-odd>.z-cell{background:#f0faff}.
+ * Neither side of this is an app rule -- it's theme-level on both --
+ * so nothing here was already restoring it. Without the alternating
+ * tint, .z-row-inner's own border-bottom (an unrelated, pre-existing
+ * app rule below, present identically under both themes -- confirmed
+ * against the Sapphire reference deployment) reads as a much more
+ * conspicuous stray line between otherwise uniformly white rows. */
+.z-grid-odd > .z-row-inner,
+.z-grid-odd > .z-cell {
+    background: #f0faff;
 }
 
 /* .planner-command / .planner-icon buttons (the gantt toolbar's
