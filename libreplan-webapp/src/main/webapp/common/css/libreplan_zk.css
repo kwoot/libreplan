@@ -2534,6 +2534,22 @@ textarea {
     min-height: 0;
     padding: 4px 10px;
     line-height: 20px;
+    border: 1px solid #8fb9d0;
+    border-width: 1px 1px 0 1px;
+    border-radius: 4px 4px 0 0;
+    background: #e7f6fd;
+    background: linear-gradient(to bottom, #e7f6fd 0%, #c6e9fa 100%);
+}
+
+/* Breeze's tabs use a flat "underline" style: no background, no border
+ * except a 2px bottom accent on the selected tab, no rounded corners --
+ * a completely different visual language from Sapphire's boxed "folder
+ * tab" look (pale blue gradient, border on 3 sides, rounded top corners,
+ * selected tab turning white to blend into the panel below it). Restored
+ * above/here rather than patched piecemeal since every property differs. */
+.z-tab-selected {
+    background: #fff;
+    box-shadow: 0 1px 0 #fff;
 }
 
 /* Breeze's native <select> mold (.z-select, used e.g. by "Show progress")
