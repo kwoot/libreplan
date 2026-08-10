@@ -2492,6 +2492,25 @@ textarea {
     padding: 4px 5px 3px;
 }
 
+/* Sapphire's tree.css.dsp base rule for .z-treecell-content (tree data
+ * rows, as opposed to .z-treecol-content headers just above) matches that
+ * font-size:12px, but is then narrowed further by a second, later rule
+ * scoped to .z-treecell-content alone: padding:4px 2px; line-height:14px
+ * -- much tighter than the header's line-height:24px, and unlike
+ * .z-listcell-content/.z-column-content this class was never covered by
+ * this app's own legacy font-size:11px override (div.z-column-content,
+ * ...,div.z-listcell-content{...} near the top of this file), so nothing
+ * restored it. Breeze's own default here is font-size:16px/padding:12px
+ * 16px/line-height:16px -- on pages like Resources > Calendars this both
+ * inflated row height a lot and, combined with the icon-button width fix
+ * below, was the main reason the fixed-width "Operations" column's icons
+ * no longer fit on one line and wrapped into two overlapping rows. */
+.z-treecell-content {
+    font-size: 12px;
+    padding: 4px 2px;
+    line-height: 14px;
+}
+
 /* Same Sapphire grid.css.dsp rule that covers .z-column-content also
  * covers .z-row-content (a table data row's cell content, as opposed to
  * its header) with the same font-size:12px/line-height:24px, but a
@@ -2681,10 +2700,24 @@ textarea {
  * no gap. That -8px pull-in was tuned against some other box model
  * (table auto-layout resolves negative-margined cell width differently
  * than a plain inline-block would) and now leaves neighboring icons
- * overlapping under Breeze. Reducing just the horizontal pull-in. */
+ * overlapping under Breeze. Reducing just the horizontal pull-in.
+ *
+ * Also shrinking the app's own padding-left/right:10px (set alongside
+ * that margin, above in this file) to 6px each. These icon buttons are
+ * commonly laid out in fixed-width columns (e.g. the "Operations"
+ * treecol on Resources > Calendars is width:150px, sized to fit 4 of
+ * them). Each button's rendered width is border(2px, from this app's
+ * own .icono{border:1px solid transparent}) + padding + a fixed 20px
+ * icon image -- at the original 10px padding that's 42px/button, and
+ * 4 no longer fit in 150px once .z-treecell-content's own padding was
+ * restored above (12px 16px under Breeze down to Sapphire's 4px 2px),
+ * so the 4th button wrapped onto a second, overlapping row. 6px brings
+ * it to 34px/button (136px for 4), fitting with room to spare. */
 .icono {
     margin-left: 0;
     margin-right: 0;
+    padding-left: 6px;
+    padding-right: 6px;
 }
 
 /* .planner-command / .planner-icon buttons (the gantt toolbar's
