@@ -2064,10 +2064,6 @@ select {
     border: 1px solid #9ECAD8;
 }
 
-.z-center-noborder {
-    border: 0;
-}
-
 .z-radio{
     padding: 3px;
 }
@@ -2587,15 +2583,20 @@ textarea {
 
 /* Breeze's borderlayout region bodies (the content area of every <north>/
  * <south>/<west>/<center>/<east>, e.g. the main page content, sidebars,
- * toolbars) add padding:16px; Sapphire's had none. This app's layouts
- * assume children fill 100% of the region with no inset, so that padding
- * shows up as unexpected extra spacing/framing throughout the site. */
+ * toolbars) add padding:16px and line-height:16px; Sapphire's had no
+ * padding and line-height:14px. This app's layouts assume children fill
+ * 100% of the region with no inset, so the extra padding shows up as
+ * unexpected spacing/framing throughout the site, and the taller
+ * line-height quietly inflates the height of any unstyled descendant
+ * (e.g. bare <td class="z-column"> cells with no font/line-height of
+ * their own) that inherits it. */
 .z-north-body,
 .z-south-body,
 .z-west-body,
 .z-center-body,
 .z-east-body {
     padding: 0;
+    line-height: 14px;
 }
 
 /* Breeze's base .z-menu-content is padding:6px 12px (then padding-right
