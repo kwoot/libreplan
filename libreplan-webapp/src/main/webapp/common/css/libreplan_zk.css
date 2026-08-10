@@ -2400,22 +2400,50 @@ textarea {
 }
 
 /* Breeze's default text inputs are height:34px/font-size:16px (assumes a
- * spacious modern form). This app's layout was built compact/dense
- * (buttons run ~11-16px), matching Sapphire's own min-height:24px/font-size:12px
- * inputs. Restoring that sizing so inputs line up with buttons and fit
- * fixed-height toolbars instead of overflowing them. */
+ * spacious modern form), vs Sapphire's ~24px/12px. Split by family instead
+ * of one blanket rule, because this app already has its own pre-existing,
+ * more-specific overrides for some of these classes (elsewhere in this
+ * file) that a blanket rule at equal specificity would silently clobber
+ * just by coming later in the file -- the same trap as the .z-button
+ * font-size bug fixed earlier in this file. Concretely:
+ *  - .z-textbox/.z-decimalbox/.z-intbox/.z-longbox/.z-doublebox/
+ *    .z-datebox-input already get font-size:11px and padding-left:2px
+ *    from an app rule several hundred lines up -- don't redeclare either.
+ *  - .z-bandbox-input already gets font-size:11px from a different app
+ *    rule -- don't redeclare it, but that rule never touches padding, so
+ *    padding still needs restoring in full.
+ *  - .z-combobox-input/.z-timebox-input have no such app override (the
+ *    app rule for this family says ".z-combobox-inp", a typo missing
+ *    "ut" that never matches the real .z-combobox-input class), so they
+ *    fall through to Breeze's font-size unless fixed here. */
 .z-textbox,
 .z-decimalbox,
 .z-intbox,
 .z-longbox,
-.z-doublebox,
-.z-bandbox-input,
+.z-doublebox {
+    height: 24px;
+    padding-top: 4px;
+    padding-right: 5px;
+    padding-bottom: 3px;
+}
+
+.z-datebox-input {
+    height: 24px;
+    padding-top: 4px;
+    padding-right: 5px;
+    padding-bottom: 4px;
+}
+
+.z-bandbox-input {
+    height: 24px;
+    padding: 4px 5px;
+}
+
 .z-combobox-input,
-.z-datebox-input,
 .z-timebox-input {
-    height: 22px;
+    height: 24px;
     font-size: 12px;
-    padding: 2px 5px;
+    padding: 4px 5px;
 }
 
 .z-combobox,
@@ -2512,6 +2540,18 @@ textarea {
     padding-bottom: 3px;
     border-width: 1px;
     line-height: 14px;
+    box-shadow: none;
+}
+
+/* Breeze's borderlayout splitters (the thin draggable handles between
+ * <west>/<east>/<north>/<south> and <center>) use a flat background-color
+ * (#f9fcff). Sapphire uses a pale blue linear-gradient instead, shared
+ * identically across all four splitter classes. */
+.z-west-splitter,
+.z-east-splitter,
+.z-north-splitter,
+.z-south-splitter {
+    background: linear-gradient(to right, #e2f4fc 0%, #cbeafb 100%);
 }
 
 /* .icono buttons each sit alone in their own <td> and use a negative
@@ -2527,15 +2567,21 @@ textarea {
 
 /* .planner-command / .planner-icon buttons (the gantt toolbar's
  * show/hide-labels/progress/reported-hours icons) get a server- or
- * ZK-JS-computed inline style (e.g. style="width:46px; margin-right:-5px")
- * sized against Sapphire's narrower button box. That inline width no
- * longer matches Breeze's rendering and the negative margin then pulls
- * each button into its neighbor. Not !important in the inline style, so
- * a !important rule here can safely override it and let the button size
- * itself naturally from its (now-compact) padding/border/icon content. */
+ * ZK-JS-computed inline style (e.g. style="width:46px; margin-right:-5px"),
+ * inconsistently -- some of these buttons have it, some don't. It's sized
+ * against Sapphire's narrower button box and, under Breeze, produces a much
+ * wider box (46px) whose negative margin then pulls each button into its
+ * neighbor. Not !important in the inline style, so a !important rule here
+ * can safely neutralize it (width:auto) and let the button size itself
+ * from its padding/border/icon content instead -- which alone comes out
+ * to ~28x25, short of Sapphire's actual ~30.67x30 target. min-width/
+ * min-height restore that floor without reintroducing the inline width's
+ * overlap. */
 .planner-command.z-button,
 .planner-icon.z-button {
     width: auto !important;
+    min-width: 30px;
+    min-height: 30px;
     margin-right: 0 !important;
 }
 
