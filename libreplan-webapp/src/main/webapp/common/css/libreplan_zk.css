@@ -2474,14 +2474,46 @@ textarea {
 }
 
 /* Same Sapphire source (font-family:Arial,Sans-serif;font-size:12px;...)
- * also sets font-size:12px for these three header-content classes, vs
- * Breeze's 16px default. Data cells (.z-listcell-content etc.) already
- * have their own pre-existing 11px override elsewhere and don't need this. */
+ * also sets font-size:12px and line-height:24px for these three
+ * header-content classes, vs Breeze's font-size:16px/line-height:1.3em.
+ * Data cells (.z-listcell-content etc.) already have their own
+ * pre-existing 11px override elsewhere and don't need this. Note:
+ * .z-column-content itself also has such a pre-existing, higher-specificity
+ * app override (div.z-column-content{font-size:11px}, near the top of
+ * this file) that already wins over the font-size:12px set here whenever
+ * the element is a literal <div> -- which it normally is. Harmless
+ * (the override was only ever redundant, never wrong), left as-is rather
+ * than removed to keep this rule's three classes symmetric. */
 .z-listheader-content,
 .z-column-content,
 .z-treecol-content {
     font-size: 12px;
+    line-height: 24px;
     padding: 4px 5px 3px;
+}
+
+/* Same Sapphire grid.css.dsp rule that covers .z-column-content also
+ * covers .z-row-content (a table data row's cell content, as opposed to
+ * its header) with the same font-size:12px/line-height:24px, but a
+ * plain padding:4px 5px (no bold, no reduced 3px bottom -- that specific
+ * tweak is column-content/header-only in the source). Font-size isn't
+ * set here for the same reason as .z-column-content above: an existing
+ * higher-specificity app rule (div.z-row-content{font-size:11px})
+ * already governs it correctly. */
+.z-row-content {
+    line-height: 24px;
+    padding: 4px 5px;
+}
+
+/* Breeze's .z-column sets position:relative on the header <td> itself,
+ * but Sapphire additionally has .z-column .z-column-content{position:
+ * relative} for the inner content <div> specifically. This app relies on
+ * that inner position:relative for .timetrackergap .z-column-content{
+ * top:-7px} (nudging date/day numbers up within their cell) to have any
+ * effect -- without it, top is simply ignored on a statically positioned
+ * element, and the numbers render too low in the gantt timeline header. */
+.z-column .z-column-content {
+    position: relative;
 }
 
 /* Breeze's base menu/tab widgets assume a spacious modern UI:
@@ -2530,13 +2562,28 @@ textarea {
  *    left/right padding for its specific layout, and for the same
  *    equal-specificity/source-order reason, setting it here would
  *    silently override those more specific paddings instead of restoring
- *    Sapphire's sizing. */
+ *    Sapphire's sizing.
+ *
+ * DOES set background/color/border-color here, unlike the properties
+ * above: Sapphire's base .z-button is a neutral light gray/white
+ * gradient with black text and a gray border (no theme ever used blue
+ * for plain buttons); Breeze's base is color:#fff on background-color:
+ * #0093f9 (blue), assuming every button is a prominent call-to-action.
+ * Icon-only button groups with no background of their own (.icono,
+ * .planner-command, .planner-icon, the >>/<< pager buttons, ...) were
+ * inheriting that Breeze blue by default. Buttons that already set their
+ * own background (.add-button/.global-action's pale green, etc.) have
+ * higher-specificity two-class selectors and are unaffected. */
 .z-button {
     padding-top: 3px;
     padding-bottom: 3px;
     border-width: 1px;
     line-height: 14px;
     box-shadow: none;
+    color: #000;
+    border-color: #a9a9a9;
+    background: #fefefe;
+    background: linear-gradient(to bottom, #fefefe 0%, #eeeeee 100%);
 }
 
 /* Breeze's borderlayout splitters (the thin draggable handles between
@@ -2628,4 +2675,33 @@ textarea {
     padding: 4px;
     min-width: 24px;
     height: 24px;
+}
+
+/* Breeze's base .z-window is padding:16px on every side, and its
+ * .z-window-noborder mold doesn't touch padding at all, so it falls
+ * through to that same 16px. Sapphire's .z-window-noborder mold instead
+ * sets padding:4px 4px 0 (top=4, right=4, bottom=0, left=4). This app
+ * already has its own higher-specificity rule
+ * (.z-window.z-window-noborder.z-window-embedded, further up in this
+ * file) overriding just padding-left to 6px, which still applies
+ * correctly on top of this -- it only needs the other three sides
+ * restored here. */
+.z-window-noborder {
+    padding: 4px 4px 0;
+}
+
+/* Breeze's base .z-window-content is padding:16px, vs Sapphire's 4px for
+ * ordinary windows (e.g. the "Projects List" page's embedded window).
+ * Sapphire uses a taller 17px/15px padding specifically for messagebox
+ * dialogs (.z-messagebox-window.z-window-modal /.z-window-highlighted),
+ * so that distinction is restored too rather than flattening every
+ * window to the same padding. */
+.z-window-content {
+    padding: 4px;
+}
+
+.z-messagebox-window.z-window-modal .z-window-content,
+.z-messagebox-window.z-window-highlighted .z-window-content {
+    padding: 17px;
+    padding-bottom: 15px;
 }
