@@ -2040,22 +2040,22 @@ select {
 }
 
 /* Made for create buttons, because default ZK css is not work correctly for create button */
-.add-button {
+.add-button.z-button {
     background-color: #E4F3D9;
     background-image: none !important;
 }
 
-.add-button:hover {
+.add-button.z-button:hover {
     background: none;
     background-color: #C3EAAF;
 }
 
-.add-button:focus {
+.add-button.z-button:focus {
     background: none;
     background-color: #C3EAAF;
 }
 
-.add-button:disabled {
+.add-button.z-button:disabled {
     background: none;
     background-color: #C3EAAF !important;
 }
@@ -2684,6 +2684,30 @@ textarea {
     background: linear-gradient(to bottom, #fefefe 0%, #eeeeee 100%);
 }
 
+/* Breeze's own .z-button:focus{border-color:#ffa516} is a modern
+ * accessibility-style amber focus ring, replacing Sapphire's
+ * .z-button:focus{border-color:#00b9ff;...} (a blue border, verified
+ * against the reference deployment). This is a generic, theme-level
+ * rule covering every button, not just pale ones like .add-button --
+ * clicking any button (which triggers :focus, easy to run into just
+ * from ordinary mouse interaction, not only keyboard tabbing) shows the
+ * wrong amber border regardless of the button's own background-color
+ * fix. Matching Breeze's own bare .z-button:focus selector so this
+ * only needs to match its specificity, not outrank it. */
+.z-button:focus {
+    border-color: #00b9ff;
+}
+
+/* Same issue, hover state: Breeze's own .z-button:hover{border-color:
+ * transparent} makes the button's border disappear on mouseover,
+ * replacing Sapphire's .z-button:hover{border-color:#8fb9d0;...} (the
+ * same blue-gray used throughout this theme for tabs/panels/etc, kept
+ * visible rather than hidden). Generic, theme-level rule covering
+ * every button, not just .add-button. */
+.z-button:hover {
+    border-color: #8fb9d0;
+}
+
 /* Breeze's borderlayout splitters (the thin draggable handles between
  * <west>/<east>/<north>/<south> and <center>) use a flat background-color
  * (#f9fcff). Sapphire uses a pale blue linear-gradient instead, shared
@@ -2925,4 +2949,30 @@ input[type="checkbox"] {
 
 .z-tab-selected .z-tab-text:hover {
     color: #00547a;
+}
+
+/* Sapphire's groupbox.css.dsp sets .z-groupbox>.z-groupbox-header{
+ * font-size:12px;color:#00547a;...}, vs Breeze's own font-size:18px/
+ * color:rgba(0,0,0,0.57) -- both properties inherit down into the
+ * header's nested .z-caption/.z-caption-content (the actual caption
+ * text span), which is why e.g. Materials > "List of materials for all
+ * categories (select one to filter)" rendered much larger and in gray
+ * instead of this app's usual teal. Same selector/specificity as
+ * Breeze's own rule, so this only needs to match it, not outrank it.
+ *
+ * That alone isn't enough, though: Breeze's .z-caption{font-size:18px}
+ * (the actual caption widget, nested inside .z-groupbox-header) sets
+ * font-size directly on itself rather than inheriting the header's, so
+ * it still overrides the fix above regardless of the header's own
+ * computed value. Sapphire's caption.css.dsp has the same bare
+ * .z-caption{font-size:12px;...} selector (color isn't set here --
+ * Sapphire's .z-caption never sets color, only the groupbox-header
+ * fix above does, and nothing on .z-caption itself competes with it). */
+.z-groupbox > .z-groupbox-header {
+    font-size: 12px;
+    color: #00547a;
+}
+
+.z-caption {
+    font-size: 12px;
 }
