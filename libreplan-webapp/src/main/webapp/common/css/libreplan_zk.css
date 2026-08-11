@@ -3003,6 +3003,8 @@ textarea {
 input[type="checkbox"] {
     -webkit-appearance: checkbox;
     appearance: auto;
+    width: 14px;
+    height: 14px;
 }
 
 /* Sapphire's window.css.dsp sets .z-label{color:#00547a} (unqualified,
