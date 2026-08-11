@@ -3214,6 +3214,21 @@ input[type="radio"]:hover {
     padding: 2px;
 }
 
+/* Sapphire's a.css.dsp sets .z-a{font-size:12px} only -- no color at
+ * all, letting a plain <a href> fall back to the browser's own native
+ * link color. Breeze's own explicitly sets font-size:16px/color:
+ * #0093f9. Visible e.g. on Configuration > Job Scheduling > Create,
+ * the "click here" link under the cron expression help text (a plain
+ * <a href> with no app-specific sclass, so nothing else styles it).
+ * color:revert (not initial/unset) specifically rolls back to the
+ * user-agent stylesheet's own :link color instead of black (initial)
+ * or the inherited surrounding text color (unset/inherit) -- matching
+ * what "simply never setting color" actually renders as in a browser. */
+.z-a {
+    font-size: 12px;
+    color: revert;
+}
+
 /* Breeze's own icon-font rule is broad: [class^="z-icon-"],[class*="
  * z-icon-"]{font-family:ZK85Icons,FontAwesome;...}, matching every
  * .z-icon-* class in the app via an attribute selector (specificity
