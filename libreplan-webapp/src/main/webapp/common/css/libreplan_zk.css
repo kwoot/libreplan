@@ -3162,6 +3162,24 @@ input[type="radio"]:hover {
     border: 1px solid #900;
 }
 
+/* Sapphire's combo.css.dsp sets .z-comboitem,.z-comboitem-button,
+ * .z-comboitem a,.z-comboitem a:visited{font-size:12px;...} (the
+ * dropdown option rows in a combobox/bandbox popup) -- Breeze's own is
+ * font-size:16px on the same selectors. Matching Breeze's selectors so
+ * this only needs to match specificity, not outrank it. */
+.z-comboitem,
+.z-comboitem-button,
+.z-comboitem a,
+.z-comboitem a:visited {
+    font-size: 12px;
+}
+
+/* Same Sapphire rule also sets .z-comboitem{padding:3px 2px;...}
+ * (3px top/bottom, 2px left/right), vs Breeze's own padding:4px 8px. */
+.z-comboitem {
+    padding: 3px 2px;
+}
+
 /* Breeze's own icon-font rule is broad: [class^="z-icon-"],[class*="
  * z-icon-"]{font-family:ZK85Icons,FontAwesome;...}, matching every
  * .z-icon-* class in the app via an attribute selector (specificity
