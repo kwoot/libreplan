@@ -3140,3 +3140,33 @@ input[type="checkbox"] {
     color: #900;
     border: 1px solid #900;
 }
+
+/* Breeze's own icon-font rule is broad: [class^="z-icon-"],[class*="
+ * z-icon-"]{font-family:ZK85Icons,FontAwesome;...}, matching every
+ * .z-icon-* class in the app via an attribute selector (specificity
+ * equivalent to one class). ZK85Icons is tried first and, having its
+ * own glyph at the same codepoint (\f073) as FontAwesome's calendar,
+ * wins over the FontAwesome fallback. Restricting the font stack to
+ * FontAwesome only for the datebox calendar icon specifically (two
+ * classes, higher specificity than the attribute-selector rule, so no
+ * need to touch other .z-icon-* icons). */
+.z-datebox-icon.z-icon-calendar {
+    font-family: FontAwesome;
+    font-size: 14px;
+}
+
+/* Breeze's .z-datebox-button relies on padding+line-height to position
+ * its icon (padding:6px 8px 0, then a later rule overrides just
+ * padding-top to 8px -- an asymmetric 8px top/0 bottom split that
+ * happened to roughly line up with the icon's original font-size:22px
+ * glyph metrics). Shrinking the icon to 14px above leaves it sitting
+ * ~3px below true center against that same asymmetric padding.
+ * Switching the button to flex centering positions the icon relative
+ * to the button's actual box instead of leftover padding math --
+ * robust regardless of icon font-size. inline-flex (not flex) to keep
+ * it sitting inline next to the datebox input as before. */
+.z-datebox-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
