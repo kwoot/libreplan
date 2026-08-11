@@ -3177,7 +3177,41 @@ input[type="radio"]:hover {
 /* Same Sapphire rule also sets .z-comboitem{padding:3px 2px;...}
  * (3px top/bottom, 2px left/right), vs Breeze's own padding:4px 8px. */
 .z-comboitem {
-    padding: 3px 2px;
+    padding: 2px 2px;
+    min-height: 18px;
+}
+
+/* Sapphire's combo.css.dsp never sets a line-height on .z-comboitem-
+ * text at all -- it just inherits the browser's normal default for a
+ * 12px font. Breeze's own explicitly sets line-height:18px, which is
+ * the actual regression. A prior version of this rule used line-
+ * height:normal to mirror "no rule at all" literally, but a direct
+ * side-by-side line count test (drawing a fixed-size box on screen:
+ * Sapphire fit 7 rows, this fit only 6) showed normal doesn't
+ * reproduce Sapphire's actual compactness -- browser-default line-
+ * height for "normal" depends on which font in the stack actually
+ * gets used, and can render taller than Sapphire's effective result
+ * if a different fallback font is picked. Pinning an explicit,
+ * deterministic value sidesteps that font-dependent variance. */
+.z-comboitem-text {
+    line-height: 13px;
+}
+
+/* Sapphire's combo.css.dsp also covers the popup container itself:
+ * .z-combobox-popup,.z-bandbox-popup,.z-datebox-popup,.z-timebox-
+ * popup{font-size:12px;border:1px solid #8fb9d0;padding:2px;...} --
+ * Breeze's own is font-size:16px/border:1px solid #0093f9/border-
+ * radius:4px/padding:4px 8px. The extra padding alone (4px+4px
+ * vertical vs 2px+2px) eats into how many rows fit in the popup's
+ * available height, compounding the per-row line-height issue above. */
+.z-combobox-popup,
+.z-bandbox-popup,
+.z-datebox-popup,
+.z-timebox-popup {
+    font-size: 12px;
+    border: 1px solid #8fb9d0;
+    border-radius: 0;
+    padding: 2px;
 }
 
 /* Breeze's own icon-font rule is broad: [class^="z-icon-"],[class*="
