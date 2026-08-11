@@ -3005,6 +3005,25 @@ input[type="checkbox"] {
     appearance: auto;
     width: 14px;
     height: 14px;
+    accent-color: #2a83b4;
+}
+
+/* Breeze's own radio button (a custom appearance:none widget, not
+ * native) uses its standard accent blue #0093f9 for the checked
+ * border/fill and hover border. Deliberate new styling choice (not a
+ * Sapphire restoration -- Sapphire never shipped radio styling either,
+ * same as checkboxes) to match this app's own active-menu-tab blue
+ * (#2a83b4, .current-section .z-menu-content's background) instead. */
+input[type="radio"]:checked {
+    border-color: #2a83b4;
+}
+
+input[type="radio"]:checked:before {
+    background-color: #2a83b4;
+}
+
+input[type="radio"]:hover {
+    border-color: #2a83b4;
 }
 
 /* Sapphire's window.css.dsp sets .z-label{color:#00547a} (unqualified,
