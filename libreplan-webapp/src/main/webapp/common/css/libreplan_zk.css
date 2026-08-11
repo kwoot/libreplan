@@ -3127,3 +3127,16 @@ input[type="checkbox"] {
 .z-groupbox-3d > .z-groupbox-content {
     padding: 5px;
 }
+
+/* Sapphire's input.css.dsp sets .z-errorbox-content{color:#900;
+ * border:1px solid #900;...} (the validation-error popup shown under
+ * an invalid input field) -- Breeze's own is color:#ff4051/border:1px
+ * solid transparent (relying on its background:#ffeaec + border-
+ * radius:4px for the "error" look instead of a solid border). Only
+ * border/color restored here, matching what was asked; Breeze's other
+ * differences (background, padding, border-radius, missing box-shadow)
+ * are left as-is. */
+.z-errorbox-content {
+    color: #900;
+    border: 1px solid #900;
+}
