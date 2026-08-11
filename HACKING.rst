@@ -17,7 +17,13 @@ Compilation requirements
 
 * *Maven 3* - Java software project management and comprehension tool
 
-  Needed to build and compile the project
+  You do **not** need to install this yourself anymore. The repository ships
+  a Maven Wrapper (``mvnw`` / ``mvnw.cmd``) pinned to a known-good Maven
+  version, which downloads and uses that exact version automatically the
+  first time you run it. Everywhere this guide shows an ``mvn`` command, run
+  ``./mvnw`` (or ``mvnw.cmd`` on Windows) from the same directory instead. A
+  separately installed system Maven still works if you prefer it, but is no
+  longer required.
 
 * *JDK 11* - Java Development Kit
 
@@ -70,7 +76,7 @@ Debian/Ubuntu
 
 * Install requirements::
 
-    # apt-get install git-core maven openjdk-11-jdk postgresql postgresql-client python3-docutils make gettext cutycapt wkhtmltopdf
+    # apt-get install git-core openjdk-11-jdk postgresql postgresql-client python3-docutils make gettext cutycapt wkhtmltopdf
 
 * Set default OpenJDK version (required for Ubuntu 24.04 and newer)::
 
@@ -93,12 +99,12 @@ Debian/Ubuntu
 * Compile project::
 
     $ cd libreplan/
-    $ mvn clean install
+    $ ./mvnw clean install
 
 * Launch application::
 
     $ cd libreplan-webapp/
-    $ mvn jetty:run
+    $ ../mvnw jetty:run
 
 * Alternatively start application as systemd service::
 
@@ -111,7 +117,7 @@ Debian/Ubuntu
     [Service]
     Type=simple
     WorkingDirectory=/root/libreplan/libreplan-webapp
-    ExecStart=/usr/bin/mvn jetty:run
+    ExecStart=/root/libreplan/mvnw jetty:run
     Restart=always
 
     [Install]
@@ -128,7 +134,7 @@ Fedora (needs update)
 
 * Install requirements::
 
-    # yum install git maven java-1.11.0-openjdk-devel postgresql postgresql-server python3-docutils make gettext gnu-free-fonts-compat wkhtmltopdf
+    # yum install git java-1.11.0-openjdk-devel postgresql postgresql-server python3-docutils make gettext gnu-free-fonts-compat wkhtmltopdf
 
 * Start database service::
 
@@ -158,12 +164,12 @@ Fedora (needs update)
 * Compile project::
 
     $ cd libreplan/
-    $ mvn clean install
+    $ ./mvnw clean install
 
 * Launch application::
 
     $ cd libreplan-webapp/
-    $ mvn jetty:run
+    $ ../mvnw jetty:run
 
 * Go to http://localhost:8080/
 
@@ -174,17 +180,8 @@ openSUSE (needs update)
 
     # zypper install git-core java-1_11_0-openjdk-devel postgresql-server postgresql docutils make gettext-tools wkhtmltopdf
 
-* Install Maven::
-
-    # cd /opt/
-    # wget http://www.apache.org/dist//maven/binaries/apache-maven-3.0.5-bin.tar.gz
-    # tar -xzvf apache-maven-3.0.5-bin.tar.gz
-
-  Edit ``/etc/bash.bashrc.local`` and add the following lines::
-
-    export M2_HOME=/opt/apache-maven-3.0.5
-    export MVN=$M2_HOME/bin
-    export PATH=$MVN:$PATH
+  A separate Maven install is no longer needed — the project's ``./mvnw``
+  wrapper downloads a known-good Maven version on first use.
 
 * Start database service::
 
@@ -219,12 +216,12 @@ openSUSE (needs update)
 * Compile project::
 
     $ cd libreplan/
-    $ mvn clean install
+    $ ./mvnw clean install
 
 * Launch application::
 
     $ cd libreplan-webapp/
-    $ mvn jetty:run
+    $ ../mvnw jetty:run
 
 * Go to http://localhost:8080/
 
@@ -271,13 +268,8 @@ Microsoft Windows
 
     # https://git-scm.com/download/win
 
-* Download Maven
-
-    # https://maven.apache.org/download.cgi
-
-.. WARNING::
-
-    Check if latest Maven version is compatible with your JDK
+  A separate Maven install is not needed — the project's ``mvnw.cmd``
+  wrapper downloads a known-good Maven version on first use.
 
 * Connect to database::
 
@@ -324,14 +316,10 @@ Microsoft Windows
 
     # You need to set it to your JDK installed directory (e.g. C:\Program Files\Java\jdk1.11.0_111)
 
-* Add path of unpacked distributions bin directory of Maven to 'Path' environment variable
-
-    # (e.g. C:/Program Files/apache-maven-3.3.3/bin)
-
 * Compile project::
 
     # cd libreplan
-    # mvn clean install
+    # mvnw.cmd clean install
 
 * Launch application::
 
@@ -457,11 +445,11 @@ command. For example:
 
 * Deactivate *reports*, *userguide* and *i18n* to save compilation time::
 
-    mvn -P-reports,-userguide,-i18n clean install
+    ./mvnw -P-reports,-userguide,-i18n clean install
 
 * Use production environment::
 
-    mvn -Pprod,postgresql clean install
+    ./mvnw -Pprod,postgresql clean install
 
 
 Compilation options
@@ -495,15 +483,15 @@ example:
 
 * Set *default.passwordsControl* to ``false``::
 
-    mvn -Ddefault.passwordsControl=false clean install
+    ./mvnw -Ddefault.passwordsControl=false clean install
 
 * Set *default.passwordsControl* and *default.exampleUsersDisabled* to false::
 
-    mvn -Ddefault.passwordsControl=false -Ddefault.exampleUsersDisabled=false clean install
+    ./mvnw -Ddefault.passwordsControl=false -Ddefault.exampleUsersDisabled=false clean install
 
 * Set *default.emailSendingEnabled* to false::
 
-    mvn -Ddefault.emailSendingEnabled=false clean install
+    ./mvnw -Ddefault.emailSendingEnabled=false clean install
 
 Tests
 -----
@@ -515,7 +503,7 @@ pushing a patch.
 
 ::
 
-  mvn -DskipTests clean install
+  ./mvnw -DskipTests clean install
 
 
 MySQL (Deprecated)
@@ -533,12 +521,12 @@ For MySQL users here are specific instructions.
 
 * Compile project::
 
-    $ mvn -Pdev,mysql clean install
+    $ ./mvnw -Pdev,mysql clean install
 
 * Launch application::
 
     $ cd libreplan-webapp/
-    $ mvn -Pdev,mysql jetty:run
+    $ ../mvnw -Pdev,mysql jetty:run
 
 * Go to http://localhost:8080/libreplan-webapp/
 
