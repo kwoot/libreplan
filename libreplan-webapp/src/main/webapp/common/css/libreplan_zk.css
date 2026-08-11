@@ -2135,8 +2135,14 @@ textarea {
     margin: 0 10px 10px 10px;
 }
 
+/* This -4px nudge (2016, pre-dates both themes) was tuned against
+ * Sapphire's original .z-groupbox-3d caption box model to visually
+ * center the label. Now that the caption's own padding/height are
+ * restored to match Sapphire exactly (see .z-groupbox-3d rules below),
+ * the caption already sits correctly centered on its own -- this old
+ * manual offset just pushes it back off-center again. */
 .more-options-label {
-    top: -4px !important;
+    top: 0 !important;
     padding-left: 6px !important;
 }
 
@@ -2461,6 +2467,17 @@ textarea {
     border-bottom: 1px solid #8fb9d0;
 }
 
+/* .z-grid-header-border is a separate, empty divider <div> both themes
+ * insert between the grid's header row and its first data row (not
+ * part of any .z-column/.z-listheader cell above). Sapphire colors it
+ * the same muted #8fb9d0 as every other grid/table border; Breeze uses
+ * a much more saturated accent blue (#0064ed), e.g. visible as a
+ * conspicuous bright line under the header on Cost > Timesheets
+ * Templates and any other sortable grid. */
+.z-grid-header-border {
+    border-bottom-color: #8fb9d0;
+}
+
 .z-listheader-content,
 .z-listheader-sorticon,
 .z-listheader-sorticon i,
@@ -2706,6 +2723,84 @@ textarea {
  * every button, not just .add-button. */
 .z-button:hover {
     border-color: #8fb9d0;
+}
+
+/* Sapphire's panel.css.dsp sets .z-panel-header{font-size:12px;color:
+ * #00547a;padding:3px 0 5px 0;line-height:24px;background:#b6e1ea}.
+ * Breeze's own is font-size:18px/padding:16px (all sides)/line-height:
+ * 24px/color:rgba(0,0,0,0.57), no background -- the 16px+24px+16px=56px
+ * total is exactly why .z-panel-head measured 56px tall instead of
+ * Sapphire's 3px+24px+5px=32px (this header IS the head's only child
+ * and drives its height), e.g. Quality Forms > [a form] > "Quality
+ * form items list" panel header. */
+.z-panel-header {
+    font-size: 12px;
+    color: #00547a;
+    padding: 3px 0 5px 0;
+    line-height: 24px;
+    background: #b6e1ea;
+}
+
+/* Sapphire's .z-panel itself (the outermost wrapper, one level above
+ * .z-panel-head) is bare -- {overflow:hidden;zoom:1}, no border/
+ * background/radius of its own at all. The "frame" look instead comes
+ * entirely from .z-panel-head (top-rounded border, fixed above) and
+ * .z-panel-body (bottom-rounded border) stacking together; for
+ * .z-panel-noframe specifically, Sapphire strips the body's border
+ * too (matched separately below), leaving only the head's frame
+ * visible. Breeze's own .z-panel{border:1px solid #a8a8a8;background:
+ * #f9fcff;border-radius:4px} puts a SECOND, redundant border/
+ * background/radius directly on this outer wrapper -- with no
+ * Sapphire equivalent to strip it back off for .z-panel-noframe (or
+ * any panel), it was left showing on every panel regardless of frame
+ * style, most visibly as an unwanted gray border around noframe
+ * panels that should have none. */
+.z-panel {
+    border: 0;
+    background: transparent;
+    border-radius: 0;
+}
+
+/* .z-panel-head (the outer header container -- distinct from
+ * .z-panel-header just above, which is the inner text run) carries
+ * ALL of the header's visual chrome in Sapphire: border:1px solid
+ * #8fb9d0, border-radius:4px 4px 0 0 (rounding only the top corners,
+ * to match .z-panel's own rounded frame), padding:5px 5px 1px, the
+ * same background:#b6e1ea as .z-panel-header (redundant/layered by
+ * design, both wrapper and content paint it), and an inset white
+ * box-shadow along the top edge for a subtle bevel/highlight. Breeze's
+ * own .z-panel-head{overflow:hidden} carries none of this -- only
+ * box-sizing:border-box comes from an unrelated global reset -- so the
+ * header rendered as a flat, borderless, unpadded strip. */
+.z-panel-head {
+    border: 1px solid #8fb9d0;
+    border-radius: 4px 4px 0 0;
+    padding: 5px 5px 1px;
+    background: #b6e1ea;
+    box-shadow: inset 0 1px 1px #fff;
+}
+
+/* Sapphire also has a higher-specificity .z-panel-noframe .z-panel-
+ * body{padding:0;...} (a plain-content panel variant with no visible
+ * frame/border, used by the Quality Forms items-list panel above) that
+ * beats this app's own ancient, unscoped .z-panel-body{padding:10px}
+ * rule (dates to 2011, in navalpro_zk.css -- this app's LibrePlan
+ * ancestor -- long predating both themes). Breeze has NO .z-panel-
+ * noframe styling at all, so nothing here ever opposed that old 10px
+ * rule, and it applied unopposed. Matching Sapphire's exact selector
+ * restores the win. */
+.z-panel-noframe .z-panel-body {
+    padding: 0;
+}
+
+/* Sapphire's .z-panelchildren (the actual content-holding element
+ * inside .z-panel-body) never sets padding at all -- {border:1px solid
+ * #8fb9d0;background:#fff;position:relative;overflow:hidden;zoom:1},
+ * defaulting to 0. Breeze's own adds padding:16px. Matching Sapphire's
+ * plain selector, generic app-wide like the other .z-panel* fixes
+ * above. */
+.z-panelchildren {
+    padding: 0;
 }
 
 /* Breeze's borderlayout splitters (the thin draggable handles between
@@ -2975,4 +3070,60 @@ input[type="checkbox"] {
 
 .z-caption {
     font-size: 12px;
+}
+
+/* The "3d" groupbox mold (.z-groupbox-3d) is used by this app for a
+ * few button-like clickable/collapsible boxes, e.g. the "More options"
+ * toggle on Cost > Timesheet Lines List's filter bar (sclass
+ * "filter-more-options"). Breeze's own .z-groupbox-3d>.z-groupbox-
+ * header .z-caption{padding:12px 16px;line-height:24px} makes the
+ * caption 12+24+12=48px tall; Sapphire's equivalent selector is
+ * padding:0 (same line-height:24px, so just 24px tall). This app's own
+ * .filter-more-options .z-groupbox-header{height:24px} rule assumed
+ * Sapphire's unpadded 24px caption would fit exactly -- under Breeze
+ * the 48px caption overflowed that fixed 24px box by half its own
+ * height, pushing the "More options" label out below the visible
+ * border instead of centering inside it. Matching Breeze's own
+ * selector so this only needs to match its specificity, not outrank
+ * it. */
+.z-groupbox-3d > .z-groupbox-header .z-caption,
+.z-groupbox-3d > .z-groupbox-header .z-groupbox-title {
+    padding: 0;
+}
+
+/* Same "3d" groupbox mold, the header box itself this time: Sapphire's
+ * .z-groupbox-3d>.z-groupbox-header sets font-weight:bold, border-
+ * bottom:1px solid #8fb9d0, and the same pale blue gradient background
+ * (#e7f6fd to #c6e9fa) used for tabs/column headers elsewhere in this
+ * theme -- reading as a proper pill-shaped button. Breeze's own sets
+ * no background at all (transparent, showing white/page background
+ * through) and a plain gray border, with normal (non-bold) text --
+ * verified against the reference deployment, where "More options"
+ * renders as a solid pale-blue pill, not the flat white/gray box seen
+ * here. */
+.z-groupbox-3d > .z-groupbox-header {
+    font-weight: bold;
+    border-bottom: 1px solid #8fb9d0;
+    background: #e7f6fd;
+    background: linear-gradient(to bottom, #e7f6fd 0%, #c6e9fa 100%);
+}
+
+/* Sapphire's .z-groupbox-content{padding:5px} (uniform), vs Breeze's
+ * own padding:8px 16px 16px. Generic, theme-level -- covers every
+ * groupbox's content area, e.g. both the "Filter timesheet lines by"
+ * box and the hidden panel "More options" expands to reveal. */
+.z-groupbox-content {
+    padding: 5px;
+}
+
+/* Breeze has a SEPARATE, more specific .z-groupbox-3d>.z-groupbox-
+ * content{padding:16px} for the 3d mold specifically (0,2,0 vs the
+ * plain .z-groupbox-content fix above at 0,1,0) -- that specificity
+ * wins over the fix above regardless of file order, so the "More
+ * options" panel (a .z-groupbox-3d) was still showing 16px. Sapphire
+ * has no such override for the 3d variant at all, so its plain
+ * .z-groupbox-content{padding:5px} was never opposed there either.
+ * Matching Breeze's own selector/specificity to close that gap. */
+.z-groupbox-3d > .z-groupbox-content {
+    padding: 5px;
 }
