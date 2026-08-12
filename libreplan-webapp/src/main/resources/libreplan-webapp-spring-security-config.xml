@@ -15,6 +15,23 @@
 
     for an explanation of the meaning of IS_AUTHENTICATED_ANONYMOUSLY and IS_AUTHENTICATED_FULLY. -->
 
+    <!--
+    ZK's own AU (Ajax Update) request URLs use ";" to encode metadata inline in the path
+    (e.g. desktop/component ids). Spring Security's default StrictHttpFirewall rejects any
+    URL containing ";" with a RequestRejectedException, which broke every ZK AU request once
+    Spring Security was upgraded as part of the JDK 25 migration - see
+    jdk25-migration-baseline/CHANGES-and-WHY.md. Using a StrictHttpFirewall with only
+    allowSemicolon relaxed (rather than switching to the permissive DefaultHttpFirewall)
+    keeps every other StrictHttpFirewall protection - URL-encoded slash/backslash, null
+    bytes, etc. - in place; only the one check ZK's own URL scheme needs is loosened.
+    -->
+    <beans:bean id="allowSemicolonHttpFirewall"
+        class="org.springframework.security.web.firewall.StrictHttpFirewall">
+        <beans:property name="allowSemicolon" value="true" />
+    </beans:bean>
+
+    <http-firewall ref="allowSemicolonHttpFirewall" />
+
     <http auto-config="false" realm="LibrePlan Web Application" >
 
         <!-- In Spring Security 4.1.0 it is useless to use hasRole() for single role because Spring is calling hasAnyRole() anyway -->
