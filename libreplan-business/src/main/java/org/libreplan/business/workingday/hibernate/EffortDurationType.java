@@ -28,7 +28,7 @@ import java.sql.Types;
 import java.util.Objects;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.usertype.UserType;
 import org.libreplan.business.workingday.EffortDuration;
@@ -60,7 +60,7 @@ public class EffortDurationType implements UserType {
 
     @Override
     public Object nullSafeGet(ResultSet rs, String[] names,
-            SessionImplementor session, Object owner)
+            SharedSessionContractImplementor session, Object owner)
             throws HibernateException, SQLException {
         Integer seconds = StandardBasicTypes.INTEGER.nullSafeGet(rs, names[0],
                 session);
@@ -72,7 +72,7 @@ public class EffortDurationType implements UserType {
 
     @Override
     public void nullSafeSet(PreparedStatement st, Object value, int index,
-            SessionImplementor session) throws HibernateException, SQLException {
+            SharedSessionContractImplementor session) throws HibernateException, SQLException {
         EffortDuration duration = (EffortDuration) value;
         Integer seconds = duration != null ? duration.getSeconds() : null;
         StandardBasicTypes.INTEGER.nullSafeSet(st, seconds, index, session);

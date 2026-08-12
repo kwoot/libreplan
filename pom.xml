@@ -40,7 +40,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- JDK 11->25 migration: bump this one property per phase (see JDK25_MIGRATION_PLAN.md) -->
-        <maven.compiler.release>8</maven.compiler.release>
+        <maven.compiler.release>17</maven.compiler.release>
 
         <jetty-port>8080</jetty-port>
         <jetty-stop-port>9967</jetty-stop-port>
@@ -266,20 +266,20 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
-                <version>5.1.1.Final</version>
+                <version>5.6.15.Final</version>
             </dependency>
 
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-ehcache</artifactId>
-                <version>5.1.0.Final</version>
+                <version>5.6.15.Final</version>
             </dependency>
 
             <!-- Hibernate Validator -->
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
-                <version>5.3.6.Final</version>
+                <version>6.2.5.Final</version>
             </dependency>
 
             <!-- Javax EL (needed for javax validation) -->
@@ -293,7 +293,7 @@
             <dependency>
               <groupId>org.jadira.usertype</groupId>
               <artifactId>usertype.core</artifactId>
-              <version>5.0.0.GA</version>
+              <version>6.0.1.GA</version>
                   <exclusions>
                     <exclusion>
                         <groupId>org.hibernate</groupId>
@@ -328,14 +328,14 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-orm</artifactId>
-                <version>4.3.9.RELEASE</version>
+                <version>5.3.39</version>
             </dependency>
 
             <!-- Spring Web -->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>4.3.9.RELEASE</version>
+                <version>5.3.39</version>
             </dependency>
 
             <!--
@@ -354,38 +354,38 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context-support</artifactId>
-                <version>4.3.9.RELEASE</version>
+                <version>5.3.39</version>
             </dependency>
 
             <!--  Spring security -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-web</artifactId>
-                <version>4.2.3.RELEASE</version>
+                <version>5.8.16</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-config</artifactId>
-                <version>4.2.3.RELEASE</version>
+                <version>5.8.16</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-acl</artifactId>
-                <version>4.2.3.RELEASE</version>
+                <version>5.8.16</version>
             </dependency>
 
             <!-- Spring Dependency LDAP -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-ldap</artifactId>
-                <version>4.2.3.RELEASE</version>
+                <version>5.8.16</version>
             </dependency>
 
             <!-- Spring test -->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
-                <version>4.3.9.RELEASE</version>
+                <version>5.3.39</version>
                 <scope>test</scope>
             </dependency>
 
@@ -405,18 +405,18 @@
                 <scope>test</scope>
             </dependency>
 
-            <!-- Easy mock -->
+            <!--
+            Easy mock. easymockclassextension used to be a separate artifact for mocking
+            concrete classes (via a bundled CGLIB); that capability was merged into the core
+            easymock artifact back in 3.2, and nothing in this codebase imports the old
+            org.easymock.classextension package, so it was dropped entirely as part of the
+            JDK 25 migration rather than just bumped - see
+            jdk25-migration-baseline/CHANGES-and-WHY.md.
+            -->
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
-                <version>3.4</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.easymock</groupId>
-                <artifactId>easymockclassextension</artifactId>
-                <version>3.2</version>
+                <version>5.6.0</version>
                 <scope>test</scope>
             </dependency>
 

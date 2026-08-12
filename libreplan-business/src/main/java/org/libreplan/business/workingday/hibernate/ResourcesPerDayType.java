@@ -29,7 +29,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.usertype.UserType;
 import org.libreplan.business.workingday.ResourcesPerDay;
@@ -87,7 +87,7 @@ public class ResourcesPerDayType implements UserType {
 
     @Override
     public Object nullSafeGet(ResultSet rs, String[] names,
-            SessionImplementor session, Object owner)
+            SharedSessionContractImplementor session, Object owner)
             throws HibernateException, SQLException {
         BigDecimal bigDecimal = (BigDecimal) StandardBasicTypes.BIG_DECIMAL
                 .nullSafeGet(rs, names[0], session);
@@ -99,7 +99,7 @@ public class ResourcesPerDayType implements UserType {
 
     @Override
     public void nullSafeSet(PreparedStatement st, Object value, int index,
-            SessionImplementor session) throws HibernateException, SQLException {
+            SharedSessionContractImplementor session) throws HibernateException, SQLException {
         BigDecimal amount = null;
         if (value != null) {
             amount = ((ResourcesPerDay) value).getAmount();
