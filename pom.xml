@@ -39,7 +39,19 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- JDK 11->25 migration: bump this one property per phase (see JDK25_MIGRATION_PLAN.md) -->
+        <!--
+            JDK 11->25 migration (see JDK25_MIGRATION_PLAN.md). Deliberately capped at 21,
+            NOT 25: Spring Framework 5.3.x (the last javax-namespace generation this project
+            is staying on, an EOL branch that won't be patched further) bundles its own
+            private, shaded copy of ASM inside spring-core.jar for classpath component
+            scanning - not a swappable dependency - and that bundled ASM cannot parse Java
+            25's class file format (major version 69) at all. This does NOT block reaching
+            JDK 25 as the actual goal: a JDK 25 JVM runs class-file-version-65 (release 21)
+            bytecode natively, so the app still genuinely runs on JDK 25 end to end (build,
+            test, deploy) - only the bytecode format itself stays one notch back, which is
+            invisible to everything except Spring's own bundled tooling. See
+            jdk25-migration-baseline/CHANGES-and-WHY.md for the full reasoning.
+        -->
         <maven.compiler.release>21</maven.compiler.release>
 
         <jetty-port>8080</jetty-port>
@@ -346,8 +358,14 @@
             <!-- AspectJ Weaver -->
             <dependency>
                 <groupId>org.aspectj</groupId>
+                <!--
+                    1.8.9's jar has a zip64 extra field JDK 25's stricter zip reader
+                    rejects outright ("Invalid CEN header (invalid zip64 extra data field
+                    size)") even though older JDKs and independent zip tools read it fine -
+                    see jdk25-migration-baseline/CHANGES-and-WHY.md. Bumped past that.
+                -->
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.8.9</version>
+                <version>1.9.25</version>
             </dependency>
 
             <!-- Spring context support -->
