@@ -40,7 +40,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- JDK 11->25 migration: bump this one property per phase (see JDK25_MIGRATION_PLAN.md) -->
-        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.release>21</maven.compiler.release>
 
         <jetty-port>8080</jetty-port>
         <jetty-stop-port>9967</jetty-stop-port>
@@ -418,6 +418,25 @@
                 <artifactId>easymock</artifactId>
                 <version>5.6.0</version>
                 <scope>test</scope>
+            </dependency>
+
+            <!--
+                Hibernate 5.6.15 declares net.bytebuddy:byte-buddy:1.12.18 as a compile-scope
+                dependency, which wins Maven's "nearest declaration" mediation over the newer
+                1.17.5 EasyMock itself prefers (test-scope, further down the tree) - confirmed
+                with `dependency:tree -Dverbose`. 1.12.18 predates full JDK 21 support: under
+                JDK 21, EasyMock's ByteBuddy-based class mocking fails with
+                "IllegalArgumentException: ...$$$EasyMock$1 must be defined in the same
+                package as org.easymock.internal.ClassProxyFactory" (a ByteBuddy
+                Lookup-based class-injection issue, reproduced and root-caused directly - see
+                jdk25-migration-baseline/CHANGES-and-WHY.md). Forcing a current version
+                reactor-wide fixes it for every module, not just wherever EasyMock's own
+                declaration happens to win the conflict.
+            -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>1.18.11</version>
             </dependency>
 
             <!-- Commons Collections -->
