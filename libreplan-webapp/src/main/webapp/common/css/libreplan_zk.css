@@ -2859,6 +2859,19 @@ textarea {
     background: transparent;
 }
 
+/* Same tbody-transparency trap, different button group: this app's own
+ * .toolbar-box .z-button tbody{background-color:transparent} (above)
+ * only ever neutralized the trendy-mold button's inner <tbody> -- dead
+ * under Breeze, which has no tbody at all -- so the plain .z-button
+ * compat rule's opaque gray/white gradient now paints directly on
+ * these buttons too. Visible e.g. on the "Create New Project" icon
+ * button (sclass "planner-icon", inside a .toolbar-box), which used to
+ * have a transparent background letting the surrounding panel color
+ * show through around the icon image, not a solid white box. */
+.toolbar-box .z-button {
+    background: transparent;
+}
+
 /* Breeze's own base .z-button:hover sets background-color:#4fb7ff (a
  * vivid blue), part of a theme-wide assumption that buttons are
  * prominent call-to-actions. Sapphire's trendy-mold buttons instead
