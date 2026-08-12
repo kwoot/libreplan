@@ -446,25 +446,30 @@ plan. **Phase 4 complete.**
 
 ## Phase 5 — Jakarta EE namespace migration (stretch, do after Phase 4)
 
-Not required to reach JDK 25 — Spring 5.3.x / Hibernate 5.6.x / CXF 3.5.x /
-Tomcat 9 all run on JDK 25 while still speaking `javax.*`. But those are the
-**last** javax-generation releases; they're increasingly EOL and won't get
-further CVE patches indefinitely. Flagging as explicit follow-on work so it
-doesn't get silently forgotten once "JDK 25" is checked off:
+Not required to reach JDK 25 as a *runtime* — Spring 5.3.x / Hibernate
+5.6.x / CXF 3.5.x / Tomcat 9 all run on a JDK 25 JVM while still speaking
+`javax.*`, and Phase 4 proved that. But it turned out to matter more than
+"just EOL risk": Spring 5.3.x's own bundled ASM can't parse Java 25 class
+files at all, which is exactly why Phase 4 had to cap
+`maven.compiler.release` at 21 instead of reaching 25 — see Phase 4 step 1
+and `jdk25-migration-baseline/CHANGES-and-WHY.md` §11b. Spring 6 is the
+only real fix for that specific gap.
 
-- Spring 5 → Spring 6 (`javax.*` → `jakarta.*`)
-- Hibernate 5 → Hibernate 6
-- CXF 3 → CXF 4
-- Servlet 4 → Servlet 5/6 (Tomcat 9 → Tomcat 10/11)
-- Every `javax.*` import in application code (annotations, JPA, servlet,
-  validation, JAXB) needs mechanical renaming — likely scriptable with
-  OpenRewrite's Jakarta EE recipes rather than by hand.
-- ZK framework's Jakarta-compatible release line needs confirming (may force
-  a ZK major version bump).
+Full scope investigation, phased execution plan, and the raw
+classification data are in this same directory:
 
-This is materially larger than Phases 1–4 combined and touches application
-code directly (not just poms), so it should be scoped as its own follow-up
-plan once Phase 4 has shipped.
+- **`Phase-5-jakarta-migration-scope.md`** — the findings: which `javax.*`
+  packages actually need renaming vs. which are JDK-native and must never
+  be touched (checked against this codebase, not assumed), the full
+  dependency chain that has to move together, and the confirmed ZK
+  Jakarta-compatibility research.
+- **`Phase-5-javax-import-inventory.txt`** — the raw import data behind
+  that classification.
+- **`Phase-5-JAKARTA_MIGRATION_PLAN.md`** — the actual phased plan (5.1
+  through 5.7), same discipline as this document.
+
+Not started as of this writing — scoped as its own follow-up project,
+deliberately not folded into reaching JDK 25, which is already done.
 
 ---
 
