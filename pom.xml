@@ -524,6 +524,21 @@
                 <version>8.6.0.1</version>
             </dependency>
 
+            <!--
+                ZK 8.6.0.1's own zel (expression-language) module declares javassist
+                3.18.2-GA as a direct dependency - a 2014-era version, from before JDK 9
+                module encapsulation existed. This dependencyManagement entry forces every
+                transitive pull of javassist reactor-wide to a modern version instead, since
+                ZK itself won't be bumped as part of this JDK 25 migration (see
+                jdk25-migration-baseline/CHANGES-and-WHY.md). javassist's core bytecode API
+                is stable across this range, so this is expected to be a safe override.
+            -->
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.32.0-GA</version>
+            </dependency>
+
             <!-- JGraphT -->
             <dependency>
                 <groupId>org.jgrapht</groupId>
