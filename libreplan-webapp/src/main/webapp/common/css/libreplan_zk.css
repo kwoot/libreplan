@@ -2872,6 +2872,54 @@ textarea {
     background: transparent;
 }
 
+/* The left-hand "perspective" buttons (Projects Planning, Projects
+ * List, Resources Load, ...) are this app's own original design --
+ * .perspective/.perspective-active near the top of this file, dating
+ * well before either theme -- with a deliberate look: inactive =
+ * white background/invisible border/dark blue text (color:#005782),
+ * active = solid blue background (#71B0D4) with white text, hover on
+ * an inactive button just lightens the background (#E6F2F9), text
+ * color unchanged. All of that lived on single-class selectors
+ * (.perspective, .perspective-active), which collide at equal
+ * specificity with this file's own later .z-button compat rules
+ * (color:#000, border-color:#a9a9a9, the gray/white gradient
+ * background, and just above, .toolbar-box .z-button{background:
+ * transparent}) -- and lose, since those compat rules come later in
+ * the file. Result: active button lost its blue fill (transparent,
+ * black text instead of white), inactive buttons gained a visible
+ * gray border they never had, and -- separately -- Breeze's own
+ * .z-button:hover{color:#fff} has no same-or-higher-specificity
+ * app-level hover color rule to lose to, so hovering ANY perspective
+ * button (active or not) turns its text white, unreadable against the
+ * now-transparent/white background. Restoring with .z-button.
+ * perspective/.z-button.perspective-active (two classes, matching the
+ * real element -- outranks every single-class rule above regardless
+ * of order) and adding the hover text-color pin Sapphire never needed
+ * but Breeze does. */
+.z-button.perspective {
+    border: 1px solid #FFFFFF;
+    background-color: #FFFFFF;
+    color: #005782;
+}
+
+.z-button.perspective:hover {
+    background-color: #E6F2F9;
+    color: #005782;
+}
+
+.z-button.perspective-active,
+.z-button.perspective-active:focus,
+.z-button.perspective-active:hover,
+.z-button.perspective-active:active {
+    color: #FFFFFF;
+    background-color: #71B0D4;
+}
+
+.z-button.perspective-active {
+    border: 1px solid #CCCCCC;
+    border-color: #006699 #DFF5FE #DFF5FE #006699;
+}
+
 /* Breeze's own base .z-button:hover sets background-color:#4fb7ff (a
  * vivid blue), part of a theme-wide assumption that buttons are
  * prominent call-to-actions. Sapphire's trendy-mold buttons instead
