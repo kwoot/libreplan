@@ -223,17 +223,32 @@ public class EmailNotificationDAOTest {
         assertTrue(emailNotificationDAO.getAll().isEmpty());
     }
 
-    // deleteAllByType has a pre-existing bug unrelated to this migration: after deleting the
-    // matches, it re-queries with Restrictions.eq("type", enumeration.ordinal()) - comparing
-    // the enum-typed "type" column against a raw int (enumeration.ordinal()) instead of the
-    // enum itself. This always throws ClassCastException (Integer cannot be cast to Enum) at
-    // that second query, regardless of whether any matching rows existed. Characterized as-is;
-    // a faithful Criteria->JPA translation should keep failing the same way.
-    @Test(expected = ClassCastException.class)
+    // deleteAllByType used to have a pre-existing bug unrelated to this migration: after deleting
+    // the matches, it re-queried with Restrictions.eq("type", enumeration.ordinal()) - comparing
+    // the enum-typed "type" column against a raw int (enumeration.ordinal()) instead of the enum
+    // itself. Hibernate 5's legacy Criteria API rejected that client-side with a ClassCastException
+    // (Integer cannot be cast to Enum) even though "type" is stored as the enum's ordinal in the
+    // database, so the comparison was valid at the SQL level. Hibernate 6's JPA Criteria API
+    // doesn't perform that same client-side check, so the query now runs and returns the correct
+    // result - a genuine fix, not a masked failure (the DAO method itself no longer uses
+    // enumeration.ordinal(), for clarity, but that's a stylistic cleanup: comparing against the
+    // enum directly compiles to the identical ordinal-based SQL).
+    @Test
     @Transactional
-    public void testDeleteAllByTypeThrowsDueToPreexistingBug() {
-        createValid(EmailTemplateEnum.TEMPLATE_MILESTONE_REACHED);
-        emailNotificationDAO.deleteAllByType(EmailTemplateEnum.TEMPLATE_MILESTONE_REACHED);
+    public void testDeleteAllByTypeRemovesMatchingNotifications() {
+        EmailNotification matching = createValid(EmailTemplateEnum.TEMPLATE_MILESTONE_REACHED);
+        EmailNotification other = createValid(EmailTemplateEnum.TEMPLATE_TODAY_TASK_SHOULD_START);
+
+        assertTrue(emailNotificationDAO.deleteAllByType(EmailTemplateEnum.TEMPLATE_MILESTONE_REACHED));
+
+        boolean otherStillFound = false;
+        for (EmailNotification n : emailNotificationDAO.getAll()) {
+            assertFalse(n.getId().equals(matching.getId()));
+            if (n.getId().equals(other.getId())) {
+                otherStillFound = true;
+            }
+        }
+        assertTrue(otherStillFound);
     }
 
     @Test

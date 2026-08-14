@@ -149,6 +149,16 @@ public class TaskSource extends BaseEntity {
         @Override
         public void save(TaskSource taskSource) {
             taskSourceDAO.saveWithoutValidating(taskSource);
+            // Without this, getVersion() keeps reporting null (see BaseEntity.newObject), so a
+            // later transaction that reaches this same, by-then-really-persisted TaskSource
+            // instance again (e.g. through TaskElement.taskSource) can no longer tell it apart
+            // from a genuinely new, unsaved one.
+            //
+            // Deliberately NOT doing the same for taskSource.getTask(): callers rely on the task
+            // still posing as new right after this returns (see BaseEntity.dontPoseAsTransientObjectAnymore()'s
+            // contract - it's an opt-in the caller makes once it actually needs the same Task
+            // instance to survive past this transaction, e.g. TaskElementDAOTest.afterSavingTheVersionIsIncreased).
+            taskSource.dontPoseAsTransientObjectAnymore();
         }
 
         @Override

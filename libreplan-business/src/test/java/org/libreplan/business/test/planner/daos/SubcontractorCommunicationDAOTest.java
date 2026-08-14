@@ -181,6 +181,12 @@ public class SubcontractorCommunicationDAOTest {
         taskElementDAO.flush();
         sessionFactory.getCurrentSession().evict(task);
         sessionFactory.getCurrentSession().evict(subcontractedTaskData);
+        task.dontPoseAsTransientObjectAnymore();
+        subcontractedTaskData.dontPoseAsTransientObjectAnymore();
+        // cascade="all-delete-orphan" means evicting subcontractedTaskData also evicted these
+        for (SubcontractorDeliverDate deliverDate : subcontractedTaskData.getRequiredDeliveringDates()) {
+            deliverDate.dontPoseAsTransientObjectAnymore();
+        }
 
         subcontractedTaskDataDAO.save(subcontractedTaskData);
 

@@ -46,6 +46,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.libreplan.business.IDataBootstrap;
+import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.common.IAdHocTransactionService;
 import org.libreplan.business.common.IOnTransaction;
 import org.libreplan.business.common.daos.IConfigurationDAO;
@@ -221,9 +222,25 @@ public class TaskElementDAOTest {
         assertThat(fromDB.getEndDate(), equalTo(inMemory.getEndDate()));
     }
 
-    private void flushAndEvict(Object entity) {
+    private void flushAndEvict(BaseEntity entity) {
         sessionFactory.getCurrentSession().flush();
         sessionFactory.getCurrentSession().evict(entity);
+        // Without this, the evicted entity's overridden getVersion() keeps reporting null
+        // (its "newObject" flag is still true), so a later flush that reaches it again via
+        // cascade (e.g. through a still-managed sibling's back-reference) can no longer tell
+        // it apart from a genuinely new entity that happens to already have a generated id.
+        // TaskGroup.taskElements is cascade="all", so evict() also detached the children below
+        // entity, unmarking each of them here too.
+        dontPoseAsTransientObjectAnymoreRecursively(entity);
+    }
+
+    private void dontPoseAsTransientObjectAnymoreRecursively(BaseEntity entity) {
+        entity.dontPoseAsTransientObjectAnymore();
+        if (entity instanceof TaskGroup) {
+            for (TaskElement child : ((TaskGroup) entity).getChildren()) {
+                dontPoseAsTransientObjectAnymoreRecursively(child);
+            }
+        }
     }
 
     @Test

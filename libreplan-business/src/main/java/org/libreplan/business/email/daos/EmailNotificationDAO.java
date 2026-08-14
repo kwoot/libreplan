@@ -99,13 +99,9 @@ public class EmailNotificationDAO
             getSession().delete(item);
         }
 
-        // Pre-existing bug, not introduced by this migration: comparing the enum-typed "type"
-        // property against enumeration.ordinal() (an int) rather than the enum itself. This
-        // throws ClassCastException at runtime on both the old Criteria API and here - deleteAllByType
-        // has never worked. Preserved as-is rather than silently fixed.
         CriteriaQuery<EmailNotification> cq2 = cb.createQuery(EmailNotification.class);
         Root<EmailNotification> root2 = cq2.from(EmailNotification.class);
-        cq2.where(cb.equal(root2.get("type"), enumeration.ordinal()));
+        cq2.where(cb.equal(root2.get("type"), enumeration));
         return getSession().createQuery(cq2)
                 .getResultList()
                 .isEmpty();

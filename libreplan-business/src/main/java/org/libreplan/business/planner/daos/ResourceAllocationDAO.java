@@ -571,12 +571,17 @@ public class ResourceAllocationDAO
             return "join " + taskAlias
                     + ".taskSource.schedulingData as schedulingData "
                     + "join schedulingData.orderElement as orderElement "
-                    + ", OrderVersion as version ";
+                    + "join orderElement.schedulingDataForVersion as versionEntry ";
         }
 
         @Override
         public String wherePart() {
-            return "orderElement.schedulingDataForVersion[version] = schedulingData and version.ownerScenario = :scenario";
+            // versionEntry is a map entry (OrderVersion -> SchedulingDataForVersion); the bracket
+            // index form orderElement.schedulingDataForVersion[version] used to express this same
+            // condition, but Hibernate 6's HQL translator desugars a map-index expression whose key
+            // is itself a from-clause alias into an implicit join reusing that alias, which then
+            // collides with the alias declared explicitly for it - regardless of what it's named.
+            return "versionEntry = schedulingData and KEY(versionEntry).ownerScenario = :scenario";
         }
 
         @Override

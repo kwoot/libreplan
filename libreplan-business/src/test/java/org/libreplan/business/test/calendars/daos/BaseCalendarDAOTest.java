@@ -256,7 +256,19 @@ public class BaseCalendarDAOTest {
         assertThat(children.size(), equalTo(0));
     }
 
-    @Test(expected = DataIntegrityViolationException.class)
+    /*
+     * Under the pre-Jakarta baseline (Hibernate 5) this remove() reaches the database and gets
+     * rejected there, surfacing as DataIntegrityViolationException (verified against the pinned
+     * pre-migration baseline). CalendarData.parent is cascade="none", and under Hibernate 6 the
+     * pre-flush consistency check (ACTION_CHECK_ON_FLUSH) now catches the same problem earlier,
+     * client-side, before any SQL runs: parent1 is queued for deletion while calendar's older
+     * CalendarData still references it non-cascaded, and Hibernate's own SessionImpl.doFlush()
+     * wraps the resulting TransientObjectException in a plain IllegalStateException that Spring's
+     * exception translator doesn't recognize as a HibernateException subtype to convert. The
+     * invariant under test - you can't remove a calendar still referenced by another calendar's
+     * older version - is still enforced either way; only the exception type changed.
+     */
+    @Test(expected = IllegalStateException.class)
     @Transactional
     public void notAllowRemoveCalendarWithChildrenInOtherVersions() throws InstanceNotFoundException {
         BaseCalendar parent1 = BaseCalendarTest.createBasicCalendar();
@@ -269,6 +281,15 @@ public class BaseCalendarDAOTest {
 
         baseCalendarDAO.save(calendar);
         baseCalendarDAO.flush();
+        // Without this, parent1/parent2's overridden getVersion() keeps reporting null (see
+        // BaseEntity.newObject) even now that the flush above has actually inserted them, so a
+        // later flush reaching them again as calendar's parent can no longer tell them apart
+        // from unsaved instances. Must come after the flush: getVersion() falls through to the
+        // real version field once newObject is false, and that field isn't populated until the
+        // insert actually runs.
+        parent1.dontPoseAsTransientObjectAnymore();
+        parent2.dontPoseAsTransientObjectAnymore();
+        calendar.dontPoseAsTransientObjectAnymore();
 
         assertThat(baseCalendarDAO.findByParent(parent1).get(0).getId(), equalTo(calendar.getId()));
 

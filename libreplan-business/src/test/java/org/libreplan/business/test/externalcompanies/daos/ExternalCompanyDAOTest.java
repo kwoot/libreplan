@@ -254,7 +254,7 @@ public class ExternalCompanyDAOTest {
     public void testUniqueCompanyNameCheck() throws ValidationException {
         final ExternalCompany externalCompany1 = createValidExternalCompany();
 
-        IOnTransaction<Void> createCompanyWithRepeatedName = new IOnTransaction<Void>() {
+        IOnTransaction<Void> createCompany = new IOnTransaction<Void>() {
             @Override
             public Void execute() {
                 externalCompanyDAO.save(externalCompany1);
@@ -262,9 +262,25 @@ public class ExternalCompanyDAOTest {
             }
         };
 
-        transactionService.runOnTransaction(createCompanyWithRepeatedName);
+        // A second, genuinely different company - not the same reused instance - with the same
+        // name: reusing the same instance here (as this test used to) makes Hibernate 6 correctly
+        // recognize it as a save of the already-persisted first company instead of a save of a
+        // second, conflicting one, once it's no longer being fooled by a stale "new" flag (see
+        // BaseEntity.newObject) - so it goes through as a harmless no-op update rather than
+        // failing this test's own uniqueness validation.
+        IOnTransaction<Void> createCompanyWithRepeatedName = new IOnTransaction<Void>() {
+            @Override
+            public Void execute() {
+                ExternalCompany externalCompany2 = createValidExternalCompany();
+                externalCompany2.setName(externalCompany1.getName());
+                externalCompanyDAO.save(externalCompany2);
+                return null;
+            }
+        };
 
-        // The second time we save the same object, a exception is thrown
+        transactionService.runOnTransaction(createCompany);
+
+        // The second company has the same name, an exception is thrown when saving it
         transactionService.runOnTransaction(createCompanyWithRepeatedName);
     }
 
