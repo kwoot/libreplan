@@ -39,7 +39,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.easymock.EasyMock;
 import org.hibernate.SessionFactory;

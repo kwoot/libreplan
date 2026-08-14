@@ -22,8 +22,10 @@ package org.libreplan.business.planner.daos;
 
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.libreplan.business.common.daos.GenericDAOHibernate;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.planner.entities.Dependency;
@@ -47,10 +49,11 @@ public class DependencyDAO extends GenericDAOHibernate<Dependency, Long>
     @Override
     @Transactional
     public void deleteUnattachedDependencies() throws InstanceNotFoundException {
-        Criteria c = getSession().createCriteria(Dependency.class);
-        c.add(Restrictions.or(Restrictions.isNull("origin"),
-                Restrictions.isNull("destination")));
-        List<Dependency> results = c.list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Dependency> cq = cb.createQuery(Dependency.class);
+        Root<Dependency> root = cq.from(Dependency.class);
+        cq.where(cb.or(cb.isNull(root.get("origin")), cb.isNull(root.get("destination"))));
+        List<Dependency> results = getSession().createQuery(cq).getResultList();
         for (Dependency each : results) {
             remove(each.getId());
         }

@@ -24,8 +24,8 @@ package org.libreplan.ws.resources.criterion.api;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * DTO for a list of <code>CriterionType</code> entities.

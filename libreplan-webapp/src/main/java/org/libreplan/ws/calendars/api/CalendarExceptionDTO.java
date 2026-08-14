@@ -21,7 +21,7 @@
 
 package org.libreplan.ws.calendars.api;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.libreplan.business.calendars.entities.CalendarException;

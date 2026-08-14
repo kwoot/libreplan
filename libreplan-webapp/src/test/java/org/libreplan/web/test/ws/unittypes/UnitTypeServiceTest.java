@@ -31,7 +31,7 @@ import static org.libreplan.web.test.WebappGlobalNames.WEBAPP_SPRING_SECURITY_CO
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.hibernate.SessionFactory;
 import org.junit.Test;

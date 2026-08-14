@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 
 import org.apache.commons.lang3.Validate;
 import org.libreplan.business.common.entities.ProgressType;

@@ -21,7 +21,7 @@ package org.libreplan.business.expensesheet.daos;
 
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.libreplan.business.common.daos.IntegrationEntityDAO;
 import org.libreplan.business.expensesheet.entities.ExpenseSheet;
 import org.libreplan.business.resources.entities.Resource;

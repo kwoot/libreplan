@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * Represents entity. It is another type of work resource.

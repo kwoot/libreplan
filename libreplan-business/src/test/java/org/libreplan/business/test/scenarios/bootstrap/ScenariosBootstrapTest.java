@@ -31,9 +31,9 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.Test;
@@ -102,12 +102,12 @@ public class ScenariosBootstrapTest {
             Session session = sessionFactory.getCurrentSession();
 
             Query deleteSchedulingStatesByOrderVersion =
-                    session.createSQLQuery("DELETE FROM scheduling_states_by_order_version");
+                    session.createNativeQuery("DELETE FROM scheduling_states_by_order_version");
 
             deleteSchedulingStatesByOrderVersion.executeUpdate();
             session.flush();
 
-            Query deleteSchedulingDataForVersion = session.createSQLQuery("DELETE FROM scheduling_data_for_version");
+            Query deleteSchedulingDataForVersion = session.createNativeQuery("DELETE FROM scheduling_data_for_version");
 
             deleteSchedulingDataForVersion.executeUpdate();
             session.flush();

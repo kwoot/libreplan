@@ -44,9 +44,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.annotation.Resource;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.hibernate.SessionFactory;
 import org.joda.time.LocalDate;

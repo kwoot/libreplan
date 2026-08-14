@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.Validate;
 import org.hibernate.NonUniqueResultException;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.libreplan.business.common.daos.GenericDAOHibernate;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.templates.entities.OrderElementTemplate;

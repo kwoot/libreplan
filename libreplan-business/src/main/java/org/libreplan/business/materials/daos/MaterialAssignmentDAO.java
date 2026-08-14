@@ -23,7 +23,10 @@ package org.libreplan.business.materials.daos;
 
 import java.util.List;
 
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.libreplan.business.common.daos.GenericDAOHibernate;
 import org.libreplan.business.materials.entities.Material;
 import org.libreplan.business.materials.entities.MaterialAssignment;
@@ -44,10 +47,11 @@ public class MaterialAssignmentDAO extends GenericDAOHibernate<MaterialAssignmen
 
     @Override
     public List<MaterialAssignment> getByMaterial(Material material) {
-
-        return (List<MaterialAssignment>)getSession().
-            createCriteria(MaterialAssignment.class)
-            .add(Restrictions.eq("materialInfo.material", material)).list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<MaterialAssignment> cq = cb.createQuery(MaterialAssignment.class);
+        Root<MaterialAssignment> root = cq.from(MaterialAssignment.class);
+        cq.where(cb.equal(root.get("materialInfo").get("material"), material));
+        return getSession().createQuery(cq).getResultList();
     }
 
 }

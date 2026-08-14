@@ -21,8 +21,8 @@
 package org.libreplan.business.orders.entities;
 
 import org.apache.commons.lang3.Validate;
-import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.orders.entities.SchedulingState.ITypeChangedListener;
 import org.libreplan.business.orders.entities.SchedulingState.Type;

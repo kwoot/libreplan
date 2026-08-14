@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import javax.ws.rs.ProcessingException;
+import jakarta.ws.rs.ProcessingException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;

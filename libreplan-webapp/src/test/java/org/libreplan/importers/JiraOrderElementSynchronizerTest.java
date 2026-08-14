@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.junit.Before;
 import org.junit.Ignore;

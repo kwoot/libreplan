@@ -36,7 +36,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;

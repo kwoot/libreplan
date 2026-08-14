@@ -30,10 +30,10 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 import org.hibernate.validator.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
 import org.joda.time.LocalDate;
 import org.libreplan.business.calendars.daos.IBaseCalendarDAO;
 import org.libreplan.business.calendars.entities.AvailabilityTimeLine.IVetoer;

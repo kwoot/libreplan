@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.hibernate.Session;

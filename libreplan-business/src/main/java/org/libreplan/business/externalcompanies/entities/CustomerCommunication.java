@@ -22,7 +22,7 @@ package org.libreplan.business.externalcompanies.entities;
 import java.util.Date;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.orders.entities.Order;
 

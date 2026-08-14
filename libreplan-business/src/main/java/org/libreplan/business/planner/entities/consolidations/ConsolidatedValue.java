@@ -23,7 +23,7 @@ package org.libreplan.business.planner.entities.consolidations;
 
 import java.math.BigDecimal;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.LocalDate;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.workingday.IntraDayDate;

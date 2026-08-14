@@ -24,7 +24,7 @@ package org.libreplan.ws.common.api;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 
 /**
  * DTO for modeling a constraint violation.

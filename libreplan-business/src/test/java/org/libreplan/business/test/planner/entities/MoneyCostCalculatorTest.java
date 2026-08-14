@@ -82,7 +82,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = { BUSINESS_SPRING_CONFIG_FILE, BUSINESS_SPRING_CONFIG_TEST_FILE })
 public class MoneyCostCalculatorTest {
 
-    @javax.annotation.Resource
+    @jakarta.annotation.Resource
     private IDataBootstrap scenariosBootstrap;
 
     @Autowired

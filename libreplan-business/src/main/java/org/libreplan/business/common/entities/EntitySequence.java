@@ -25,9 +25,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import org.hibernate.NonUniqueResultException;
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 import org.hibernate.validator.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.common.IntegrationEntity;
 import org.libreplan.business.common.Registry;

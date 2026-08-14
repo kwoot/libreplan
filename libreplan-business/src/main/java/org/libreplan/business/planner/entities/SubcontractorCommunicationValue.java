@@ -22,7 +22,7 @@ package org.libreplan.business.planner.entities;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 import org.libreplan.business.INewObject;
 
 /**

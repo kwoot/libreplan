@@ -74,7 +74,7 @@ import org.zkforge.timeplot.Timeplot;
 import org.zkoss.ganttz.util.Interval;
 import org.zkoss.zk.ui.Desktop;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * Tests for {@link ChartFiller}.

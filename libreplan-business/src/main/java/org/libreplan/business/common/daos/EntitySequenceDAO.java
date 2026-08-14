@@ -24,9 +24,12 @@ package org.libreplan.business.common.daos;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.apache.commons.lang3.Validate;
 import org.hibernate.NonUniqueResultException;
-import org.hibernate.criterion.Restrictions;
 import org.libreplan.business.common.entities.EntityNameEnum;
 import org.libreplan.business.common.entities.EntitySequence;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
@@ -53,7 +56,6 @@ public class EntitySequenceDAO extends GenericDAOHibernate<EntitySequence, Long>
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<EntitySequence> findEntitySequencesNotIn(List<EntitySequence> entitySequences) {
         List<Long> entitySequenceIds = new ArrayList<>();
         for (EntitySequence entitySequence : entitySequences) {
@@ -62,10 +64,19 @@ public class EntitySequenceDAO extends GenericDAOHibernate<EntitySequence, Long>
             }
         }
 
-        return getSession()
-                .createCriteria(EntitySequence.class)
-                .add(Restrictions.not(Restrictions.in("id", entitySequenceIds)))
-                .list();
+        // Matches the old Hibernate Criteria behavior of
+        // Restrictions.not(Restrictions.in("id", emptyList)): that renders as always-false
+        // (not always-true), so an empty id list must return no rows rather than all rows.
+        if ( entitySequenceIds.isEmpty() ) {
+            return new ArrayList<>();
+        }
+
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<EntitySequence> cq = cb.createQuery(EntitySequence.class);
+        Root<EntitySequence> root = cq.from(EntitySequence.class);
+        cq.where(cb.not(root.get("id").in(entitySequenceIds)));
+
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override
@@ -82,11 +93,11 @@ public class EntitySequenceDAO extends GenericDAOHibernate<EntitySequence, Long>
     public EntitySequence getActiveEntitySequence(EntityNameEnum entityName)
             throws InstanceNotFoundException, NonUniqueResultException {
 
-        EntitySequence entitySequence = (EntitySequence) getSession()
-                .createCriteria(EntitySequence.class)
-                .add(Restrictions.eq("entityName", entityName))
-                .add(Restrictions.eq("active", true))
-                .uniqueResult();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<EntitySequence> cq = cb.createQuery(EntitySequence.class);
+        Root<EntitySequence> root = cq.from(EntitySequence.class);
+        cq.where(cb.equal(root.get("entityName"), entityName), cb.equal(root.get("active"), true));
+        EntitySequence entitySequence = getSession().createQuery(cq).uniqueResult();
 
         if ( entitySequence == null ) {
             throw new InstanceNotFoundException(entitySequence, "Entity sequence not exist");

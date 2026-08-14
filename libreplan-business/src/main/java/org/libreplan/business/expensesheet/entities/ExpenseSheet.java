@@ -25,11 +25,11 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Min;
 import org.hibernate.validator.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
 import org.joda.time.LocalDate;
 import org.libreplan.business.common.IHumanIdentifiable;
 import org.libreplan.business.common.IntegrationEntity;

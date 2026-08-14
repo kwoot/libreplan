@@ -22,7 +22,7 @@ package org.libreplan.ws.costcategories.api;
 
 import java.math.BigDecimal;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.libreplan.business.costcategories.entities.HourCost;

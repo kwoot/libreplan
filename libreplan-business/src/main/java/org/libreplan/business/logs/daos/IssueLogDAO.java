@@ -21,7 +21,10 @@ package org.libreplan.business.logs.daos;
 
 import java.util.List;
 
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.libreplan.business.common.daos.IntegrationEntityDAO;
 import org.libreplan.business.logs.entities.IssueLog;
 import org.libreplan.business.orders.entities.Order;
@@ -46,10 +49,11 @@ public class IssueLogDAO extends IntegrationEntityDAO<IssueLog> implements
 
     @Override
     public List<IssueLog> getByParent(Order order) {
-        return getSession()
-                .createCriteria(IssueLog.class)
-                .add(Restrictions.eq("project", order))
-                .list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<IssueLog> cq = cb.createQuery(IssueLog.class);
+        Root<IssueLog> root = cq.from(IssueLog.class);
+        cq.where(cb.equal(root.get("project"), order));
+        return getSession().createQuery(cq).getResultList();
     }
 
 }

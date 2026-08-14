@@ -48,7 +48,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;

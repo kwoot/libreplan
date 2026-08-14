@@ -24,8 +24,8 @@ package org.libreplan.business.qualityforms.entities;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.Validate;
 import org.hibernate.validator.constraints.NotEmpty;

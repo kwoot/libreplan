@@ -23,7 +23,7 @@ package org.libreplan.business.costcategories.daos;
 
 import java.math.BigDecimal;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.joda.time.LocalDate;
 import org.libreplan.business.common.daos.IntegrationEntityDAO;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;

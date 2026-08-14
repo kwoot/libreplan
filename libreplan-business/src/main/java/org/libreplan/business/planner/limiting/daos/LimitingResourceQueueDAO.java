@@ -23,7 +23,10 @@ package org.libreplan.business.planner.limiting.daos;
 
 import java.util.List;
 
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.libreplan.business.common.daos.GenericDAOHibernate;
 import org.libreplan.business.resources.entities.LimitingResourceQueue;
 import org.libreplan.business.resources.entities.Resource;
@@ -43,9 +46,11 @@ public class LimitingResourceQueueDAO extends
         ILimitingResourceQueueDAO {
 
     public LimitingResourceQueue findQueueByResource(Resource resource) {
-        return (LimitingResourceQueue) getSession().createCriteria(
-                LimitingResourceQueue.class).add(
-                Restrictions.eq("resource", resource)).uniqueResult();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<LimitingResourceQueue> cq = cb.createQuery(LimitingResourceQueue.class);
+        Root<LimitingResourceQueue> root = cq.from(LimitingResourceQueue.class);
+        cq.where(cb.equal(root.get("resource"), resource));
+        return getSession().createQuery(cq).uniqueResult();
     }
 
     @Override

@@ -22,7 +22,7 @@ package org.libreplan.business.materials.entities;
 
 import java.math.BigDecimal;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Óscar González Fernández <ogonzalez@igalia.com>

@@ -21,7 +21,7 @@
 
 package org.libreplan.ws.common.api;
 
-import javax.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlEnum;
 
 /**
  * DTO for <code>ResourceEnum</code> entity.

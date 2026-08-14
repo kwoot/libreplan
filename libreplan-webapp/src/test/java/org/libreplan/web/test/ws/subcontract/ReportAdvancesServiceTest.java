@@ -44,7 +44,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.hibernate.SessionFactory;
 import org.joda.time.LocalDate;

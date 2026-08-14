@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.libreplan.business.common.daos.IIntegrationEntityDAO;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;

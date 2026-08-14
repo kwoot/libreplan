@@ -23,7 +23,7 @@ package org.libreplan.ws.materials.api;
 
 import java.math.BigDecimal;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 
 import org.libreplan.ws.common.api.IntegrationEntityDTO;
 

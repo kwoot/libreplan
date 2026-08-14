@@ -41,10 +41,15 @@ import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.common.exceptions.ValidationException;
 import org.libreplan.business.resources.daos.IWorkerDAO;
 import org.libreplan.business.resources.entities.Worker;
+import org.libreplan.business.scenarios.daos.IScenarioDAO;
+import org.libreplan.business.scenarios.entities.Scenario;
+import org.libreplan.business.users.daos.IOrderAuthorizationDAO;
 import org.libreplan.business.users.daos.IProfileDAO;
 import org.libreplan.business.users.daos.IUserDAO;
+import org.libreplan.business.users.entities.OrderAuthorizationType;
 import org.libreplan.business.users.entities.Profile;
 import org.libreplan.business.users.entities.User;
+import org.libreplan.business.users.entities.UserOrderAuthorization;
 import org.libreplan.business.users.entities.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -74,6 +79,12 @@ public class UserDAOTest {
 
     @Autowired
     private IWorkerDAO workerDAO;
+
+    @Autowired
+    private IScenarioDAO scenarioDAO;
+
+    @Autowired
+    private IOrderAuthorizationDAO orderAuthorizationDAO;
 
     @Test
     @Transactional
@@ -386,6 +397,70 @@ public class UserDAOTest {
                     }
                 });
         assertEquals(previous + 1, size);
+    }
+
+    /*
+     * Characterization tests added for the Hibernate Criteria -> JPA Criteria API migration
+     * (Jakarta EE / Hibernate 6). findByLastConnectedScenario, the private
+     * getOrderAuthorizationsByUser (exercised here via remove()), and getRowCount had no test
+     * coverage before. Run once here (pre-migration, still on the old Criteria API) to confirm
+     * they pass against known-correct behavior, then re-run unchanged after the DAO is rewritten.
+     */
+
+    @Test
+    @Transactional
+    public void testFindByLastConnectedScenario() {
+        Scenario scenario1 = Scenario.create(getUniqueName());
+        scenarioDAO.save(scenario1);
+        Scenario scenario2 = Scenario.create(getUniqueName());
+        scenarioDAO.save(scenario2);
+
+        User user1 = createUser(getUniqueName());
+        user1.setLastConnectedScenario(scenario1);
+        userDAO.save(user1);
+
+        // Different scenario - must NOT be returned for scenario1's query
+        User user2 = createUser(getUniqueName());
+        user2.setLastConnectedScenario(scenario2);
+        userDAO.save(user2);
+
+        List<User> results = userDAO.findByLastConnectedScenario(scenario1);
+        assertTrue(results.contains(user1));
+        assertFalse(results.contains(user2));
+    }
+
+    @Test
+    @Transactional
+    public void testRemoveCascadesToOrderAuthorizations() throws InstanceNotFoundException {
+        User userToRemove = createUser(getUniqueName());
+        userDAO.save(userToRemove);
+
+        UserOrderAuthorization authOnRemovedUser =
+                UserOrderAuthorization.create(OrderAuthorizationType.READ_AUTHORIZATION);
+        authOnRemovedUser.setUser(userToRemove);
+        orderAuthorizationDAO.save(authOnRemovedUser);
+
+        // A different user's authorization must survive the removal below untouched.
+        User otherUser = createUser(getUniqueName());
+        userDAO.save(otherUser);
+        UserOrderAuthorization authOnOtherUser =
+                UserOrderAuthorization.create(OrderAuthorizationType.READ_AUTHORIZATION);
+        authOnOtherUser.setUser(otherUser);
+        orderAuthorizationDAO.save(authOnOtherUser);
+
+        userDAO.remove(userToRemove);
+
+        assertFalse(orderAuthorizationDAO.exists(authOnRemovedUser.getId()));
+        assertTrue(orderAuthorizationDAO.exists(authOnOtherUser.getId()));
+    }
+
+    @Test
+    @Transactional
+    public void testGetRowCount() {
+        int previous = userDAO.getRowCount().intValue();
+        userDAO.save(createUser(getUniqueName()));
+        userDAO.save(createUser(getUniqueName()));
+        assertEquals(previous + 2, userDAO.getRowCount().intValue());
     }
 
 }

@@ -23,8 +23,8 @@ package org.libreplan.ws.typeofworkhours.api;
 
 import java.math.BigDecimal;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.libreplan.business.costcategories.entities.TypeOfWorkHours;
 import org.libreplan.ws.common.api.IntegrationEntityDTO;

@@ -23,8 +23,11 @@ package org.libreplan.business.resources.daos;
 
 import java.util.List;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+
 import org.libreplan.business.common.daos.IntegrationEntityDAO;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.resources.entities.Machine;
@@ -52,16 +55,22 @@ public class MachineDAO extends IntegrationEntityDAO<Machine>
         return list(Machine.class);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Machine> findByNameOrCode(String name, boolean limitingResource) {
-        final String containsName = "%" + name + "%";
-        return getSession().createCriteria(Machine.class).add(
-                Restrictions.and(
-                        Restrictions.eq("limitingResource",limitingResource),
-                        Restrictions.or(
-                                Restrictions.ilike("name", containsName),
-                                Restrictions.ilike("code", containsName)))).list();
+        final String containsName = "%" + name.toLowerCase() + "%";
+
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Machine> cq = cb.createQuery(Machine.class);
+        Root<Machine> root = cq.from(Machine.class);
+
+        Predicate matchesNameOrCode = cb.or(
+                cb.like(cb.lower(root.get("name")), containsName),
+                cb.like(cb.lower(root.get("code")), containsName));
+        // "limitingResource" was never actually a mapped property on Machine, so this method
+        // always throws when called (no callers exist in the codebase) - preserved as-is.
+        cq.where(cb.equal(root.get("limitingResource"), limitingResource), matchesNameOrCode);
+
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override

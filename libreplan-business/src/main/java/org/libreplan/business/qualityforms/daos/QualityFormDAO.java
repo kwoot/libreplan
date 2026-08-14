@@ -25,11 +25,13 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.apache.commons.lang3.Validate;
-import org.hibernate.Criteria;
 import org.hibernate.NonUniqueResultException;
-import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
 import org.libreplan.business.advance.daos.IAdvanceTypeDAO;
 import org.libreplan.business.advance.entities.AdvanceType;
 import org.libreplan.business.common.daos.GenericDAOHibernate;
@@ -78,20 +80,21 @@ public class QualityFormDAO extends GenericDAOHibernate<QualityForm, Long> imple
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     public QualityForm findByNameAndType(String name, QualityFormType type) {
-        return (QualityForm) getSession()
-                .createCriteria(QualityForm.class)
-                .add(Restrictions.eq("name", name))
-                .add(Restrictions.eq("qualityFormType", type))
-                .uniqueResult();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<QualityForm> cq = cb.createQuery(QualityForm.class);
+        Root<QualityForm> root = cq.from(QualityForm.class);
+        cq.where(cb.equal(root.get("name"), name), cb.equal(root.get("qualityFormType"), type));
+        return getSession().createQuery(cq).uniqueResult();
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     public List<QualityForm> getAllByType(QualityFormType type) {
-        return getSession()
-                .createCriteria(QualityForm.class)
-                .add(Restrictions.eq("qualityFormType", type))
-                .list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<QualityForm> cq = cb.createQuery(QualityForm.class);
+        Root<QualityForm> root = cq.from(QualityForm.class);
+        cq.where(cb.equal(root.get("qualityFormType"), type));
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override
@@ -104,10 +107,11 @@ public class QualityFormDAO extends GenericDAOHibernate<QualityForm, Long> imple
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     public QualityForm findUniqueByName(String name) throws InstanceNotFoundException, NonUniqueResultException {
-        QualityForm qualityForm = (QualityForm) getSession()
-                .createCriteria(QualityForm.class)
-                .add(Restrictions.eq("name", name))
-                .uniqueResult();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<QualityForm> cq = cb.createQuery(QualityForm.class);
+        Root<QualityForm> root = cq.from(QualityForm.class);
+        cq.where(cb.equal(root.get("name"), name));
+        QualityForm qualityForm = getSession().createQuery(cq).uniqueResult();
 
         if (qualityForm == null) {
             throw new InstanceNotFoundException(null, "QualityForm");

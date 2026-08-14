@@ -21,8 +21,8 @@ package org.libreplan.importers.tim;
 
 import java.util.Locale;
 
-import javax.xml.bind.DatatypeConverter;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * Adapter responsible for converting from <code>Double</code> to

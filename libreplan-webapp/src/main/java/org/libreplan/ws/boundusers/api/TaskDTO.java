@@ -21,8 +21,8 @@ package org.libreplan.ws.boundusers.api;
 
 import java.math.BigDecimal;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.libreplan.business.planner.entities.Task;

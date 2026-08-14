@@ -26,9 +26,9 @@ package org.libreplan.business.qualityforms.entities;
 
 import java.math.BigDecimal;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 import org.hibernate.validator.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.libreplan.business.INewObject;
 
 public class QualityFormItem implements INewObject {

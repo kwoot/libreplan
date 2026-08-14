@@ -165,10 +165,6 @@ public class LDAPConfiguration extends BaseEntity {
         this.ldapSaveRolesDB = ldapSaveRolesDB;
     }
 
-    public Boolean getLdapSavePasswordsDB() {
-        return ldapSavePasswordsDB;
-    }
-
     public String getLdapGroupPath() {
         return ldapGroupPath;
     }

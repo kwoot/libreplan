@@ -21,7 +21,7 @@
 
 package org.libreplan.business.users.entities;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.orders.entities.Order;
 

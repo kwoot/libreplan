@@ -21,7 +21,7 @@
 
 package org.libreplan.ws.calendarexceptiontypes.api;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import org.libreplan.business.calendars.entities.CalendarExceptionType;
 import org.libreplan.ws.common.api.InstanceConstraintViolationsListDTO;

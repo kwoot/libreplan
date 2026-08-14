@@ -19,7 +19,7 @@
 
 package org.libreplan.ws.subcontract.api;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.libreplan.business.externalcompanies.entities.EndDateCommunication;

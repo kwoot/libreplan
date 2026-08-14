@@ -23,6 +23,8 @@ package org.libreplan.business.test.planner.daos;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -36,7 +38,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.hibernate.SessionFactory;
 import org.joda.time.LocalDate;
@@ -567,6 +569,105 @@ public class TaskElementDAOTest {
         };
 
         transactionService.runOnTransaction(checkAllocatedHoursWereUpdated);
+    }
+
+    /*
+     * Characterization tests added for the Hibernate Criteria -> JPA Criteria API migration
+     * (Jakarta EE / Hibernate 6). findChildrenOf/listFilteredByDate had no test coverage
+     * before.
+     */
+
+    @Test
+    @Transactional
+    public void testFindChildrenOfReturnsOnlyDirectChildren() {
+        // Note: passing an evicted (detached) entity as a Criteria restriction parameter for a
+        // many-to-one comparison throws TransientObjectException, even though it has a real id
+        // - a legacy Hibernate Criteria quirk. So taskGroup is kept attached here (no
+        // flushAndEvict), unlike most other tests in this file.
+        TaskGroup taskGroup = createValidTaskGroup();
+        Task child1 = createValidTask();
+        Task child2 = createValidTask();
+        taskGroup.addTaskElement(child1);
+        taskGroup.addTaskElement(child2);
+        taskElementDAO.save(taskGroup);
+        sessionFactory.getCurrentSession().flush();
+
+        List<TaskElement> children = taskElementDAO.findChildrenOf(taskGroup);
+        assertEquals(2, children.size());
+        for (TaskElement each : children) {
+            assertTrue(each.getId().equals(child1.getId()) || each.getId().equals(child2.getId()));
+        }
+    }
+
+    @Test
+    @Transactional
+    public void testFindChildrenOfReturnsEmptyWhenNoChildren() {
+        TaskGroup emptyTaskGroup = createValidTaskGroup();
+        taskElementDAO.save(emptyTaskGroup);
+        sessionFactory.getCurrentSession().flush();
+
+        assertTrue(taskElementDAO.findChildrenOf(emptyTaskGroup).isEmpty());
+    }
+
+    @Test
+    @Transactional
+    public void testListFilteredByDateMatchesOverlappingRange() {
+        TaskMilestone milestone = createValidTaskMilestone();
+        milestone.setIntraDayStartDate(
+                org.libreplan.business.workingday.IntraDayDate.startOfDay(new LocalDate(2020, 6, 15)));
+        milestone.setIntraDayEndDate(
+                org.libreplan.business.workingday.IntraDayDate.startOfDay(new LocalDate(2020, 6, 15)));
+        taskElementDAO.save(milestone);
+        flushAndEvict(milestone);
+
+        List<TaskElement> result = taskElementDAO.listFilteredByDate(
+                new LocalDate(2020, 6, 1).toDateTimeAtStartOfDay().toDate(),
+                new LocalDate(2020, 6, 30).toDateTimeAtStartOfDay().toDate());
+
+        boolean found = false;
+        for (TaskElement each : result) {
+            if (each.getId().equals(milestone.getId())) {
+                found = true;
+            }
+        }
+        assertTrue(found);
+    }
+
+    @Test
+    @Transactional
+    public void testListFilteredByDateExcludesOutOfRange() {
+        TaskMilestone milestone = createValidTaskMilestone();
+        milestone.setIntraDayStartDate(
+                org.libreplan.business.workingday.IntraDayDate.startOfDay(new LocalDate(2020, 1, 1)));
+        milestone.setIntraDayEndDate(
+                org.libreplan.business.workingday.IntraDayDate.startOfDay(new LocalDate(2020, 1, 1)));
+        taskElementDAO.save(milestone);
+        flushAndEvict(milestone);
+
+        List<TaskElement> result = taskElementDAO.listFilteredByDate(
+                new LocalDate(2020, 6, 1).toDateTimeAtStartOfDay().toDate(),
+                new LocalDate(2020, 6, 30).toDateTimeAtStartOfDay().toDate());
+
+        for (TaskElement each : result) {
+            assertFalse(each.getId().equals(milestone.getId()));
+        }
+    }
+
+    @Test
+    @Transactional
+    public void testListFilteredByDateWithNullBoundsReturnsAll() {
+        TaskMilestone milestone = createValidTaskMilestone();
+        taskElementDAO.save(milestone);
+        flushAndEvict(milestone);
+
+        List<TaskElement> result = taskElementDAO.listFilteredByDate(null, null);
+        boolean found = false;
+        for (TaskElement each : result) {
+            if (each.getId().equals(milestone.getId())) {
+                found = true;
+            }
+        }
+        assertTrue(found);
     }
 
 }

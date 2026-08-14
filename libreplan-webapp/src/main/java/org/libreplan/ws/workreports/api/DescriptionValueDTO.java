@@ -21,7 +21,7 @@
 
 package org.libreplan.ws.workreports.api;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 
 import org.libreplan.business.workreports.valueobjects.DescriptionValue;
 

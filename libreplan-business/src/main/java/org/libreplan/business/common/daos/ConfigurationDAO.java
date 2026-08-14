@@ -23,7 +23,7 @@ package org.libreplan.business.common.daos;
 
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.libreplan.business.common.entities.Configuration;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;

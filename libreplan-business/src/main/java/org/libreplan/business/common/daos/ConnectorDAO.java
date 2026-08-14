@@ -21,8 +21,10 @@ package org.libreplan.business.common.daos;
 
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.libreplan.business.common.entities.Connector;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -49,9 +51,12 @@ public class ConnectorDAO extends GenericDAOHibernate<Connector, Long> implement
     @Override
     @Transactional(readOnly = true)
     public Connector findUniqueByName(String name) {
-        Criteria c = getSession().createCriteria(Connector.class).add(Restrictions.eq("name", name));
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Connector> cq = cb.createQuery(Connector.class);
+        Root<Connector> root = cq.from(Connector.class);
+        cq.where(cb.equal(root.get("name"), name));
 
-        return (Connector) c.uniqueResult();
+        return getSession().createQuery(cq).uniqueResult();
     }
 
     @Override

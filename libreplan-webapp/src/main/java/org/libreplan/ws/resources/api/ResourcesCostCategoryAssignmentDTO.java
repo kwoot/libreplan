@@ -20,8 +20,8 @@
  */
 package org.libreplan.ws.resources.api;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlSchemaType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.libreplan.ws.common.api.IntegrationEntityDTO;

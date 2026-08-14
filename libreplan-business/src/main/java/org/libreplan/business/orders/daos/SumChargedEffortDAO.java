@@ -27,8 +27,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.libreplan.business.common.IAdHocTransactionService;
 import org.libreplan.business.common.IOnTransaction;
 import org.libreplan.business.common.daos.GenericDAOHibernate;
@@ -243,9 +246,11 @@ public class SumChargedEffortDAO extends
 
     @Override
     public SumChargedEffort findByOrderElement(OrderElement orderElement) {
-        return (SumChargedEffort) getSession().createCriteria(getEntityClass())
-                .add(Restrictions.eq("orderElement", orderElement))
-                .uniqueResult();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<SumChargedEffort> cq = cb.createQuery(getEntityClass());
+        Root<SumChargedEffort> root = cq.from(getEntityClass());
+        cq.where(cb.equal(root.get("orderElement"), orderElement));
+        return getSession().createQuery(cq).uniqueResult();
     }
 
     @Override

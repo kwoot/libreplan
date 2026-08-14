@@ -24,7 +24,7 @@ package org.libreplan.business.workreports.entities;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.orders.entities.OrderElement;
 import org.libreplan.business.resources.entities.Criterion;

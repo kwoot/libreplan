@@ -26,14 +26,16 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.apache.commons.lang3.Validate;
 import org.hibernate.Hibernate;
 import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StaleObjectStateException;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.common.exceptions.ValidationException;
@@ -139,11 +141,12 @@ public class GenericDAOHibernate<E extends BaseEntity, PK extends Serializable> 
         }
 
         /* Check version */
-        Long versionValueInDB = (Long) getSession()
-                .createCriteria(entityClass)
-                .add(Restrictions.idEq(id))
-                .setProjection(Projections.property("version"))
-                .uniqueResult();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<E> root = cq.from(entityClass);
+        cq.where(cb.equal(root.get("id"), id));
+        cq.select(root.get("version"));
+        Long versionValueInDB = getSession().createQuery(cq).uniqueResult();
 
         if ( versionValueInDB == null ) {
             return;
@@ -156,9 +159,7 @@ public class GenericDAOHibernate<E extends BaseEntity, PK extends Serializable> 
     }
 
     public void lock(E entity) {
-        // TODO resolve deprecated
-        getSession().lock(entity, LockMode.UPGRADE);
-
+        getSession().lock(entity, LockMode.PESSIMISTIC_WRITE);
     }
 
     @SuppressWarnings("unchecked")
@@ -186,11 +187,12 @@ public class GenericDAOHibernate<E extends BaseEntity, PK extends Serializable> 
 
     public boolean exists(final PK id) {
 
-        return getSession()
-                .createCriteria(entityClass)
-                .add(Restrictions.idEq(id))
-                .setProjection(Projections.id())
-                .uniqueResult() != null;
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<E> root = cq.from(entityClass);
+        cq.where(cb.equal(root.get("id"), id));
+        cq.select(root.get("id"));
+        return getSession().createQuery(cq).uniqueResult() != null;
 
     }
 
@@ -198,11 +200,13 @@ public class GenericDAOHibernate<E extends BaseEntity, PK extends Serializable> 
         getSession().delete(find(id));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     @Transactional(readOnly = true)
     public <T extends E> List<T> list(Class<T> klass) {
-        return getSession().createCriteria(klass).list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<T> cq = cb.createQuery(klass);
+        cq.from(klass);
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override

@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 import org.hibernate.validator.constraints.NotEmpty;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.common.Registry;
 import org.libreplan.business.common.daos.IConnectorDAO;

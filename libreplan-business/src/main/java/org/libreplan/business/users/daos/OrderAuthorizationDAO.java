@@ -24,8 +24,10 @@ package org.libreplan.business.users.daos;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.libreplan.business.common.Registry;
 import org.libreplan.business.common.daos.GenericDAOHibernate;
 import org.libreplan.business.orders.entities.Order;
@@ -46,23 +48,29 @@ public class OrderAuthorizationDAO extends GenericDAOHibernate<OrderAuthorizatio
 
     @Override
     public List<OrderAuthorization> listByOrder(Order order) {
-        Criteria c = getSession().createCriteria(OrderAuthorization.class);
-        c.add(Restrictions.eq("order", order));
-        return c.list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<OrderAuthorization> cq = cb.createQuery(OrderAuthorization.class);
+        Root<OrderAuthorization> root = cq.from(OrderAuthorization.class);
+        cq.where(cb.equal(root.get("order"), order));
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override
     public List<OrderAuthorization> listByUser(User user) {
-        Criteria c = getSession().createCriteria(OrderAuthorization.class);
-        c.add(Restrictions.eq("user", user));
-        return c.list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<OrderAuthorization> cq = cb.createQuery(OrderAuthorization.class);
+        Root<OrderAuthorization> root = cq.from(OrderAuthorization.class);
+        cq.where(cb.equal(root.get("user"), user));
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override
     public List<OrderAuthorization> listByProfile(Profile profile) {
-        Criteria c = getSession().createCriteria(OrderAuthorization.class);
-        c.add(Restrictions.eq("profile", profile));
-        return c.list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<OrderAuthorization> cq = cb.createQuery(OrderAuthorization.class);
+        Root<OrderAuthorization> root = cq.from(OrderAuthorization.class);
+        cq.where(cb.equal(root.get("profile"), profile));
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override
@@ -92,18 +100,20 @@ public class OrderAuthorizationDAO extends GenericDAOHibernate<OrderAuthorizatio
 
     @Override
     public List<OrderAuthorization> listByOrderAndUser(Order order, User user) {
-        Criteria c = getSession().createCriteria(OrderAuthorization.class);
-        c.add(Restrictions.eq("order", order));
-        c.add(Restrictions.eq("user", user));
-        return c.list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<OrderAuthorization> cq = cb.createQuery(OrderAuthorization.class);
+        Root<OrderAuthorization> root = cq.from(OrderAuthorization.class);
+        cq.where(cb.equal(root.get("order"), order), cb.equal(root.get("user"), user));
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override
     public List<OrderAuthorization> listByOrderAndProfile(Order order, Profile profile) {
-        Criteria c = getSession().createCriteria(OrderAuthorization.class);
-        c.add(Restrictions.eq("order", order));
-        c.add(Restrictions.eq("profile", profile));
-        return c.list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<OrderAuthorization> cq = cb.createQuery(OrderAuthorization.class);
+        Root<OrderAuthorization> root = cq.from(OrderAuthorization.class);
+        cq.where(cb.equal(root.get("order"), order), cb.equal(root.get("profile"), profile));
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override

@@ -26,8 +26,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.criterion.Restrictions;
 import org.libreplan.business.common.daos.GenericDAOHibernate;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.common.exceptions.ValidationException;
@@ -85,10 +88,11 @@ public class ScenarioDAO extends GenericDAOHibernate<Scenario, Long> implements 
             throw new InstanceNotFoundException(null, Scenario.class.getName());
         }
 
-        Scenario scenario = (Scenario) getSession()
-                .createCriteria(Scenario.class)
-                .add(Restrictions.eq("name", name.trim()).ignoreCase())
-                .uniqueResult();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Scenario> cq = cb.createQuery(Scenario.class);
+        Root<Scenario> root = cq.from(Scenario.class);
+        cq.where(cb.equal(cb.lower(root.get("name")), name.trim().toLowerCase()));
+        Scenario scenario = getSession().createQuery(cq).uniqueResult();
 
         if (scenario == null) {
             throw new InstanceNotFoundException(name, Scenario.class.getName());
@@ -121,10 +125,11 @@ public class ScenarioDAO extends GenericDAOHibernate<Scenario, Long> implements 
 
     @Override
     public List<Scenario> getAllExcept(Scenario scenario) {
-        return getSession()
-                .createCriteria(Scenario.class)
-                .add(Restrictions.ne("name", scenario.getName()))
-                .list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Scenario> cq = cb.createQuery(Scenario.class);
+        Root<Scenario> root = cq.from(Scenario.class);
+        cq.where(cb.notEqual(root.get("name"), scenario.getName()));
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
@@ -144,12 +149,15 @@ public class ScenarioDAO extends GenericDAOHibernate<Scenario, Long> implements 
 
     @Override
     public List<Scenario> findByPredecessor(Scenario scenario) {
-        return scenario == null
-                ? Collections.emptyList()
-                : getSession()
-                    .createCriteria(Scenario.class)
-                    .add(Restrictions.eq("predecessor", scenario))
-                    .list();
+        if (scenario == null) {
+            return Collections.emptyList();
+        }
+
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Scenario> cq = cb.createQuery(Scenario.class);
+        Root<Scenario> root = cq.from(Scenario.class);
+        cq.where(cb.equal(root.get("predecessor"), scenario));
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override

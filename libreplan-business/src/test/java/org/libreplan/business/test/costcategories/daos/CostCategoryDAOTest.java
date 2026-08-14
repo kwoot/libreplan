@@ -161,6 +161,91 @@ public class CostCategoryDAOTest {
         assertTrue(costCategory.canAddHourCost(hourCost2));
     }
 
+    /*
+     * Characterization tests added for the Hibernate Criteria -> JPA Criteria API migration
+     * (Jakarta EE / Hibernate 6). findActive/findUniqueByName/findUniqueByCode/
+     * findByNameCaseInsensitive had no test coverage before.
+     */
+
+    @Test
+    @Transactional
+    public void testFindActiveOnlyReturnsEnabledOnes() {
+        CostCategory active = createValidCostCategory();
+        active.setEnabled(true);
+        costCategoryDAO.save(active);
+
+        CostCategory inactive = createValidCostCategory();
+        inactive.setEnabled(false);
+        costCategoryDAO.save(inactive);
+
+        boolean activeFound = false;
+        for (CostCategory c : costCategoryDAO.findActive()) {
+            assertTrue(c.getEnabled());
+            if (c.getId().equals(active.getId())) {
+                activeFound = true;
+            }
+            assertFalse(c.getId().equals(inactive.getId()));
+        }
+        assertTrue(activeFound);
+    }
+
+    @Test
+    @Transactional
+    public void testFindUniqueByNameIsCaseInsensitive() throws InstanceNotFoundException {
+        String mixedCaseName = "MiXeD-" + UUID.randomUUID();
+        CostCategory costCategory = CostCategory.create(mixedCaseName);
+        costCategoryDAO.save(costCategory);
+
+        assertEquals(costCategory.getId(), costCategoryDAO.findUniqueByName(mixedCaseName).getId());
+        assertEquals(costCategory.getId(), costCategoryDAO.findUniqueByName(mixedCaseName.toLowerCase()).getId());
+        assertEquals(costCategory.getId(), costCategoryDAO.findUniqueByName(mixedCaseName.toUpperCase()).getId());
+    }
+
+    @Test(expected = InstanceNotFoundException.class)
+    @Transactional
+    public void testFindUniqueByNameThrowsWhenNotFound() throws InstanceNotFoundException {
+        costCategoryDAO.findUniqueByName("does-not-exist-" + UUID.randomUUID());
+    }
+
+    @Test
+    @Transactional
+    public void testFindUniqueByCodeIsCaseInsensitive() throws InstanceNotFoundException {
+        String mixedCaseCode = "MiXeD-" + UUID.randomUUID();
+        CostCategory costCategory = createValidCostCategory();
+        costCategory.setCode(mixedCaseCode);
+        costCategoryDAO.save(costCategory);
+
+        assertEquals(costCategory.getId(), costCategoryDAO.findUniqueByCode(mixedCaseCode).getId());
+        assertEquals(costCategory.getId(), costCategoryDAO.findUniqueByCode(mixedCaseCode.toLowerCase()).getId());
+        assertEquals(costCategory.getId(), costCategoryDAO.findUniqueByCode(mixedCaseCode.toUpperCase()).getId());
+    }
+
+    @Test(expected = InstanceNotFoundException.class)
+    @Transactional
+    public void testFindUniqueByCodeThrowsWhenNotFound() throws InstanceNotFoundException {
+        costCategoryDAO.findUniqueByCode("does-not-exist-" + UUID.randomUUID());
+    }
+
+    @Test
+    @Transactional
+    public void testFindByNameCaseInsensitiveMatchesAnyCase() throws InstanceNotFoundException {
+        String mixedCaseName = "MiXeD-" + UUID.randomUUID();
+        CostCategory costCategory = CostCategory.create(mixedCaseName);
+        costCategoryDAO.save(costCategory);
+
+        assertEquals(costCategory.getId(), costCategoryDAO.findByNameCaseInsensitive(mixedCaseName).getId());
+        assertEquals(costCategory.getId(),
+                costCategoryDAO.findByNameCaseInsensitive(mixedCaseName.toLowerCase()).getId());
+        assertEquals(costCategory.getId(),
+                costCategoryDAO.findByNameCaseInsensitive(mixedCaseName.toUpperCase()).getId());
+    }
+
+    @Test(expected = InstanceNotFoundException.class)
+    @Transactional
+    public void testFindByNameCaseInsensitiveThrowsWhenNotFound() throws InstanceNotFoundException {
+        costCategoryDAO.findByNameCaseInsensitive("does-not-exist-" + UUID.randomUUID());
+    }
+
     @Test
     @Transactional
     public void testListHourCosts() {

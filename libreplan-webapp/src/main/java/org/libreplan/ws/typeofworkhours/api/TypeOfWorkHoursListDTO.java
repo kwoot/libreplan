@@ -24,8 +24,8 @@ package org.libreplan.ws.typeofworkhours.api;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * DTO for a list of <code>TypeOfWorkHours</code> entities.

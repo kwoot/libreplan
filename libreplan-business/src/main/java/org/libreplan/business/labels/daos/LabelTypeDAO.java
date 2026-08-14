@@ -23,10 +23,12 @@ package org.libreplan.business.labels.daos;
 
 import java.util.List;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.apache.commons.lang3.Validate;
-import org.hibernate.Criteria;
 import org.hibernate.NonUniqueResultException;
-import org.hibernate.criterion.Restrictions;
 import org.libreplan.business.common.daos.IntegrationEntityDAO;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.labels.entities.LabelType;
@@ -87,9 +89,11 @@ public class LabelTypeDAO extends IntegrationEntityDAO<LabelType> implements
     @Override
     public LabelType findUniqueByName(String name)
             throws InstanceNotFoundException, NonUniqueResultException {
-        Criteria c = getSession().createCriteria(LabelType.class);
-        c.add(Restrictions.eq("name", name));
-        LabelType labelType = (LabelType) c.uniqueResult();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<LabelType> cq = cb.createQuery(LabelType.class);
+        Root<LabelType> root = cq.from(LabelType.class);
+        cq.where(cb.equal(root.get("name"), name));
+        LabelType labelType = getSession().createQuery(cq).uniqueResult();
 
         if (labelType == null) {
             throw new InstanceNotFoundException(null, "LabelType");

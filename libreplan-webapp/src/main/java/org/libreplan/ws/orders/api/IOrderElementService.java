@@ -21,7 +21,7 @@
 
 package org.libreplan.ws.orders.api;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import org.libreplan.business.orders.entities.OrderElement;
 import org.libreplan.ws.common.api.InstanceConstraintViolationsListDTO;

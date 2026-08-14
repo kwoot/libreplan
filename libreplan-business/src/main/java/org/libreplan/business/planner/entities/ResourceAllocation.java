@@ -39,7 +39,7 @@ import java.util.Set;
 
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.LocalDate;
 import org.libreplan.business.calendars.entities.AvailabilityTimeLine;
 import org.libreplan.business.calendars.entities.BaseCalendar;

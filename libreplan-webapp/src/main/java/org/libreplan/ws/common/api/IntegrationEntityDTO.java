@@ -23,7 +23,7 @@ package org.libreplan.ws.common.api;
 
 import java.util.UUID;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 
 /**
  * DTO for <code>IntegrationEntity</code>. All DTOs corresponding to entities

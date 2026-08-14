@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.libreplan.business.common.daos.IntegrationEntityDAO;
 import org.libreplan.business.expensesheet.entities.ExpenseSheetLine;
 import org.libreplan.business.orders.entities.OrderElement;
@@ -43,7 +45,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExpenseSheetLineDAO extends IntegrationEntityDAO<ExpenseSheetLine> implements
         IExpenseSheetLineDAO {
 
-    @SuppressWarnings("unchecked")
     @Override
     @Transactional(readOnly = true)
     public List<ExpenseSheetLine> findByOrderElement(OrderElement orderElement) {
@@ -51,10 +52,11 @@ public class ExpenseSheetLineDAO extends IntegrationEntityDAO<ExpenseSheetLine> 
             return new ArrayList<ExpenseSheetLine>();
         }
 
-        // Prepare criteria
-        final Criteria criteria = getSession().createCriteria(ExpenseSheetLine.class);
-        criteria.add(Restrictions.eq("orderElement", orderElement));
-        return criteria.list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<ExpenseSheetLine> cq = cb.createQuery(ExpenseSheetLine.class);
+        Root<ExpenseSheetLine> root = cq.from(ExpenseSheetLine.class);
+        cq.where(cb.equal(root.get("orderElement"), orderElement));
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override
@@ -65,17 +67,17 @@ public class ExpenseSheetLineDAO extends IntegrationEntityDAO<ExpenseSheetLine> 
         return findByOrderAndItsChildren(orderElement);
     }
 
-    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public List<ExpenseSheetLine> findByOrderAndItsChildren(OrderElement orderElement) {
         // Create collection with current orderElement and all its children
         Collection<OrderElement> orderElements = orderElement.getAllChildren();
         orderElements.add(orderElement);
 
-        // Prepare criteria
-        final Criteria criteria = getSession().createCriteria(ExpenseSheetLine.class);
-        criteria.add(Restrictions.in("orderElement", orderElements));
-        return criteria.list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<ExpenseSheetLine> cq = cb.createQuery(ExpenseSheetLine.class);
+        Root<ExpenseSheetLine> root = cq.from(ExpenseSheetLine.class);
+        cq.where(root.get("orderElement").in(orderElements));
+        return getSession().createQuery(cq).getResultList();
     }
 
 }

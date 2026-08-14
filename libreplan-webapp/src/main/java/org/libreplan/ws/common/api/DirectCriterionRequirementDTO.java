@@ -21,7 +21,7 @@
 
 package org.libreplan.ws.common.api;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.libreplan.business.requirements.entities.DirectCriterionRequirement;
 

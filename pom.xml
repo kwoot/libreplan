@@ -146,7 +146,7 @@
                 <dataSource.url>jdbc:postgresql://localhost/libreplan${libreplan.mode}</dataSource.url>
                 <testDataSource.url>${dataSource.url}test</testDataSource.url>
                 <!-- Hibernate properties -->
-                <hibernate.dialect>org.hibernate.dialect.PostgreSQL82Dialect</hibernate.dialect>
+                <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
                 <databasetable.prefix>public.</databasetable.prefix>
             </properties>
         </profile>
@@ -172,7 +172,7 @@
                 <dataSource.url>jdbc:mysql://localhost/libreplan${libreplan.mode}</dataSource.url>
                 <testDataSource.url>${dataSource.url}test</testDataSource.url>
                 <!-- Hibernate properties -->
-                <hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</hibernate.dialect>
+                <hibernate.dialect>org.hibernate.dialect.MySQLDialect</hibernate.dialect>
                 <databasetable.prefix/>
             </properties>
         </profile>
@@ -230,21 +230,21 @@
 
             <!-- Javax Annotation API (required for Java 9+) -->
             <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>1.3.2</version>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>2.0.0</version>
             </dependency>
 
             <!-- JAXB API (required for Java 9+) -->
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jakarta.xml.bind-api</artifactId>
-                <version>2.3.3</version>
+                <version>3.0.1</version>
             </dependency>
             <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
-                <version>2.3.3</version>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>3.0.2</version>
             </dependency>
 
             <!-- GPL JFreechartEngine for ZK -->
@@ -278,40 +278,60 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
-                <version>5.6.15.Final</version>
+                <version>6.6.55.Final</version>
             </dependency>
 
+            <!--
+                hibernate-ehcache never reached GA for Hibernate 6.x (stuck at 6.0.0.Alpha*
+                forever - Hibernate 6 restructured 2nd-level caching to be JCache-based).
+                Replaced with hibernate-jcache + a JCache-compliant ehcache 3.x provider.
+                JCache (javax.cache, JSR-107) is a separate spec never renamed to jakarta.*,
+                so org.ehcache:ehcache needs no jakarta-specific variant.
+            -->
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-ehcache</artifactId>
-                <version>5.6.15.Final</version>
+                <artifactId>hibernate-jcache</artifactId>
+                <version>6.6.55.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ehcache</groupId>
+                <artifactId>ehcache</artifactId>
+                <version>3.12.0</version>
             </dependency>
 
             <!-- Hibernate Validator -->
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator</artifactId>
-                <version>6.2.5.Final</version>
+                <version>8.0.5.Final</version>
             </dependency>
 
             <!-- Javax EL (needed for javax validation) -->
             <dependency>
-                <groupId>javax.el</groupId>
-                <artifactId>javax.el-api</artifactId>
-                <version>3.0.0</version>
+                <groupId>jakarta.el</groupId>
+                <artifactId>jakarta.el-api</artifactId>
+                <version>4.0.0</version>
             </dependency>
 
-            <!-- Usertype.Core ( Significant for Hibernate ) -->
+            <!--
+                Jakarta EE APIs added by the OpenRewrite javax->jakarta migration recipe.
+                Centralized here rather than inline-versioned per-module, matching this
+                project's existing convention for every other dependency version.
+            -->
             <dependency>
-              <groupId>org.jadira.usertype</groupId>
-              <artifactId>usertype.core</artifactId>
-              <version>6.0.1.GA</version>
-                  <exclusions>
-                    <exclusion>
-                        <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-entitymanager</artifactId>
-                    </exclusion>
-                </exclusions>
+                <groupId>jakarta.persistence</groupId>
+                <artifactId>jakarta.persistence-api</artifactId>
+                <version>3.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.transaction</groupId>
+                <artifactId>jakarta.transaction-api</artifactId>
+                <version>2.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>3.0.2</version>
             </dependency>
 
             <!-- JDBC driver -->
@@ -340,14 +360,14 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-orm</artifactId>
-                <version>5.3.39</version>
+                <version>6.2.19</version>
             </dependency>
 
             <!-- Spring Web -->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>5.3.39</version>
+                <version>6.2.19</version>
             </dependency>
 
             <!--
@@ -372,38 +392,38 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context-support</artifactId>
-                <version>5.3.39</version>
+                <version>6.2.19</version>
             </dependency>
 
             <!--  Spring security -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-web</artifactId>
-                <version>5.8.16</version>
+                <version>6.5.11</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-config</artifactId>
-                <version>5.8.16</version>
+                <version>6.5.11</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-acl</artifactId>
-                <version>5.8.16</version>
+                <version>6.5.11</version>
             </dependency>
 
             <!-- Spring Dependency LDAP -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-ldap</artifactId>
-                <version>5.8.16</version>
+                <version>6.5.11</version>
             </dependency>
 
             <!-- Spring test -->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
-                <version>5.3.39</version>
+                <version>6.2.19</version>
                 <scope>test</scope>
             </dependency>
 
@@ -509,9 +529,9 @@
 
             <!-- Apache Commons Fileupload (required by ZK) -->
             <dependency>
-                <groupId>commons-fileupload</groupId>
-                <artifactId>commons-fileupload</artifactId>
-                <version>1.6.0</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-fileupload2-jakarta-servlet5</artifactId>
+                <version>2.0.0-M4</version>
                 <scope>runtime</scope>
             </dependency>
 
@@ -519,31 +539,31 @@
             <dependency>
                 <groupId>org.zkoss.zk</groupId>
                 <artifactId>zul</artifactId>
-                <version>8.6.0.1</version>
+                <version>10.3.0.1-jakarta</version>
             </dependency>
 
             <dependency>
                 <groupId>org.zkoss.zk</groupId>
                 <artifactId>zkplus</artifactId>
-                <version>8.6.0.1</version>
+                <version>10.3.0.1-jakarta</version>
             </dependency>
 
             <dependency>
                 <groupId>org.zkoss.zk</groupId>
                 <artifactId>zkbind</artifactId>
-                <version>8.6.0.1</version>
+                <version>10.3.0.1-jakarta</version>
             </dependency>
 
             <dependency>
                 <groupId>org.zkoss.common</groupId>
                 <artifactId>zcommon</artifactId>
-                <version>8.6.0.1</version>
+                <version>10.3.0.1-jakarta</version>
             </dependency>
 
             <dependency>
                 <groupId>org.zkoss.zk</groupId>
                 <artifactId>zk</artifactId>
-                <version>8.6.0.1</version>
+                <version>10.3.0.1-jakarta</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.jruby</groupId>
@@ -558,7 +578,7 @@
             <dependency>
                 <groupId>org.zkoss.common</groupId>
                 <artifactId>zweb</artifactId>
-                <version>8.6.0.1</version>
+                <version>10.3.0.1-jakarta</version>
             </dependency>
 
             <!--
@@ -618,18 +638,18 @@
 
             <!-- Servlet -->
             <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>4.0.1</version>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>5.0.0</version>
                 <type>jar</type>
                 <scope>provided</scope>
             </dependency>
 
             <!-- JAX-RS API -->
             <dependency>
-                <groupId>javax.ws.rs</groupId>
-                <artifactId>javax.ws.rs-api</artifactId>
-                <version>2.0.1</version>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>3.0.0</version>
             </dependency>
 
             <!--
@@ -645,7 +665,7 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-transports-http</artifactId>
-                <version>3.5.11</version>
+                <version>4.1.8</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.springframework</groupId>
@@ -673,7 +693,7 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-                <version>3.5.11</version>
+                <version>4.1.8</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.springframework</groupId>
@@ -697,7 +717,7 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-rs-client</artifactId>
-                <version>3.5.11</version>
+                <version>4.1.8</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.codehaus.woodstox</groupId>
@@ -706,16 +726,21 @@
                 </exclusions>
             </dependency>
 
-            <!-- Jackson provider -->
+            <!--
+                Jackson provider. The OpenRewrite recipe picked 2.13.5 by default; bumped to
+                2.22.1 to match what CXF 4.1.8 itself expects (cxf.jackson.version) - CXF 4.2.0+
+                jumped to Jackson 3.x (new tools.jackson groupId), deliberately not targeted
+                here, same reasoning as staying on Spring 6.x for now (see Phase-5 plan doc).
+            -->
             <dependency>
-                <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                <artifactId>jackson-jaxrs-json-provider</artifactId>
-                <version>2.17.2</version>
+                <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                <artifactId>jackson-jakarta-rs-json-provider</artifactId>
+                <version>2.22.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-module-jaxb-annotations</artifactId>
-                <version>2.17.2</version>
+                <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
+                <version>2.22.1</version>
             </dependency>
 
             <!-- ZK Timeplot -->
@@ -794,9 +819,19 @@
 
             <!-- Java mail -->
             <dependency>
-                <groupId>com.sun.mail</groupId>
-                <artifactId>javax.mail</artifactId>
-                <version>1.5.5</version>
+                <groupId>jakarta.mail</groupId>
+                <artifactId>jakarta.mail-api</artifactId>
+                <version>2.0.2</version>
+            </dependency>
+            <!--
+                jakarta.mail-api is API-only; the old com.sun.mail:javax.mail artifact it
+                replaced bundled both API and implementation together. Angus Mail is the
+                Eclipse-hosted successor implementation for the Jakarta Mail generation.
+            -->
+            <dependency>
+                <groupId>org.eclipse.angus</groupId>
+                <artifactId>angus-mail</artifactId>
+                <version>2.0.5</version>
             </dependency>
 
         </dependencies>

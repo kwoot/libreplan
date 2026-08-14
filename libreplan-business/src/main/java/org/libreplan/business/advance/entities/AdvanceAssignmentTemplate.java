@@ -23,7 +23,7 @@ package org.libreplan.business.advance.entities;
 import java.math.BigDecimal;
 
 import org.apache.commons.lang3.Validate;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.orders.entities.OrderElement;
 import org.libreplan.business.templates.entities.OrderElementTemplate;

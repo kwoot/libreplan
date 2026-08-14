@@ -103,7 +103,7 @@ import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 import org.zkoss.zul.Listbox;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;

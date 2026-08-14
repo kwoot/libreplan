@@ -28,6 +28,7 @@ import static org.libreplan.business.BusinessGlobalNames.BUSINESS_SPRING_CONFIG_
 import static org.libreplan.business.test.BusinessGlobalNames.BUSINESS_SPRING_CONFIG_TEST_FILE;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,5 +82,63 @@ public class WorkReportTypeDAOTest extends AbstractWorkReportTest {
         List<WorkReportType> list = workReportTypeDAO
                 .list(WorkReportType.class);
         assertEquals(previous + 2, list.size());
+    }
+
+    /*
+     * Characterization tests added for the Hibernate Criteria -> JPA Criteria API migration
+     * (Jakarta EE / Hibernate 6). findUniqueByName/findUniqueByCode/existsOtherWorkReportTypeByName/
+     * existsOtherWorkReportTypeByCode/getWorkReportTypes had no test coverage before.
+     */
+
+    @Test
+    @Transactional
+    public void findUniqueByNameReturnsMatch() throws InstanceNotFoundException {
+        WorkReportType workReportType = createValidWorkReportType();
+        workReportTypeDAO.save(workReportType);
+
+        assertEquals(workReportType.getId(), workReportTypeDAO.findUniqueByName(workReportType.getName()).getId());
+    }
+
+    @Test(expected = InstanceNotFoundException.class)
+    @Transactional
+    public void findUniqueByNameThrowsWhenNotFound() throws InstanceNotFoundException {
+        workReportTypeDAO.findUniqueByName("does-not-exist-" + UUID.randomUUID());
+    }
+
+    @Test
+    @Transactional
+    public void findUniqueByCodeReturnsMatch() throws InstanceNotFoundException {
+        WorkReportType workReportType = createValidWorkReportType();
+        workReportTypeDAO.save(workReportType);
+
+        assertEquals(workReportType.getId(), workReportTypeDAO.findUniqueByCode(workReportType.getCode()).getId());
+    }
+
+    @Test(expected = InstanceNotFoundException.class)
+    @Transactional
+    public void findUniqueByCodeThrowsWhenNotFound() throws InstanceNotFoundException {
+        workReportTypeDAO.findUniqueByCode("does-not-exist-" + UUID.randomUUID());
+    }
+
+    @Test
+    @Transactional
+    public void existsOtherWorkReportTypeByNameFalseWhenNotSaved() {
+        WorkReportType notSaved = createValidWorkReportType();
+        assertFalse(workReportTypeDAO.existsOtherWorkReportTypeByName(notSaved));
+    }
+
+    @Test
+    @Transactional
+    public void existsOtherWorkReportTypeByCodeFalseWhenNotSaved() {
+        WorkReportType notSaved = createValidWorkReportType();
+        assertFalse(workReportTypeDAO.existsOtherWorkReportTypeByCode(notSaved));
+    }
+
+    @Test
+    @Transactional
+    public void getWorkReportTypesReflectsSaved() {
+        int previous = workReportTypeDAO.getWorkReportTypes().size();
+        workReportTypeDAO.save(createValidWorkReportType());
+        assertEquals(previous + 1, workReportTypeDAO.getWorkReportTypes().size());
     }
 }

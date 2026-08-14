@@ -21,9 +21,9 @@
 
 package org.libreplan.business.workreports.valueobjects;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 import org.hibernate.validator.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.libreplan.business.INewObject;
 
 /**

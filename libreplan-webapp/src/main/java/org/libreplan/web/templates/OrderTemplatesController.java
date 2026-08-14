@@ -25,7 +25,7 @@ import static org.libreplan.web.planner.tabs.MultipleTabsPlannerController.BREAD
 
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.libreplan.business.calendars.entities.BaseCalendar;
 import org.libreplan.business.common.exceptions.ValidationException;

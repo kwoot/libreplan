@@ -21,7 +21,7 @@
 
 package org.libreplan.ws.boundusers.api;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Service for managing operations related with bound users.

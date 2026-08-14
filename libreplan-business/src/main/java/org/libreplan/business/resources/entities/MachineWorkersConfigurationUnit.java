@@ -27,8 +27,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.Valid;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.util.deepcopy.OnCopy;
 import org.libreplan.business.util.deepcopy.Strategy;

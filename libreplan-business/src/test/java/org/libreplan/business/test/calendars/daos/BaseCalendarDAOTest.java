@@ -29,10 +29,11 @@ import static org.junit.Assert.fail;
 import static org.libreplan.business.BusinessGlobalNames.BUSINESS_SPRING_CONFIG_FILE;
 import static org.libreplan.business.test.BusinessGlobalNames.BUSINESS_SPRING_CONFIG_TEST_FILE;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.hibernate.SessionFactory;
 import org.joda.time.LocalDate;
@@ -49,9 +50,15 @@ import org.libreplan.business.calendars.entities.CalendarExceptionType;
 import org.libreplan.business.calendars.entities.ResourceCalendar;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.common.exceptions.ValidationException;
+import org.libreplan.business.orders.daos.IOrderDAO;
+import org.libreplan.business.orders.entities.Order;
 import org.libreplan.business.resources.daos.IResourceDAO;
 import org.libreplan.business.resources.entities.Worker;
+import org.libreplan.business.scenarios.IScenarioManager;
+import org.libreplan.business.scenarios.bootstrap.IScenariosBootstrap;
+import org.libreplan.business.scenarios.entities.OrderVersion;
 import org.libreplan.business.test.calendars.entities.BaseCalendarTest;
+import org.libreplan.business.test.planner.daos.ResourceAllocationDAOTest;
 import org.libreplan.business.test.resources.daos.ResourceDAOTest;
 import org.libreplan.business.workingday.EffortDuration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +88,15 @@ public class BaseCalendarDAOTest {
     @Autowired
     private IResourceDAO resourceDAO;
 
+    @Autowired
+    private IOrderDAO orderDAO;
+
+    @Autowired
+    private IScenariosBootstrap scenariosBootstrap;
+
+    @Autowired
+    private IScenarioManager scenarioManager;
+
     @Resource
     private IDataBootstrap configurationBootstrap;
 
@@ -91,6 +107,7 @@ public class BaseCalendarDAOTest {
     public void loadRequiredData() {
         configurationBootstrap.loadRequiredData();
         calendarBootstrap.loadRequiredData();
+        scenariosBootstrap.loadRequiredData();
     }
 
     @Test
@@ -369,6 +386,64 @@ public class BaseCalendarDAOTest {
         } catch (InstanceNotFoundException ignored) {}
 
         assertTrue(!baseCalendarDAO.exists(resourceCalendar.getId()));
+    }
+
+    /*
+     * Characterization tests added for the Hibernate Criteria -> JPA Criteria API migration
+     * (Jakarta EE / Hibernate 6). checkIsReferencedByOtherEntities (and its private helpers
+     * checkHasResources/checkHasOrders/checkHasTasks/checkHasTemplates) had no test coverage
+     * before.
+     */
+
+    @Test
+    @Transactional
+    public void testCheckIsReferencedByOtherEntitiesDoesNotThrowWhenUnused() {
+        BaseCalendar calendar = BaseCalendarTest.createBasicCalendar();
+        calendar.setName("unused-calendar-" + UUID.randomUUID());
+        baseCalendarDAO.save(calendar);
+        baseCalendarDAO.flush();
+
+        // Exercises all four underlying checks (resources/orders/tasks/templates); none
+        // should find a match, so no ValidationException is thrown.
+        baseCalendarDAO.checkIsReferencedByOtherEntities(calendar);
+    }
+
+    @Test(expected = ValidationException.class)
+    @Transactional
+    public void testCheckIsReferencedByOtherEntitiesThrowsWhenOrderUsesCalendar() {
+        BaseCalendar calendar = BaseCalendarTest.createBasicCalendar();
+        calendar.setName("order-calendar-" + UUID.randomUUID());
+        baseCalendarDAO.save(calendar);
+
+        Order order = Order.create();
+        order.setName("order-" + UUID.randomUUID());
+        order.setCode(UUID.randomUUID().toString());
+        order.setInitDate(new Date());
+        order.setCalendar(calendar);
+        OrderVersion orderVersion = ResourceAllocationDAOTest.setupVersionUsing(scenarioManager, order);
+        order.useSchedulingDataFor(orderVersion);
+        orderDAO.save(order);
+        orderDAO.flush();
+
+        baseCalendarDAO.checkIsReferencedByOtherEntities(calendar);
+    }
+
+    @Test(expected = ValidationException.class)
+    @Transactional
+    public void testCheckIsReferencedByOtherEntitiesThrowsWhenResourceCalendarChildExists() {
+        BaseCalendar calendar = BaseCalendarTest.createBasicCalendar();
+        calendar.setName("parent-calendar-" + UUID.randomUUID());
+        baseCalendarDAO.save(calendar);
+
+        Worker worker = ResourceDAOTest.givenValidWorker();
+        ResourceCalendar resourceCalendar = calendar.newDerivedResourceCalendar();
+        resourceCalendar.setName("derived-resource-calendar-" + UUID.randomUUID());
+        BaseCalendarTest.setHoursForAllDays(resourceCalendar, 8);
+        worker.setCalendar(resourceCalendar);
+        resourceDAO.save(worker);
+        resourceDAO.flush();
+
+        baseCalendarDAO.checkIsReferencedByOtherEntities(calendar);
     }
 
 }

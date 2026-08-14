@@ -69,7 +69,7 @@ public class CriterionSatisfactionDAOTest {
     @Autowired
     private IWorkerDAO workerDAO;
 
-    @javax.annotation.Resource
+    @jakarta.annotation.Resource
     private IDataBootstrap configurationBootstrap;
 
     @Before

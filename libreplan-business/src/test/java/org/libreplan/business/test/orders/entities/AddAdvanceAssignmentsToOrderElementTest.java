@@ -31,7 +31,7 @@ import static org.libreplan.business.test.BusinessGlobalNames.BUSINESS_SPRING_CO
 
 import java.math.BigDecimal;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

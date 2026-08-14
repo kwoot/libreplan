@@ -25,8 +25,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
-import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.scenarios.entities.Scenario;
 import org.libreplan.business.util.deepcopy.OnCopy;

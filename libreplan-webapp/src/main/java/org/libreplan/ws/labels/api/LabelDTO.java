@@ -21,8 +21,8 @@
 
 package org.libreplan.ws.labels.api;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.libreplan.business.labels.entities.Label;
 import org.libreplan.ws.common.api.IntegrationEntityDTO;

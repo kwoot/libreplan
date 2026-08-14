@@ -23,7 +23,10 @@ package org.libreplan.business.costcategories.daos;
 
 import java.util.List;
 
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.libreplan.business.common.daos.IntegrationEntityDAO;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.costcategories.entities.CostCategory;
@@ -57,8 +60,10 @@ public class ResourcesCostCategoryAssignmentDAO
     @Override
     public List<ResourcesCostCategoryAssignment> getResourcesCostCategoryAssignmentsByCostCategory(
             CostCategory costCategory) {
-        return (List<ResourcesCostCategoryAssignment>)getSession().
-            createCriteria(ResourcesCostCategoryAssignment.class)
-            .add(Restrictions.eq("costCategory", costCategory)).list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<ResourcesCostCategoryAssignment> cq = cb.createQuery(ResourcesCostCategoryAssignment.class);
+        Root<ResourcesCostCategoryAssignment> root = cq.from(ResourcesCostCategoryAssignment.class);
+        cq.where(cb.equal(root.get("costCategory"), costCategory));
+        return getSession().createQuery(cq).getResultList();
     }
 }

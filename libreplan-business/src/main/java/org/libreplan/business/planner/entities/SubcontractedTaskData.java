@@ -27,9 +27,9 @@ import java.util.Date;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 import org.hibernate.validator.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.externalcompanies.entities.DeliverDateComparator;
 import org.libreplan.business.externalcompanies.entities.EndDateCommunication;

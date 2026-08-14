@@ -24,8 +24,10 @@ package org.libreplan.business.scenarios.daos;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.libreplan.business.common.daos.GenericDAOHibernate;
 import org.libreplan.business.scenarios.entities.OrderVersion;
 import org.libreplan.business.scenarios.entities.Scenario;
@@ -50,9 +52,11 @@ public class OrderVersionDAO extends GenericDAOHibernate<OrderVersion, Long>
             return Collections.emptyList();
         }
 
-        Criteria c = getSession().createCriteria(OrderVersion.class).add(
-                Restrictions.eq("ownerScenario", ownerScenario));
-        return (List<OrderVersion>) c.list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<OrderVersion> cq = cb.createQuery(OrderVersion.class);
+        Root<OrderVersion> root = cq.from(OrderVersion.class);
+        cq.where(cb.equal(root.get("ownerScenario"), ownerScenario));
+        return getSession().createQuery(cq).getResultList();
     }
 
 }

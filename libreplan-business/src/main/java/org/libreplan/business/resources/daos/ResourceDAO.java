@@ -26,9 +26,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.hibernate.Query;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
+import org.hibernate.query.Query;
 import org.libreplan.business.common.daos.IntegrationEntityDAO;
 import org.libreplan.business.labels.entities.Label;
 import org.libreplan.business.reports.dtos.HoursWorkedPerResourceDTO;
@@ -92,16 +94,26 @@ public class ResourceDAO extends IntegrationEntityDAO<Resource> implements IReso
         return list(Resource.class);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Resource> getAllLimitingResources() {
-        return getSession().createCriteria(Resource.class).add(Restrictions.eq("limitingResource", true)).list();
+        // "limitingResource" was never actually a mapped property on Resource, so this method
+        // always throws when called (no callers exist in the codebase) - preserved as-is.
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Resource> cq = cb.createQuery(Resource.class);
+        Root<Resource> root = cq.from(Resource.class);
+        cq.where(cb.equal(root.get("limitingResource"), true));
+        return getSession().createQuery(cq).getResultList();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Resource> getAllNonLimitingResources() {
-        return getSession().createCriteria(Resource.class).add(Restrictions.eq("limitingResource", false)).list();
+        // "limitingResource" was never actually a mapped property on Resource, so this method
+        // always throws when called (no callers exist in the codebase) - preserved as-is.
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Resource> cq = cb.createQuery(Resource.class);
+        Root<Resource> root = cq.from(Resource.class);
+        cq.where(cb.equal(root.get("limitingResource"), false));
+        return getSession().createQuery(cq).getResultList();
     }
 
     @Override
@@ -265,8 +277,11 @@ public class ResourceDAO extends IntegrationEntityDAO<Resource> implements IReso
 
     @Override
     public Number getRowCount() {
-        return (Number) getSession()
-                .createCriteria(Resource.class).setProjection(Projections.rowCount()).uniqueResult();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<Resource> root = cq.from(Resource.class);
+        cq.select(cb.count(root));
+        return getSession().createQuery(cq).uniqueResult();
     }
 
     private List<HoursWorkedPerWorkerInAMonthDTO> toDTO(List<Object> rows) {

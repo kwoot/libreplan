@@ -23,7 +23,7 @@ package org.libreplan.business.resources.entities;
 
 import java.util.List;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 import org.libreplan.business.common.Registry;
 

@@ -34,8 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.logging.Log;

@@ -33,9 +33,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.annotation.PostConstruct;
-import javax.transaction.Status;
-import javax.transaction.Synchronization;
+import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -158,7 +158,7 @@ public class HibernateDatabaseModificationsListener implements
     }
 
     @Override
-    public boolean requiresPostCommitHanding(EntityPersister persister) {
+    public boolean requiresPostCommitHandling(EntityPersister persister) {
         return false;
     }
 

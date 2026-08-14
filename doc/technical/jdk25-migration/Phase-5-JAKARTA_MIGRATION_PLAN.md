@@ -62,37 +62,45 @@ code. Nothing in this phase changes behavior.
 
 Steps:
 
-1. **Confirm ZK's Jakarta edition actually covers what LibrePlan needs,
-   licensing included.** `Phase-5-jakarta-migration-scope.md` confirmed
-   `org.zkoss.zk:zk:10.0.0-jakarta` exists on Maven Central under the same
-   free coordinate this project already uses, but ZK's licensing has
-   shifted across major versions before — verify explicitly rather than
-   assume the free tier still covers everything LibrePlan currently uses
-   from ZK 8.6 (this project pulls `zk`, `zul`, `zkplus`, `zkbind`,
-   `zcommon`, `zweb` — check each has a `-jakarta` free equivalent, not
-   just the core `zk` artifact).
-2. **Decide Tomcat 10 vs. 11** for the deployment target, together with
-   whoever owns the Docker deployment (external to this repo, per
-   `JDK25_MIGRATION_PLAN.md` Phase 4 step 4). This affects which
-   `jakarta.servlet-api` version to target (5.0 for Tomcat 10, 6.0/6.1 for
-   Tomcat 11) and needs to be settled before step 5.2, not discovered
-   partway through it.
-3. **Run OpenRewrite's Jakarta EE migration recipe in dry-run mode**
-   (`mvn org.openrewrite.maven:rewrite-maven-plugin:dryRun
-   -Drewrite.activeRecipes=org.openrewrite.java.migrate.jakarta.JavaxMigrationToJakarta`
-   or the current equivalent recipe id — check what's current, recipe ids
-   move around between OpenRewrite releases) to get an exact preview diff
-   without committing to anything. Compare its output against the manual
-   classification in `Phase-5-javax-import-inventory.txt` as a sanity
-   check — it should leave every JDK-native import (`javax.xml.datatype`,
-   `javax.management.*`, `javax.naming.*`, `javax.net.ssl`) untouched.
-4. Capture a fresh `dependency:tree` + full test-suite baseline snapshot
-   for all 3 modules (same pattern as the JDK 25 plan's per-phase
-   baselines) — save under a `phase5-pre-jakarta/` subdirectory here, so
-   there's something concrete to diff against once 5.2/5.3 land.
-5. Create the working branch for this effort (off `main`, once
-   `jdk11to25` has been merged — don't build Jakarta work on top of an
-   unmerged branch).
+1. **[done]** Confirmed ZK's Jakarta edition covers what LibrePlan needs.
+   Checked all 6 ZK artifacts this project actually depends on (`zk`,
+   `zul`, `zkplus`, `zkbind`, `zcommon`, `zweb`), not just the core `zk`
+   one — every single one has `-jakarta`-suffixed versions on Maven
+   Central through `10.3.0.1-jakarta` (latest), under the same free
+   coordinates already in use. Licensing checked separately (web search):
+   ZK CE remains free under LGPL for both open-source and commercial use,
+   no indication the free tier lost anything relevant for this jump.
+2. **[done]** Tomcat **10** chosen (Jeroen's call). Target
+   `jakarta.servlet-api` **5.0.x** accordingly in step 5.2, not 6.x.
+3. **[done]** Ran OpenRewrite's Jakarta EE migration recipe in dry-run
+   mode:
+   ```
+   ./mvnw org.openrewrite.maven:rewrite-maven-plugin:6.45.0:dryRun \
+     -Drewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-migrate-java:3.41.0 \
+     -Drewrite.activeRecipes=org.openrewrite.java.migrate.jakarta.JavaxMigrationToJakarta
+   ```
+   Produced `target/rewrite/rewrite.patch` — **315 files touched**, no
+   `pom.xml`/source files modified (dry-run only). Cross-checked directly
+   against the manual classification in `Phase-5-javax-import-inventory.txt`:
+   confirmed `javax.xml.datatype` (20 occurrences) and `javax.management.*`
+   (3 occurrences) appear in the patch only as unchanged diff-context
+   lines (no `-`/`+` prefix) — the recipe correctly left them as `javax.*`.
+   `javax.naming`/`javax.net.ssl` don't appear in the patch at all. This is
+   a real, verified confirmation that the recipe respects the JDK-native
+   boundary, not an assumption from its documentation.
+4. **[done]** Captured a fresh `dependency:tree` baseline for all 3
+   modules under `phase5-pre-jakarta/` (this directory). Test-suite
+   baseline: no separate run needed — no code has changed since Phase 4's
+   own final green result (1315 tests, 0 failures/errors), which is the
+   authoritative baseline (see `phase5-pre-jakarta/README.md`).
+5. **[decided, adapted]** Not waiting for `jdk11to25` to merge to `main` —
+   Jeroen wants to keep moving rather than block on that PR. Branching
+   `phase5-jakarta-migration` off `jdk11to25`'s current tip instead (a
+   stacked branch/PR: `git checkout -b phase5-jakarta-migration` from
+   `jdk11to25`, PR opened with base `jdk11to25` for now, retargeted to
+   `main` once that PR merges — standard stacked-PR pattern, one GitHub
+   setting change, no rebase needed since the branch already contains
+   `jdk11to25`'s full history).
 
 Exit criteria: ZK licensing/artifact coverage confirmed; Tomcat version
 decided; OpenRewrite dry-run diff reviewed and understood; baseline
@@ -101,6 +109,26 @@ captured; branch created. No source code changed yet.
 ---
 
 ## Phase 5.2 — Mechanical namespace rewrite + dependency bump
+
+**Version-choice finding (2026-08-12):** Spring Framework 6.2.x — the
+version this plan originally assumed — reached end-of-life on 2026-06-30,
+already in the past as of this writing; Spring Framework 7.0 is now the
+only actively-patched generation (verified via
+[OpenLogic](https://www.openlogic.com/blog/spring-framework-6-2-EOL),
+[HeroDevs](https://www.herodevs.com/blog-posts/what-you-need-to-know-spring-frameworks-end-of-life-dates),
+[endoflife.ai](https://endoflife.ai/spring-framework); Spring 7's own
+bytecode confirmed to only require a JDK 17 floor by inspecting
+`spring-core-7.0.8.jar` directly — class file major version 61 — so it's
+not a JDK-compatibility blocker). **Deliberate decision (Jeroen's call):**
+target Spring **6.x** anyway for this phase, not 7.x, because Spring 7 is
+beyond Claude's knowledge cutoff and therefore a real risk to navigate
+reliably in an agentic session — better to land on the well-understood 6.x
+line now and treat the Spring 6→7 jump as its own explicit follow-up
+project once Phase 5 is complete and stable, the same way this whole
+Jakarta migration was deliberately kept separate from "reach JDK 25."
+**Add this Spring 7 jump to the list of known follow-up work once Phase 5
+ships** — don't let Spring 6.x quietly become the permanent target just
+because it's what got landed first.
 
 Goal: get to a *compiling* state on the full Jakarta stack. Deliberately
 not gating this step on tests passing — that's 5.3 — because the

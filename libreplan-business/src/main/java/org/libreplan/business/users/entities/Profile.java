@@ -24,7 +24,7 @@ package org.libreplan.business.users.entities;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.common.IHumanIdentifiable;

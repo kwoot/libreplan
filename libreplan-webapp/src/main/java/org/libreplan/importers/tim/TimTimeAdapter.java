@@ -19,7 +19,7 @@
 
 package org.libreplan.importers.tim;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.joda.time.LocalTime;
 

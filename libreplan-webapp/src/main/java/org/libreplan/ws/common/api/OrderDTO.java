@@ -24,8 +24,8 @@ package org.libreplan.ws.common.api;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.libreplan.business.orders.entities.Order;

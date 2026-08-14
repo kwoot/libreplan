@@ -19,7 +19,10 @@
 
 package org.libreplan.business.orders.daos;
 
-import org.hibernate.criterion.Restrictions;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 import org.libreplan.business.common.daos.GenericDAOHibernate;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.orders.entities.OrderElement;
@@ -52,9 +55,10 @@ public class OrderFileDAO extends GenericDAOHibernate<OrderFile, Long> implement
 
     @Override
     public List<OrderFile> findByParent(OrderElement parent) {
-        return getSession()
-                .createCriteria(OrderFile.class)
-                .add(Restrictions.eq("parent", parent))
-                .list();
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<OrderFile> cq = cb.createQuery(OrderFile.class);
+        Root<OrderFile> root = cq.from(OrderFile.class);
+        cq.where(cb.equal(root.get("parent"), parent));
+        return getSession().createQuery(cq).getResultList();
     }
 }

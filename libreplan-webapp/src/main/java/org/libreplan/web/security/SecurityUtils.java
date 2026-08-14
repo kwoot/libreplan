@@ -24,7 +24,7 @@ package org.libreplan.web.security;
 import java.security.Principal;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.jfree.util.Log;
 import org.libreplan.business.common.Registry;

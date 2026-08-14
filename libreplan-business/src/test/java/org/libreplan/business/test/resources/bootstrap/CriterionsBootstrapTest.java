@@ -28,7 +28,7 @@ import static org.libreplan.business.test.BusinessGlobalNames.BUSINESS_SPRING_CO
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -48,17 +48,17 @@ import org.springframework.web.context.WebApplicationContext;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.zkoss.zul.Messagebox;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -163,7 +163,7 @@ public class ComposeMessage {
 
 			// It is very important to use Session.getInstance() instead of
 			// Session.getDefaultInstance()
-			Session mailSession = Session.getInstance(properties, new javax.mail.Authenticator() {
+			Session mailSession = Session.getInstance(properties, new jakarta.mail.Authenticator() {
 				@Override
 				protected PasswordAuthentication getPasswordAuthentication() {
 					return new PasswordAuthentication(username, password);

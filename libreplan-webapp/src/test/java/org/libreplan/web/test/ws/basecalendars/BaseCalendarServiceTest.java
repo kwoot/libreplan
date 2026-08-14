@@ -32,7 +32,7 @@ import static org.libreplan.web.test.ws.common.Util.getUniqueName;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.Before;

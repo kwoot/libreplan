@@ -22,8 +22,8 @@
  *
  * @author Manuel Rego Casasnovas <rego@igalia.com>
  */
-@javax.xml.bind.annotation.XmlSchema(
-        elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
+@jakarta.xml.bind.annotation.XmlSchema(
+        elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED,
         namespace = WSCommonGlobalNames.REST_NAMESPACE)
 
 package org.libreplan.ws.boundusers.api;

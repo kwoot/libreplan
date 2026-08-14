@@ -23,7 +23,7 @@ package org.libreplan.ws.resources.api;
 
 import java.util.Date;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 
 import org.libreplan.business.calendars.entities.CalendarAvailability;
 import org.libreplan.ws.common.api.IntegrationEntityDTO;
