@@ -20,7 +20,7 @@
 -->
 
 <window id="listWindow" title="${i18n:_t('Criterion Types List')}">
-<newdatasortablegrid model="@{controller.criterionTypes}" fixedLayout="true" sclass="clickable-rows">
+<newdatasortablegrid model="@{controller.criterionTypes}" sclass="clickable-rows">
    <columns>
         <newdatasortablecolumn label="${i18n:_t('Name')}" sort="auto(lower(name))" sortDirection="ascending" />
         <newdatasortablecolumn label="${i18n:_t('Code')}" />

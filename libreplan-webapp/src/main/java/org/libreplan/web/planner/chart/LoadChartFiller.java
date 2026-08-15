@@ -18,12 +18,11 @@
  */
 package org.libreplan.web.planner.chart;
 
-import org.zkforge.timeplot.Plotinfo;
-import org.zkforge.timeplot.Timeplot;
-import org.zkforge.timeplot.geometry.TimeGeometry;
-import org.zkforge.timeplot.geometry.ValueGeometry;
+import java.util.Arrays;
+
 import org.zkoss.ganttz.util.Interval;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Div;
 
 public abstract class LoadChartFiller extends ChartFiller {
 
@@ -37,25 +36,12 @@ public abstract class LoadChartFiller extends ChartFiller {
     public static final String COLOR_OVERLOAD = "#FF5A11";
 
     @Override
-    public void fillChart(Timeplot chart, Interval interval, Integer size) {
-        if (chart.getChildren() != null) {
-            chart.getChildren().clear();
-        }
-        chart.invalidate();
-
+    public void fillChart(Div chart, Interval interval, Integer size) {
         if (getOptionalJavascriptCall() != null) {
             Clients.evalJavaScript(getOptionalJavascriptCall());
         }
-        resetMinimumAndMaximumValueForChart();
 
-        ValueGeometry valueGeometry = getValueGeometry();
-        TimeGeometry timeGeometry = getTimeGeometry(interval);
-        Plotinfo[] plotInfos = getPlotInfo(interval);
-        for (Plotinfo each : plotInfos) {
-            appendPlotinfo(chart, each, valueGeometry, timeGeometry);
-        }
-        chart.setWidth(size + "px");
-        chart.setHeight("150px");
+        renderChart(chart, Arrays.asList(getPlotInfo(interval)), interval, size);
     }
 
 
@@ -65,8 +51,8 @@ public abstract class LoadChartFiller extends ChartFiller {
      * The order must be from the topmost one to the lowest one.
      *
      * @param interval
-     * @return the {@link Plotinfo plot info} to show
+     * @return the {@link ChartSeries series} to show
      */
-    protected abstract Plotinfo[] getPlotInfo(Interval interval);
+    protected abstract ChartSeries[] getPlotInfo(Interval interval);
 
 }

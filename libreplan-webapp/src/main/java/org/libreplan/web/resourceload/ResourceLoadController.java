@@ -62,8 +62,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.zkforge.timeplot.Plotinfo;
-import org.zkforge.timeplot.Timeplot;
 import org.zkoss.ganttz.IChartVisibilityChangedListener;
 import org.zkoss.ganttz.data.resourceload.LoadTimeLine;
 import org.zkoss.ganttz.resourceload.IFilterChangedListener;
@@ -82,6 +80,7 @@ import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.util.Composer;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Datebox;
+import org.zkoss.zul.Div;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Messagebox;
@@ -185,7 +184,7 @@ public class ResourceLoadController implements Composer {
 
     class LoadChart extends VisualizationModifier implements IListenerAdder {
 
-        private Emitter<Timeplot> emitter = Emitter.withInitial(null);
+        private Emitter<Div> emitter = Emitter.withInitial(null);
 
         private volatile Chart loadChart;
 
@@ -219,7 +218,7 @@ public class ResourceLoadController implements Composer {
             };
         }
 
-        private Tabbox buildChart(Emitter<Timeplot> timePlot) {
+        private Tabbox buildChart(Emitter<Div> timePlot) {
             Tabbox chartComponent = new Tabbox();
             chartComponent.setOrient("vertical");
             chartComponent.setHeight("200px");
@@ -232,7 +231,7 @@ public class ResourceLoadController implements Composer {
             Tabpanels chartTabpanels = new Tabpanels();
             Tabpanel loadChartPanel = new Tabpanel();
 
-            // Avoid adding Timeplot since it has some pending issues
+            // Avoid adding Div since it has some pending issues
             CompanyPlanningModel.appendLoadChartAndLegend(loadChartPanel, timePlot);
             chartTabpanels.appendChild(loadChartPanel);
             chartComponent.appendChild(chartTabpanels);
@@ -246,14 +245,14 @@ public class ResourceLoadController implements Composer {
             zoomLevelListener = fillOnZoomChange(panel);
             timeTracker.addZoomListener(zoomLevelListener);
 
-            Timeplot newLoadChart = buildLoadChart(panel, generatedData, timeTracker);
+            Div newLoadChart = buildLoadChart(panel, generatedData, timeTracker);
             emitter.emit(newLoadChart);
         }
 
-        private Timeplot buildLoadChart(
+        private Div buildLoadChart(
                 ResourcesLoadPanel resourcesLoadPanel, ResourceLoadDisplayData generatedData, TimeTracker timeTracker) {
 
-            Timeplot chartLoadTimeplot = createEmptyTimeplot();
+            Div chartLoadTimeplot = createEmptyTimeplot();
 
             ResourceLoadChartFiller chartFiller = new ResourceLoadChartFiller(generatedData);
             loadChart = new Chart(chartLoadTimeplot, chartFiller, timeTracker);
@@ -286,10 +285,8 @@ public class ResourceLoadController implements Composer {
             resourcesLoadPanel.getTimeTrackerComponent().movePositionScroll();
         }
 
-        private Timeplot createEmptyTimeplot() {
-            Timeplot timeplot = new Timeplot();
-            timeplot.appendChild(new Plotinfo());
-            return timeplot;
+        private Div createEmptyTimeplot() {
+            return new Div();
         }
     }
 

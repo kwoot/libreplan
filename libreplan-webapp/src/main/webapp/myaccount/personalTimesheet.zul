@@ -19,7 +19,7 @@
  -->
 
 <?page id="exceptionDayTypesList" title="${i18n:_t('LibrePlan: Personal timesheet')}" ?>
-<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?init class="org.libreplan.web.common.AnnotateBinderInit" ?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="/common/layout/template.zul"?>
 
 <?link rel="shortcut icon" href="/common/img/favicon.ico" type="image/x-icon"?>
@@ -40,7 +40,7 @@
         <hbox width="100%">
             <groupbox style="margin-top: 5px" closable="false" hflex="1">
                 <caption label="${i18n:_t('Timesheet data')}" />
-                <grid fixedLayout="true">
+                <grid>
                     <columns>
                         <column width="200px" />
                         <column />
@@ -79,7 +79,7 @@
 
             <groupbox style="margin-top: 5px; margin-left: 10px;" closable="false" hflex="1">
                 <caption label="${i18n:_t('Timesheet summary')}" />
-                <grid fixedLayout="true">
+                <grid>
                     <columns>
                         <column width="200px" />
                         <column />

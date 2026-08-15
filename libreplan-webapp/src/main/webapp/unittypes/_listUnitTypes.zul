@@ -21,7 +21,7 @@
 
 <window id="${arg.top_id}">
     <newdatasortablegrid id="listing" model="@{controller.unitTypes}" mold="paging"
-        pageSize="10" fixedLayout="true" sclass="clickable-rows"
+        pageSize="10" sclass="clickable-rows"
         rowRenderer="@{controller.unitTypeRenderer}" >
         <columns>
             <newdatasortablecolumn label="${i18n:_t('Material Unit')}"

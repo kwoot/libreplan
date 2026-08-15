@@ -43,8 +43,7 @@
                 <newdatasortablegrid id="listingRequirements" sclass="margin-border"
                                      model="@{criterionRequirementsController.criterionRequirementWrappers}"
                                      mold="paging"
-                                     pageSize="10"
-                                     fixedLayout="true" >
+                                     pageSize="10" >
 
                     <columns>
                         <newdatasortablecolumn label="${i18n:_t('Criterion name')}" sort="auto(criterionAndType)"
@@ -68,7 +67,7 @@
                                          onCtrlKey="criterionRequirementsController.onCtrlKey(event);">
 
                                     <bandpopup>
-                                        <listbox width="500px" height="150px" fixedLayout="true"
+                                        <listbox width="500px" height="150px"
                                                  model="@{criterionRequirementsController.criterionWithItsTypes}"
                                                  onSelect="criterionRequirementsController.selectCriterionAndType(self.selectedItem,self.parent.parent,self.parent.parent.parent.parent.value);"
                                                  onOk="criterionRequirementsController.onOK(event);">
@@ -126,7 +125,7 @@
         <panel title="${i18n:_t('Total hours task')}"
                style="overflow:auto" >
             <panelchildren>
-                <grid fixedLayout="true">
+                <grid>
                     <columns>
                         <column width="200px" />
                         <column />

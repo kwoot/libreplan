@@ -70,9 +70,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import org.zkforge.timeplot.Timeplot;
 import org.zkoss.ganttz.util.Interval;
 import org.zkoss.zk.ui.Desktop;
+import org.zkoss.zul.Div;
 
 import jakarta.annotation.Resource;
 
@@ -94,7 +94,7 @@ public class ChartFillerTest {
     private ChartFiller chartFiller = new ChartFiller() {
 
         @Override
-        public void fillChart(Timeplot chart, Interval interval, Integer size) {
+        public void fillChart(Div chart, Interval interval, Integer size) {
         }
 
     };

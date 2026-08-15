@@ -300,8 +300,9 @@ public class JiraSynchronizationController extends GenericForwardComposer {
         }
 
         public ListModel getSubModel(Object value, int nRows) {
-            //TODO change deprecated method
-            final String idx = value == null ? "" : objectToString(value);
+            // SimpleListModel.objectToString(Object) was removed in ZK 10; it was just a
+            // null-safe String conversion of the search value here.
+            final String idx = value == null ? "" : String.valueOf(value);
 
             if ( nRows < 0 ) {
                 nRows = 10;

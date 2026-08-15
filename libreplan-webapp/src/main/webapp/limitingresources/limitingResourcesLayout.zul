@@ -90,7 +90,7 @@
 
                     <borderlayout >
                         <north border="0" height="31px" vflex="min" hflex="1" collapsible="true">
-                            <tree fixedLayout="true">
+                            <tree>
                                 <treecols>
                                     <treecol label="${i18n:_t('Name')}" height="26px"/>
                                 </treecols>

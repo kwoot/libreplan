@@ -47,6 +47,15 @@
     </zscript>
 
     <div xmlns:n="http://www.zkoss.org/2005/zk/native" apply="${templateCtrl}" height="100%">
+        <!--
+          Chart.js, driving the load/earned-value charts (org.libreplan.web.planner.chart.*).
+          Kept as children of this div rather than page-level siblings: ganttz's MenuBuilder picks
+          the first VISIBLE page-root component as the anchor for task context menus
+          (MenuBuilder.findVisibleOn/getRoots), and a root-level <script> would win that lookup
+          over this div, breaking the Gantt's right-click menu.
+        -->
+        <script src="/webjars/chart.js/4.4.0/dist/chart.umd.js"/>
+        <script src="/common/js/libreplan-chart.js"/>
         <timer repeats="true" running="true" delay="20000" onTimer=""/>
         <borderlayout height="100%" width="100%">
             <north border="none">

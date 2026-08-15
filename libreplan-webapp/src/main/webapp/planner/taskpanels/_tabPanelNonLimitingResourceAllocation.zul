@@ -83,7 +83,7 @@
                     <grid id="allocationsGrid"
                           model="@{allocationController.resourceAllocations}"
                           rowRenderer="@{allocationController.resourceAllocationRenderer}"
-                          style="margin-bottom: 5px" fixedLayout="true">
+                          style="margin-bottom: 5px">
 
                         <auxhead>
                             <auxheader colspan="1"/>

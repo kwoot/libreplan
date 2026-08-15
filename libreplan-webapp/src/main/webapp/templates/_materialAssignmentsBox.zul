@@ -21,7 +21,7 @@
 
 <panel title="${i18n:_t('Materials')}" border="normal">
     <panelchildren>
-        <newdatasortablegrid id="gridMaterials" fixedLayout="true"
+        <newdatasortablegrid id="gridMaterials"
                              sclass="margin-border"
                              model="@{assignedMaterialsController.assignedMaterials}">
             <columns>

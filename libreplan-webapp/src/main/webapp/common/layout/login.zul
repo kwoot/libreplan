@@ -94,7 +94,7 @@
                         <n:tr>
                             <n:td>
                                 <label/>
-                                <div align="center">
+                                <div style="text-align: center;">
                                     <n:input id="textfield" type="text" class="campotexto" size="30" autofocus="autofocus"
                                              name="j_username" value="${controller.loginValue}"/>
                                 </div>
@@ -107,7 +107,7 @@
 
                         <n:tr>
                             <n:td>
-                                <div align="center">
+                                <div style="text-align: center;">
                                     <n:input id="textfield2" type="password" class="campotexto"  size="30"
                                              name="j_password" value="${controller.loginValue}"/>
                                 </div>
@@ -166,7 +166,7 @@
 
         <n:tr>
             <n:td height="100">
-                <div align="right">
+                <div style="text-align: right;">
                     <n:a href="http://www.libreplan-enterprise.com" target="_blank">
                         <n:img src="${contextPath}/common/img/login-banner.png" width="750" height="40" />
                     </n:a>

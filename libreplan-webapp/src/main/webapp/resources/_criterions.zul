@@ -32,7 +32,7 @@
                     label="${i18n:_t('Add')}" />
         </hbox>
 
-        <div align="right" style="padding-top: 4px;">
+        <div style="text-align: right; padding-top: 4px;">
             <label sclass="subtitulo" value="${i18n:_t('Show only current satisfied criteria')}" />
 
             <checkbox id="criterionFilterCheckbox" onCheck="assignedCriterionsController.reload();"
@@ -41,7 +41,7 @@
     </hbox>
 
     <newdatasortablegrid id="listingCriterions"
-                         mold="paging" pageSize="10" fixedLayout="true"
+                         mold="paging" pageSize="10"
                          model="@{assignedCriterionsController.criterionSatisfactionDTOs}">
         <columns>
             <newdatasortablecolumn label="${i18n:_t('Criterion name')}" sort="auto(lower(criterionAndType))"
@@ -73,7 +73,6 @@
 
                             <listbox width="500px"
                                      height="150px"
-                                     fixedLayout="true"
                                      model="@{assignedCriterionsController.criterionWithItsTypes}"
                                      onSelect="assignedCriterionsController.selectCriterionAndType(self.selectedItem, self.parent.parent,self.parent.parent.parent.parent.value);"
                                      onOk="assignedCriterionsController.onOK(event);">

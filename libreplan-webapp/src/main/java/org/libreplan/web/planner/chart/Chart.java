@@ -21,32 +21,32 @@
 package org.libreplan.web.planner.chart;
 
 import org.apache.commons.lang3.Validate;
-import org.zkforge.timeplot.Timeplot;
 import org.zkoss.ganttz.timetracker.TimeTracker;
 import org.zkoss.ganttz.timetracker.zoom.ZoomLevel;
+import org.zkoss.zul.Div;
 
 /**
  * @author Óscar González Fernández <ogonzalez@igalia.com>
  */
 public class Chart {
 
-    private final Timeplot timeplot;
+    private final Div chartDiv;
 
     private final IChartFiller filler;
 
     private final TimeTracker timeTracker;
 
-    public Chart(Timeplot timeplot, IChartFiller filler, TimeTracker timeTracker) {
+    public Chart(Div chartDiv, IChartFiller filler, TimeTracker timeTracker) {
         Validate.notNull(filler);
         Validate.notNull(timeTracker);
-        Validate.notNull(timeplot);
-        this.timeplot = timeplot;
+        Validate.notNull(chartDiv);
+        this.chartDiv = chartDiv;
         this.filler = filler;
         this.timeTracker = timeTracker;
     }
 
     public void fillChart() {
-        filler.fillChart(timeplot, timeTracker.getRealInterval(), timeTracker.getHorizontalSize());
+        filler.fillChart(chartDiv, timeTracker.getRealInterval(), timeTracker.getHorizontalSize());
     }
 
     public void setZoomLevel(ZoomLevel zoomLevel) {

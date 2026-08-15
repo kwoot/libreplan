@@ -22,7 +22,7 @@
 <window id="${arg.top_id}">
     <caption id="caption" sclass="caption-title" />
 
-    <grid  fixedLayout="true" style="margin-bottom: 10px;">
+    <grid style="margin-bottom: 10px;">
         <columns>
             <column width="200px" />
             <column/>

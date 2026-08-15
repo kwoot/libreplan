@@ -32,7 +32,7 @@
             <tabpanel>
                 <!--  Name qualityForm -->
                 <vbox style="margin-bottom: 5px" width="100%">
-                    <grid fixedLayout="true">
+                    <grid>
                         <columns>
                             <column width="250px" />
                             <column />
@@ -78,7 +78,7 @@
                                     onClick="controller.createQualityFormItem()" />
                         </hbox>
                         <grid id="gridQualityFormItems"
-                              model="@{controller.qualityFormItems}" fixedLayout="true">
+                              model="@{controller.qualityFormItems}">
                             <columns sizable="true">
                                 <column label="${i18n:_t('Name')}"/>
                                 <column label="${i18n:_t('Position')}" align="center" width="120px"

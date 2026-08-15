@@ -19,7 +19,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?init class="org.libreplan.web.common.AnnotateBinderInit" ?>
 <?page title="${i18n:_t('LibrePlan: Timesheets')}" id="work_report_admin"?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="/common/layout/template.zul"?>
 <?link rel="shortcut icon" href="/common/img/favicon.ico" type="image/x-icon"?>
@@ -106,7 +106,7 @@
 
             <separator bar="false" spacing="20px" orient="horizontal"/>
 
-            <div align="left">
+            <div style="text-align: left;">
                 <hbox align="center">
 
                     <!-- Create new Work Report  -->
@@ -162,7 +162,7 @@
 
                             <groupbox closable="false">
                                 <caption label="${i18n:_t('General data')}" />
-                                <grid fixedLayout="false" width="100%" span="1">
+                                <grid sizedByContent="true" width="100%" span="1">
                                     <columns>
                                         <column width="200px" />
                                         <column />
@@ -191,7 +191,7 @@
 
                                 <caption label="${i18n:_t('Heading Fields')}" />
 
-                                <grid id="HeadingRequirementsFields" mold="paging" pageSize="4" fixedLayout="true"
+                                <grid id="HeadingRequirementsFields" mold="paging" pageSize="4"
                                       style="border-bottom:0">
                                     <columns>
                                         <column width="200px"/>
@@ -225,7 +225,6 @@
                                 </grid>
 
                                 <grid id="headingFieldsAndLabels" mold="paging" pageSize="4"
-                                      fixedLayout="true"
                                       style="border-top:0;"
                                       model="@{controller.fieldsAndLabelsHeading}"
                                       rowRenderer= "@{controller.orderedFieldsAndLabelsRowRenderer}">
@@ -247,7 +246,7 @@
                                 </hbox>
 
                                 <newdatasortablegrid id="listWorkReportLines"
-                                                     fixedLayout="false"
+                                                     sizedByContent="true"
                                                      rowRenderer="@{controller.renderer}"
                                                      sclass="listWorkReportLines report-margin"/>
                             </groupbox>

@@ -21,7 +21,7 @@
 <window id="${arg.top_id}" title="${i18n:_t('Templates List')}">
 
     <grid id="listing" model="@{templatesForOrdersController.templates}"
-          mold="paging" pageSize="10" fixedLayout="true" sclass="clickable-rows">
+          mold="paging" pageSize="10" sclass="clickable-rows">
 
         <columns>
             <column label="${i18n:_t('Type')}" sort="auto(type)" />

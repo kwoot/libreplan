@@ -42,7 +42,7 @@
                         </hbox>
                     </vbox>
                     <separator bar="false" spacing="40px" orient="vertical"/>
-                    <grid height="300px" fixedLayout="true" style="margin: 0 5px 0 5px;"
+                    <grid height="300px" style="margin: 0 5px 0 5px;"
                           model="@{assignedQualityForms.assigned}">
                         <columns>
                             <column width="25px"/>

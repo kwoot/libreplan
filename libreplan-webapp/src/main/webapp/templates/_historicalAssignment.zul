@@ -29,7 +29,7 @@
             <vbox id="messagesContainerHistoricAssignment" />
             <panel title="${i18n:_t('Assignment log')}" border="normal">
                 <panelchildren>
-                    <grid height="200px" fixedLayout="true" sclass="margin-border"
+                    <grid height="200px" sclass="margin-border"
                           model="@{historicalAssignment.orderElementsWithThisAssignedTemplate}">
                         <columns>
                             <column label="${i18n:_t('Project code')}" sort="orderCode" sortDirection="descending"/>

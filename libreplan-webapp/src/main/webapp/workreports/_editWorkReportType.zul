@@ -134,7 +134,7 @@
 
                             <separator bar="false" spacing="40px" orient="vertical"/>
                         </hbox>
-                        <newdatasortablegrid id="listDescriptionFields" mold="paging" pageSize="4" fixedLayout="true"
+                        <newdatasortablegrid id="listDescriptionFields" mold="paging" pageSize="4"
                                              model="@{controller.descriptionFields}"
                                              rowRenderer= "@{controller.descriptionFieldsRowRender}">
                             <columns>
@@ -160,7 +160,6 @@
                         </hbox>
 
                         <newdatasortablegrid id="listWorkReportLabelTypeAssignments" mold="paging" pageSize="4"
-                                             fixedLayout="true"
                                              model="@{controller.workReportLabelTypeAssignments}"
                                              rowRenderer= "@{controller.workReportLabelTypeAssignmentRowRender}">
                             <columns>

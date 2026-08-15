@@ -21,7 +21,7 @@
 
     <caption id="caption" sclass="caption-title" />
 
-    <grid id="jobSchedulerGrid" fixedLayout="true">
+    <grid id="jobSchedulerGrid">
 
         <columns>
             <column width="200px" />

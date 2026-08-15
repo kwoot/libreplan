@@ -28,9 +28,9 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -45,7 +45,8 @@ import org.libreplan.business.common.BaseEntity;
 import org.libreplan.business.common.Configuration;
 import org.libreplan.business.common.Registry;
 import org.springframework.web.context.ContextLoaderListener;
-import org.zkoss.bind.DefaultBinder;
+import org.zkoss.bind.AnnotateBinder;
+import org.zkoss.bind.Binder;
 import org.zkoss.ganttz.util.ComponentsFinder;
 import org.zkoss.image.AImage;
 import org.zkoss.image.Image;
@@ -53,11 +54,10 @@ import org.zkoss.util.Locales;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.InputEvent;
-import org.zkoss.zkplus.databind.AnnotateDataBinder;
-import org.zkoss.zkplus.databind.DataBinder;
 import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
@@ -108,7 +108,7 @@ public class Util {
     }
 
     /**
-     * Forces to reload the bindings of the provided components if there is an associated {@link DefaultBinder}.
+     * Forces to reload the bindings of the provided components if there is an associated {@link Binder}.
      *
      * @param toReload
      *            the components to reload
@@ -119,7 +119,7 @@ public class Util {
 
     public enum ReloadStrategy {
         /**
-         * If the {@link DefaultBinder} exists the bindings are reloaded no matter what.
+         * If the {@link Binder} exists the bindings are reloaded no matter what.
          */
         FORCE,
 
@@ -137,7 +137,7 @@ public class Util {
 
     /**
      * Reload the bindings of the provided components if there is an associated
-     * {@link DefaultBinder} and the {@link ReloadStrategy} allows it.
+     * {@link Binder} and the {@link ReloadStrategy} allows it.
      *
      * @param toReload
      *            the components to reload
@@ -148,12 +148,10 @@ public class Util {
 
     private static void reloadBindings(boolean forceReload, Component... toReload) {
         for (Component reload : toReload) {
-
-            // TODO resolve deprecated
-            DataBinder binder = Util.getBinder(reload);
+            Binder binder = Util.getBinder(reload);
 
             if (binder != null && (forceReload || notReloadedInThisRequest(reload))) {
-                binder.loadComponent(reload);
+                binder.loadComponent(reload, true);
                 markAsReloadedForThisRequest(reload);
             }
         }
@@ -202,18 +200,19 @@ public class Util {
 
     public static void saveBindings(Component... toReload) {
         for (Component reload : toReload) {
-            /* TODO resolve deprecated */
-            DataBinder binder = Util.getBinder(reload);
+            Binder binder = Util.getBinder(reload);
 
             if (binder != null) {
-                binder.saveComponent(reload);
+                // AnnotateBinder has no direct saveComponent(Component) method (unlike the old,
+                // removed DataBinder): saving is event-driven, triggered by sending the binder's
+                // own save event at the component whose save bindings should fire.
+                Events.sendEvent(new Event(Binder.SAVE_EVENT, reload, null));
             }
         }
     }
 
-    /** TODO resolve deprecated */
-    public static DataBinder getBinder(Component component) {
-        return (DataBinder) component.getAttribute("binder", true);
+    public static Binder getBinder(Component component) {
+        return (Binder) component.getAttribute("binder", true);
     }
 
     public static void executeIgnoringCreationOfBindings(Runnable action) {
@@ -230,8 +229,23 @@ public class Util {
             return;
         }
 
-        /* TODO resolve deprecated */
-        AnnotateDataBinder binder = new AnnotateDataBinder(result, true);
+        // The removed AnnotateDataBinder(Component, boolean) resolved "controller.xxx" bind
+        // expressions against whatever ZK's own apply="ControllerClass" composer machinery had
+        // already put in scope. AnnotateBinder needs that object explicitly: BaseCRUDController
+        // (and every other controller base class) already exposes itself the same way Util itself
+        // exposes "binder" below - as a plain component attribute named "controller" - so fetch it
+        // the same way.
+        Object controller = result.getAttributeOrFellow("controller", true);
+        if (controller == null) {
+            // Root components composed without their own apply="..." controller (e.g. a plain
+            // <div> alongside a controller-applied sibling under the same page) have nothing to
+            // bind - AnnotateBinderInit calls this for every page-level root unconditionally.
+            return;
+        }
+
+        AnnotateBinder binder = new AnnotateBinder();
+        binder.init(result, controller, Collections.emptyMap());
+        binder.initAnnotatedBindings();
 
         /*
          * Before it was:
@@ -736,13 +750,17 @@ public class Util {
      * @param uniqueListeners
      *            new listeners to add
      */
+    @SuppressWarnings("unchecked")
     public static void ensureUniqueListeners(Component component, String eventName, EventListener... uniqueListeners) {
-        // TODO Replace deprecated method
-        Iterator<?> listenerIterator = component.getListenerIterator(eventName);
-
-        while (listenerIterator.hasNext()) {
-            listenerIterator.next();
-            listenerIterator.remove();
+        // component.getListenerIterator(String) was removed in ZK 10; getEventListeners(String) +
+        // removeEventListener(String, EventListener) is the replacement. Collect first: removing
+        // while iterating the live Iterable risks a ConcurrentModificationException.
+        List<EventListener<?>> existing = new ArrayList<>();
+        for (EventListener<?> each : component.getEventListeners(eventName)) {
+            existing.add(each);
+        }
+        for (EventListener<?> each : existing) {
+            component.removeEventListener(eventName, each);
         }
         for (EventListener each : uniqueListeners) {
             component.addEventListener(eventName, each);

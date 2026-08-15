@@ -951,7 +951,7 @@ class PersonalTimesheetRow {
 
     public static PersonalTimesheetRow createOrderElementRow(OrderElement orderElemement) {
         PersonalTimesheetRow row = new PersonalTimesheetRow(PersonalTimesheetRowType.ORDER_ELEMENT);
-        Assert.notNull(orderElemement);
+        Assert.notNull(orderElemement, "orderElemement must not be null");
         row.orderElemement = orderElemement;
 
         return row;

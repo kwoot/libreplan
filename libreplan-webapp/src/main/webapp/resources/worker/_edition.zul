@@ -44,7 +44,7 @@
                 <groupbox style="margin-top: 5px" closable="false">
                     <caption label="${i18n:_t('Basic data')}" />
 
-                    <grid fixedLayout="true">
+                    <grid>
                         <columns>
                             <column width="200px" />
                             <column  />
@@ -123,7 +123,7 @@
                            visible="@{controller.existingUser}">
 
                         <panelchildren>
-                            <grid fixedLayout="true" sclass="margin-border">
+                            <grid sclass="margin-border">
                                 <columns>
                                     <column width="200px" />
                                     <column />
@@ -159,7 +159,7 @@
 
                     <panel title="${i18n:_t('New user')}" border="normal" visible="@{controller.createNewUser}">
                         <panelchildren>
-                            <grid fixedLayout="true">
+                            <grid>
                                 <columns>
                                     <column width="200px" />
                                     <column />

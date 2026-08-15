@@ -39,7 +39,7 @@
 
                 <menu forEach="${each.children}" label="${i18n:_t(each.name)}" visible="${each.hasChildren}" >
                     <menupopup>
-                        <menuitem forEach="${forEachStatus.each.children}"
+                        <menuitem forEach="${forEachStatus.current.children}"
                                   label="${i18n:_t(each.name)}" href='${each.url}' />
                     </menupopup>
                 </menu>

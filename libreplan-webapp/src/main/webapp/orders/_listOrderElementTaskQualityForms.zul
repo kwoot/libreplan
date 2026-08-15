@@ -41,7 +41,6 @@
                 <separator bar="false" spacing="40px" orient="vertical"/>
 
                 <grid id="assignedTaskQualityForms" height="300px"
-                      fixedLayout="true"
                       rowRenderer = "@{assignedTaskQualityFormsController.taskQualityFormsRowRenderer}"
                       model="@{assignedTaskQualityFormsController.taskQualityForms}"
                       onInitRender ="assignedTaskQualityFormsController.sortTaskQualityForms();">

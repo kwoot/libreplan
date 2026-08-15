@@ -31,7 +31,7 @@
             <tabpanel>
                 <vbox>
                     <!-- Type of work hour details  -->
-                    <grid fixedLayout="false">
+                    <grid sizedByContent="true">
                         <columns>
                             <column width="200px" />
                             <column />

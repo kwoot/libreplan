@@ -645,11 +645,15 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- JAX-RS API -->
+            <!--
+                JAX-RS API. 3.0.0 predates jakarta.ws.rs.core.EntityPart (added in 3.1); CXF
+                4.1.8 needs it, so bean creation for the REST servlet fails with
+                NoClassDefFoundError at webapp startup with 3.0.0 on the classpath.
+            -->
             <dependency>
                 <groupId>jakarta.ws.rs</groupId>
                 <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
             </dependency>
 
             <!--
@@ -743,27 +747,19 @@
                 <version>2.22.1</version>
             </dependency>
 
-            <!-- ZK Timeplot -->
+            <!--
+                Chart.js (replaces the old ZK Timeplot/timeplotz/timelinez widget - that vendored
+                ~2010-era Simile Widgets JS had a genuine bug in its bundled error handler and,
+                once that was patched, turned out to loop against ZK's AU cycle indefinitely.
+                Delivered as a webjar so it resolves through the normal Maven dependency flow;
+                Jetty serves META-INF/resources/** automatically per the Servlet 3.0+ spec, so no
+                extra servlet wiring is needed - see common/layout/template.zul for the <script>
+                include and common/js/libreplan-chart.js for the small wrapper that drives it.
+            -->
             <dependency>
-                <groupId>dev.libreplan.zkoss</groupId>
-                <artifactId>timeplotz</artifactId>
-                <version>1.1_50b</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.zkoss.zkforge</groupId>
-                <artifactId>timelinez</artifactId>
-                <version>2.3.1_50</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.zkoss.common</groupId>
-                        <artifactId>zcommon</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.zkoss.common</groupId>
-                        <artifactId>zweb</artifactId>
-                    </exclusion>
-                </exclusions>
+                <groupId>org.webjars.npm</groupId>
+                <artifactId>chart.js</artifactId>
+                <version>4.4.0</version>
             </dependency>
 
             <!-- LiquiBase -->
@@ -998,7 +994,12 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.56.v20240826</version>
+                <!--
+                    9.4.x is javax.servlet-based and predates Jakarta EE entirely - it cannot serve
+                    this app's jakarta.servlet 5.0 (Jakarta EE 9) classes. 11.0.x is the matching
+                    Jakarta EE 9 generation.
+                -->
+                <version>11.0.24</version>
                 <configuration>
                     <systemProperties>
                         <systemProperty>
@@ -1006,18 +1007,23 @@
                             <value>true</value>
                         </systemProperty>
                     </systemProperties>
-                    <jettyXml>target/jetty/jetty-env.xml</jettyXml>
+                    <!--
+                        jetty-env.xml's root is <Configure class="org.eclipse.jetty.webapp.WebAppContext">
+                        - a webapp-context-scoped file, so it belongs in contextXml (applied to this
+                        specific webapp). jettyXml/jettyXmls are for server-level files applied before
+                        any webapp exists; passing a WebAppContext file there meant the JNDI datasource
+                        resource never ended up bound into this webapp's java:comp/env, so Spring's
+                        dataSource bean failed with NameNotFoundException: jdbc is not bound.
+                    -->
+                    <contextXml>target/jetty/jetty-env.xml</contextXml>
                     <reload>manual</reload>
                     <stopPort>${jetty-stop-port}</stopPort>
                     <stopKey>stop</stopKey>
-                    <!-- Log to the console -->
-                    <requestLog implementation="org.eclipse.jetty.server.NCSARequestLog">
-                        <!--
-                            This do anything for Jetty,
-                            but is a workaround for a Maven bug that prevents the requestLog from being set.
-                        -->
-                        <append>true</append>
-                    </requestLog>
+                    <!--
+                        No requestLog config here (there used to be one, pinned to the now-removed
+                        org.eclipse.jetty.server.NCSARequestLog): the comment on it already said it
+                        was inert, just a workaround for an old Maven bug, not functional logging.
+                    -->
                     <httpConnector>
                         <port>${jetty-port}</port>
                     </httpConnector>

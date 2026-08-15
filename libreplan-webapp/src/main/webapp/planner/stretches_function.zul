@@ -46,7 +46,7 @@
                     <listbox id="stretchesList"
                              model="@{stretchesFunctionController.stretches}"
                              itemRenderer="@{stretchesFunctionController.stretchesRenderer}"
-                             style="margin-bottom: 5px" fixedLayout="true"
+                             style="margin-bottom: 5px"
                              rows="15"
                              width="500px" >
                         <listhead>

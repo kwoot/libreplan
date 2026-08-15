@@ -25,7 +25,7 @@
 
     <div visible="@{controller.isCalendarNull}">
 
-        <grid fixedLayout="true">
+        <grid>
             <columns>
                 <column width="200px" />
                 <column />

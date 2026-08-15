@@ -22,8 +22,9 @@ package org.libreplan.web.common.typeconverters;
 import java.util.Date;
 
 import org.libreplan.web.common.Util;
+import org.zkoss.bind.BindContext;
+import org.zkoss.bind.Converter;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zkplus.databind.TypeConverter;
 
 /**
  * Converter for the type java.util.Date with an hour minute precision
@@ -31,15 +32,15 @@ import org.zkoss.zkplus.databind.TypeConverter;
  * @author Susana Montes Pedreira <smontes@wirelessgalicia.com>
  *
  */
-public class DateTimeConverter implements TypeConverter {
+public class DateTimeConverter implements Converter<Object, Object, Component> {
 
     @Override
-    public Object coerceToBean(Object arg0, Component arg1) {
+    public Object coerceToBean(Object value, Component component, BindContext ctx) {
         return null;
     }
 
     @Override
-    public Object coerceToUi(Object object, Component component) {
+    public Object coerceToUi(Object object, Component component, BindContext ctx) {
         return Util.formatDateTime((Date) object);
     }
 

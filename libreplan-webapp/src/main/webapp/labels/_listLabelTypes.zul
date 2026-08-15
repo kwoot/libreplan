@@ -21,7 +21,7 @@
 
 <window id="${arg.id}" title="${i18n:_t('Label Types List')}">
     <newdatasortablegrid id="labelTypes" model="@{controller.labelTypes}"
-        mold="paging" pageSize="10" fixedLayout="true" sclass="clickable-rows">
+        mold="paging" pageSize="10" sclass="clickable-rows">
         <columns>
             <newdatasortablecolumn label="${i18n:_t('Name')}" sort="auto(lower(name))" sortDirection="ascending" />
             <newdatasortablecolumn label="${i18n:_t('Code')}"/>

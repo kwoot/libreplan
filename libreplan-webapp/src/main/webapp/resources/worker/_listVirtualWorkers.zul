@@ -22,14 +22,14 @@
 <window id="${arg.top_id}" title="${i18n:_t('Virtual Workers Groups List')}">
      <separator bar="false" spacing="5px" orient="horizontal"/>
 
-    <div align="right">
+    <div style="text-align: right;">
         <filter id="filter"/>
     </div>
 
     <separator bar="false" spacing="5px" orient="horizontal"/>
 
     <newdatasortablegrid id="listing" model="@{controller.virtualWorkers}" mold="paging"
-        pageSize="10" fixedLayout="true" sclass="clickable-rows">
+        pageSize="10" sclass="clickable-rows">
         <columns>
             <newdatasortablecolumn label="${i18n:_t('Name')}" sort="auto(lower(name))" sortDirection="ascending"/>
             <newdatasortablecolumn label="${i18n:_t('Capacity')}" sort="auto(capacity)" />

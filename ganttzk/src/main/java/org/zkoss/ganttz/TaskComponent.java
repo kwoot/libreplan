@@ -421,8 +421,8 @@ public class TaskComponent extends Div implements AfterCompose {
         if ( getColor() != null )
             setStyle("background-color : " +  getColor());
 
-        setWidgetAttribute("movingTasksEnabled", ((Boolean)isMovingTasksEnabled()).toString());
-        setWidgetAttribute("resizingTasksEnabled", ((Boolean)isResizingTasksEnabled()).toString());
+        render(renderer, "movingTasksEnabled", isMovingTasksEnabled());
+        render(renderer, "resizingTasksEnabled", isResizingTasksEnabled());
 
         /* We can't use setStyle because of restrictions involved with UiVisualizer#getResponses and the
          * smartUpdate method (when the request is asynchronous)

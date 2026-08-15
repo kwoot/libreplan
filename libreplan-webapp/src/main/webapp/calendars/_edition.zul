@@ -30,7 +30,7 @@
     <tabpanels>
       <tabpanel>
 
-        <grid fixedLayout="true" style="margin-bottom: 10px;" sclass="calendar-data">
+        <grid style="margin-bottom: 10px;" sclass="calendar-data">
           <columns>
             <column width="200px" />
             <column />

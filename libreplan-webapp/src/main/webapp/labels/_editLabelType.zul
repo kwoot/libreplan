@@ -32,7 +32,7 @@
             <tabpanel>
                 <!-- Name labeltype -->
                 <vbox style="margin-bottom: 5px" width="100%">
-                    <grid fixedLayout="true">
+                    <grid>
                         <columns>
                             <column width="200px" />
                             <column />
@@ -72,7 +72,7 @@
                         <button label="${i18n:_t('Add')}" onClick="controller.createLabel()" />
                     </hbox>
                     <grid id="gridLabels" height="320px"
-                          model="@{controller.labels}" fixedLayout="true">
+                          model="@{controller.labels}">
                         <columns sizable="true">
                             <column label="${i18n:_t('Name')}"
                                     sort="auto(lower(name))" sortDirection="ascending" />

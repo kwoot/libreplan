@@ -22,7 +22,7 @@
 <?link rel="shortcut icon" href="/common/img/favicon.ico" type="image/x-icon"?>
 <?link rel="stylesheet" type="text/css" href="/common/css/libreplan.css"?>
 <?link rel="stylesheet" type="text/css" href="/common/css/libreplan_zk.css"?>
-<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?init class="org.libreplan.web.common.AnnotateBinderInit" ?>
 <?taglib uri="/WEB-INF/tld/i18n.tld" prefix="i18n"?>
 <?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
 
@@ -34,7 +34,7 @@
 
         <vbox id="messagesContainer" />
 
-        <div align="right">
+        <div style="text-align: right;">
             <label class="subtitulo" value="${i18n:_t('Show')}:" />
             <listbox id="listFilter" mold="select" rows="1"
                      model="@{controller.filterItems}"
@@ -51,8 +51,7 @@
               model="@{controller.customerCommunications}"
               rowRenderer="@{controller.customerCommunicationRenderer}"
               mold="paging"
-              pageSize="10"
-              fixedLayout="true">
+              pageSize="10">
             <columns>
                 <column label="${i18n:_t('Communication Type')}" sort="auto(lower(communicationType))"/>
                 <column label="${i18n:_t('Project Name')}" sort="auto(lower(order.name))"/>

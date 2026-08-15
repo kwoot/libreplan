@@ -81,8 +81,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.zkforge.timeplot.Plotinfo;
-import org.zkforge.timeplot.Timeplot;
 import org.zkoss.ganttz.IChartVisibilityChangedListener;
 import org.zkoss.ganttz.Planner;
 import org.zkoss.ganttz.adapters.IStructureNavigator;
@@ -297,7 +295,7 @@ public class CompanyPlanningModel implements ICompanyPlanningModel {
     }
 
     private void setupChartAndItsContent(final Planner planner, final Tabbox chartComponent) {
-        Timeplot chartLoadTimeplot = createEmptyTimeplot();
+        Div chartLoadTimeplot = createEmptyTimeplot();
 
         appendTab(chartComponent, appendLoadChartAndLegend(new Tabpanel(), chartLoadTimeplot));
 
@@ -314,7 +312,7 @@ public class CompanyPlanningModel implements ICompanyPlanningModel {
 
     private void createOnDemandEarnedValueTimePlot(final Tabbox chartComponent, final Planner planner){
         transactionService.runOnReadOnlyTransaction((IOnTransaction<Void>) () -> {
-            Timeplot chartEarnedValueTimeplot = createEmptyTimeplot();
+            Div chartEarnedValueTimeplot = createEmptyTimeplot();
             CompanyEarnedValueChartFiller earnedValueChartFiller = new CompanyEarnedValueChartFiller();
             earnedValueChartFiller.calculateValues(planner.getTimeTracker().getRealInterval());
             Tabpanel earnedValueTabpanel = new Tabpanel();
@@ -336,10 +334,8 @@ public class CompanyPlanningModel implements ICompanyPlanningModel {
     }
 
 
-    private Timeplot createEmptyTimeplot() {
-        Timeplot timeplot = new Timeplot();
-        timeplot.appendChild(new Plotinfo());
-        return timeplot;
+    private Div createEmptyTimeplot() {
+        return new Div();
     }
 
     private void appendTabs(Tabbox chartComponent) {
@@ -389,16 +385,16 @@ public class CompanyPlanningModel implements ICompanyPlanningModel {
         }
     }
 
-    public static Tabpanel appendLoadChartAndLegend(Tabpanel loadChartPanel, Timeplot loadChart) {
+    public static Tabpanel appendLoadChartAndLegend(Tabpanel loadChartPanel, Div loadChart) {
         return appendLoadChartAndLegend(loadChartPanel, Emitter.withInitial(loadChart));
     }
 
-    public static Tabpanel appendLoadChartAndLegend(Tabpanel loadChartPanel, Emitter<Timeplot> loadChartEmitter) {
+    public static Tabpanel appendLoadChartAndLegend(Tabpanel loadChartPanel, Emitter<Div> loadChartEmitter) {
         Hbox hbox = new Hbox();
         hbox.appendChild(getLoadChartLegend());
 
         final Div div = new Div();
-        Timeplot timePlot = loadChartEmitter.getLastValue();
+        Div timePlot = loadChartEmitter.getLastValue();
 
         if (timePlot != null) {
             div.appendChild(timePlot);
@@ -430,7 +426,7 @@ public class CompanyPlanningModel implements ICompanyPlanningModel {
     }
 
     private void appendEarnedValueChartAndLegend(Tabpanel earnedValueChartPanel,
-                                                 Timeplot chartEarnedValueTimeplot,
+                                                 Div chartEarnedValueTimeplot,
                                                  CompanyEarnedValueChartFiller earnedValueChartFiller) {
 
         Vbox vbox = new Vbox();
@@ -630,7 +626,7 @@ public class CompanyPlanningModel implements ICompanyPlanningModel {
         });
     }
 
-    private Chart setupChart(Timeplot chartComponent, IChartFiller loadChartFiller, Planner planner) {
+    private Chart setupChart(Div chartComponent, IChartFiller loadChartFiller, Planner planner) {
         TimeTracker timeTracker = planner.getTimeTracker();
         Chart loadChart = new Chart(chartComponent, loadChartFiller, timeTracker);
         loadChart.setZoomLevel(planner.getZoomLevel());

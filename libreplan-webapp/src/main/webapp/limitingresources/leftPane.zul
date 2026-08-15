@@ -26,5 +26,5 @@
         ]]>
     </zscript>
 
-    <tree id="loadsTree" sclass="limitingresources-left-pane" fixedLayout="true"/>
+    <tree id="loadsTree" sclass="limitingresources-left-pane"/>
 </zk>

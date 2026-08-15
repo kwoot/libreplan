@@ -144,14 +144,14 @@
         <panel
                 title="${i18n:_t('Percentage of estimated budget hours / hours consumed')}">
             <panelchildren>
-                <grid fixedLayout="true">
+                <grid>
                     <columns>
                         <column />
                         <column />
                     </columns>
                     <rows>
                         <row>
-                            <grid fixedLayout="true">
+                            <grid>
                                 <columns>
                                     <column width="200px" />
                                     <column width="200px" />
@@ -192,14 +192,14 @@
         <panel
                 title="${i18n:_t('Percentage of estimated budget in money / money spent')}">
             <panelchildren>
-                <grid fixedLayout="true">
+                <grid>
                     <columns>
                         <column />
                         <column />
                     </columns>
                     <rows sclass="remove-detailrow-background">
                         <row>
-                            <grid fixedLayout="true">
+                            <grid>
                                 <columns>
                                     <column width="40px"/>
                                     <column width="200px"/>
@@ -208,7 +208,7 @@
                                 <rows>
                                     <row>
                                         <detailrow open="false">
-                                            <grid fixedLayout="true">
+                                            <grid>
                                                 <columns>
                                                     <column width="200px" />
                                                     <column align="right"/>
@@ -242,7 +242,7 @@
 
                                     <row>
                                         <detailrow open="false">
-                                            <grid fixedLayout="true">
+                                            <grid>
                                                 <columns>
                                                     <column width="200px" />
                                                     <column align="right"/>

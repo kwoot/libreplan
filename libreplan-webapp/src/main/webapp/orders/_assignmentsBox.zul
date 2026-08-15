@@ -20,7 +20,6 @@
 -->
 
 <newdatasortablegrid id="gridMaterials"
-                     fixedLayout="true"
                      model="@{assignedMaterialsController.assignedMaterials}">
 
     <columns width="100%">

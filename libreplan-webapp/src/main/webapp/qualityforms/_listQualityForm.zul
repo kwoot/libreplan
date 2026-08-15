@@ -20,7 +20,7 @@
 -->
 
 <window id="${arg.id}" title="${i18n:_t('Quality Forms List')}">
-    <div align="right">
+    <div style="text-align: right;">
         <hbox align="end" sclass="label-middle">
             <!-- Filter by name -->
             <label value="${i18n:_t('Filter quality forms by')}:"/>
@@ -33,7 +33,7 @@
     <separator bar="false" spacing="5px" orient="vertical"/>
 
     <grid id="qualityFormsList" model="@{controller.qualityForms}" sclass="clickable-rows"
-          mold="paging" pageSize="10" fixedLayout="true">
+          mold="paging" pageSize="10">
         <columns>
             <column label="${i18n:_t('Name')}" sort="auto(lower(name))" sortDirection="ascending" />
             <column label="${i18n:_t('Description')}" />

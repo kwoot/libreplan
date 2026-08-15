@@ -107,7 +107,7 @@
         <grid id="gridDeliverDate"
               model="@{subController.deliverDates}"
               rowRenderer="@{subController.deliverDatesRenderer}"
-              mold="paging" pageSize="10" fixedLayout="true" width="880px">
+              mold="paging" pageSize="10" width="880px">
             <columns>
                 <column label="${i18n:_t('Save date')}" sort="auto(saveDate)" align="center" width="220px"/>
                 <column label="${i18n:_t('Deliver date')}" align="center" width="220px"/>
@@ -125,7 +125,7 @@
         <grid id="gridEndDates"
               model="@{subController.askedEndDates}"
               rowRenderer="@{subController.endDatesRenderer}"
-              mold="paging" pageSize="10" fixedLayout="true" width="880px">
+              mold="paging" pageSize="10" width="880px">
             <columns>
                 <column label="${i18n:_t('End date')}" sort="auto(saveDate)" align="center" width="320px"/>
                 <column label="${i18n:_t('Communication date')}" align="center" width="320px"/>

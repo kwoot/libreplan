@@ -87,7 +87,7 @@
 
                         <separator spacing="10px"/>
 
-                        <grid fixedLayout="true" width="100%">
+                        <grid width="100%">
                             <columns>
                                 <column width="200px" />
                                 <column  />
@@ -135,7 +135,7 @@
 
                             <separator spacing="10px"/>
 
-                            <grid fixedLayout="true">
+                            <grid>
                                 <columns>
                                     <column width="180px" />
                                     <column />
@@ -183,7 +183,7 @@
 
                             <separator spacing="10px"/>
 
-                            <grid fixedLayout="true">
+                            <grid>
                                 <columns>
                                     <column width="120px" />
                                     <column  />
@@ -254,7 +254,7 @@
                     <hbox width="100%">
                         <separator spacing="10px" width="100%"/>
 
-                        <grid fixedLayout="true" hflex="1">
+                        <grid hflex="1">
                             <columns>
                                 <column width="200px" />
                                 <column  />
@@ -295,7 +295,7 @@
 
                             <grid id="gridDeliveryDates"
                                   model="@{controller.deliverDates}"
-                                  mold="paging" pageSize="4" fixedLayout="true" width="400px"
+                                  mold="paging" pageSize="4" width="400px"
                                   onInitRender="controller.setCurrentDeliveryDate(self);">
                                 <columns>
                                     <column label="${i18n:_t('Delivery date')}" align="center" width="200px"/>
@@ -331,7 +331,7 @@
                         <grid id="gridAskedEndDates" model="@{controller.endDates}"
                               rowRenderer="@{controller.endDatesRenderer}"
                               mold="paging"
-                              pageSize="10" fixedLayout="true" width="880px">
+                              pageSize="10" width="880px">
                             <columns>
                                 <column label="${i18n:_t('Save date')}" sort="auto(saveDate)" align="center" width="220px"/>
                                 <column label="${i18n:_t('End date')}" align="center" width="220px"/>

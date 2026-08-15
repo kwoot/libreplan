@@ -21,9 +21,9 @@
 
 package org.libreplan.web.planner.chart;
 
-import org.zkforge.timeplot.Timeplot;
 import org.zkoss.ganttz.timetracker.zoom.ZoomLevel;
 import org.zkoss.ganttz.util.Interval;
+import org.zkoss.zul.Div;
 
 /**
  * Contract for {@link ChartFiller}.
@@ -32,7 +32,7 @@ import org.zkoss.ganttz.util.Interval;
  */
 public interface IChartFiller {
 
-    void fillChart(Timeplot chart, Interval interval, Integer size);
+    void fillChart(Div chart, Interval interval, Integer size);
 
     void setZoomLevel(ZoomLevel zoomLevel);
 

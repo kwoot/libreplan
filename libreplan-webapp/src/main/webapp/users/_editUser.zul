@@ -38,7 +38,7 @@
                             <label value="${i18n:_t('Password cannot be managed for LDAP users because LDAP authentication is enabled.')}"
                                    visible="@{controller.ldapUserLdapConfiguration}" />
                         </vbox>
-                        <grid fixedLayout="true" span="true">
+                        <grid span="true">
                             <columns>
                                 <column width="200px" />
                                 <column />
@@ -100,7 +100,7 @@
 
                     <groupbox closable="false" id="boundResourceGroupbox">
                         <caption label="${i18n:_t('Bound resource')}" />
-                        <grid fixedLayout="true" span="true">
+                        <grid span="true">
                             <columns>
                                 <column width="200px" />
                                 <column />

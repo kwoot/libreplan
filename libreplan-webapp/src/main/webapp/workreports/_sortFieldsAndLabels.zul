@@ -27,7 +27,7 @@
         <panel title="${i18n:_t('Heading')}" border="normal"
             style="overflow:auto">
             <panelchildren>
-                <grid id="headingFieldsAndLabels" mold="paging" pageSize="5" fixedLayout="true"
+                <grid id="headingFieldsAndLabels" mold="paging" pageSize="5"
                     model="@{controller.headingFieldsAndLabels}"
                     rowRenderer= "@{controller.orderedFieldsAndLabelsRowRenderer}">
                     <columns>
@@ -43,7 +43,7 @@
         <!-- Ordered List Line Fields and Labels -->
         <panel title="${i18n:_t('Lines')}" border="normal" style="overflow:auto">
             <panelchildren>
-                <grid id="linesFieldsAndLabels" mold="paging" pageSize="5" fixedLayout="true"
+                <grid id="linesFieldsAndLabels" mold="paging" pageSize="5"
                     model="@{controller.linesFieldsAndLabels}"
                     rowRenderer= "@{controller.orderedFieldsAndLabelsRowRenderer}">
                     <columns>

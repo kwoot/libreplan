@@ -19,7 +19,7 @@
 -->
 
 <?page title="${i18n:_t('LibrePlan: Materials')}" id="labelTypesList"?>
-<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?init class="org.libreplan.web.common.AnnotateBinderInit" ?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="/common/layout/template.zul"?>
 
 <?link rel="shortcut icon" href="/common/img/favicon.ico" type="image/x-icon"?>
@@ -76,8 +76,7 @@
                         label="${i18n:_t('New')}" sclass="add-button"
                         onClick="materialsController.addMaterialToMaterialCategory(categoriesTree.selectedItem)" />
                 <separator spacing="15px" orient="horizontal" />
-                <newdatasortablegrid id="gridMaterials"
-                                     fixedLayout="true" mold="paging" pageSize="5"
+                <newdatasortablegrid id="gridMaterials" mold="paging" pageSize="5"
                                      model="@{materialsController.materials}">
                     <columns>
                         <newdatasortablecolumn label="${i18n:_t('Code')}" />

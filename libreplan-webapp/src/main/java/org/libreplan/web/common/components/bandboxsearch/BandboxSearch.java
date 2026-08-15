@@ -41,7 +41,6 @@ import org.zkoss.zk.ui.HtmlMacroComponent;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.InputEvent;
-import org.zkoss.zkplus.databind.DataBinder;
 import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Constraint;
 import org.zkoss.zul.ListModel;
@@ -163,11 +162,12 @@ public class BandboxSearch extends HtmlMacroComponent {
             bandbox.setValue("");
         }
 
-        /* TODO resolve deprecated */
-        DataBinder binder = Util.getBinder(this);
-
-        if (binder != null) {
-            binder.saveAttribute(this, SELECTED_ELEMENT_ATTRIBUTE);
+        // The old DataBinder.saveAttribute(Component, String) saved one specific bound attribute;
+        // AnnotateBinder has no per-attribute equivalent, only saving a whole component's
+        // save-bindings (see Util.saveBindings). SELECTED_ELEMENT_ATTRIBUTE is the only bound
+        // property this component saves, so that's equivalent here.
+        if (Util.getBinder(this) != null) {
+            Util.saveBindings(this);
         }
     }
 

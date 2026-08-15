@@ -19,7 +19,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?init class="org.libreplan.web.common.AnnotateBinderInit" ?>
 <?page id="work_report_admin" title="${i18n:_t('LibrePlan: Transfer Projects Between Scenarios')}" ?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="/common/layout/template.zul"?>
 <?link rel="stylesheet" type="text/css" href="/common/css/libreplan.css"?>
@@ -33,7 +33,7 @@
 
     <vbox id="messagesContainer"></vbox>
 
-                <grid fixedLayout="true">
+                <grid>
                     <columns>
                         <column label="${i18n:_t('Source scenario')}"/>
                         <column label="${i18n:_t('Destination scenario')}"/>

@@ -17,7 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?init class="org.libreplan.web.common.AnnotateBinderInit" ?>
 <?page title="${i18n:_t('LibrePlan: Expenses')}" id="expense_sheet_admin"?>
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="/common/layout/template.zul"?>
 <?link rel="shortcut icon" href="/common/img/favicon.ico" type="image/x-icon"?>
@@ -30,7 +30,7 @@
         <vbox id="messagesContainer"/>
 
         <window id="listWindow" title="${i18n:_t('Expense Sheets List')}">
-            <div align="left">
+            <div style="text-align: left;">
                 <hbox align="center">
 
                     <!-- Create new Expense Sheet  -->
@@ -65,7 +65,7 @@
                 <caption label="${i18n:_t('Identification')}" />
                 <separator bar="false" spacing="5px" orient="horizontal"/>
                 <vbox>
-                    <grid width="100%" fixedLayout="true">
+                    <grid width="100%">
                         <columns>
                             <column width="100px" />
                             <column />

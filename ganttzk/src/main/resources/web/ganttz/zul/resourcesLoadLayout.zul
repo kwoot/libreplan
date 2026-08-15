@@ -72,7 +72,7 @@
                     <borderlayout>
                         <north border="0" height="35px" hflex="true" collapsible="true">
                             <vbox pack="top" align="center">
-                                <tree fixedLayout="true" hflex="true" sclass="resourceload-details-container">
+                                <tree hflex="true" sclass="resourceload-details-container">
                                     <treecols>
                                         <treecol label="${ganttzk_i18n:_t('Name')}" height="29px"/>
                                     </treecols>

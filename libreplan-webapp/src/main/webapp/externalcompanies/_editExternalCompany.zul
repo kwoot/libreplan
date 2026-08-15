@@ -30,7 +30,7 @@
         <tabpanels>
             <tabpanel>
                 <vbox width="100%">
-                    <grid fixedLayout="true">
+                    <grid>
                         <columns>
                             <column width="200px" />
                             <column />

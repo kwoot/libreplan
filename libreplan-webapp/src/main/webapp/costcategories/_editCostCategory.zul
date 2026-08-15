@@ -34,7 +34,7 @@
                 <vbox>
 
                     <!-- CostCategory details  -->
-                    <grid fixedLayout="false">
+                    <grid sizedByContent="true">
 
                         <columns>
                             <column width="200px" />
