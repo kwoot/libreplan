@@ -8,25 +8,32 @@ than silently fix it — fixing behavior while also changing the underlying API 
 verifiable migration" turns into an unreviewable one. This file exists so those findings don't
 just live in prose buried inside the punch list and get forgotten.
 
-**Status as of 2026-08-15 (Phase 6 execution): 7 of the 9 original data-layer bugs are now fixed**
-(each with its own commit on `phase5-jakarta-migration`, characterization tests updated to assert
-the corrected behavior instead of the bug). `libreplan-business`'s full test suite is **fully
-green: 1214 tests, 0 failures, 0 errors** — the one long-standing pre-existing failure
-(`ScenariosBootstrapTest`, item 9) is gone. Two items (1 and 3) are explicitly left open because
-they need a product decision, not a code fix, from Jeroen.
+**Status as of 2026-08-15 (Phase 6 execution): 8 of the 9 original data-layer bugs are now fixed**
+(characterization tests updated to assert the corrected behavior instead of the bug).
+`libreplan-business`'s full test suite is **fully green: 1216 tests, 0 failures, 0 errors** — the
+one long-standing pre-existing failure (`ScenariosBootstrapTest`, item 9) is gone. Item 1
+(`LimitsDAO`) needed and got a product decision from Jeroen first, then was fixed. Item 3
+(`ResourcesSearcher`) is still open pending a product decision.
 
 Each entry: what's wrong, where, how it was confirmed pre-existing (not migration-caused), and
 either the fix that landed or why it's still waiting on a decision.
 
 ## Data-layer bugs (found during the DAO Criteria migration, mostly fixed in Phase 6)
 
-### 1. [OPEN — needs a product decision] `LimitsDAO.save()` is fundamentally broken
-`libreplan-business/.../orders/daos/LimitsDAO.java`. `Limits.hbm.xml` maps `Limits` as
-`abstract="true"`, which makes any direct `save()` call on this DAO non-functional. Only one
-characterization test exists for this DAO (the query-side logic still needed migrating regardless
-of `save()`'s state). **Not fixed** — this needs Jeroen to decide whether `Limits` was ever meant
-to be concretely persisted (give it a real mapping) or whether the dead `save()` path should just
-be removed. Not something to guess at.
+### 1. [FIXED, 2026-08-15] `LimitsDAO.save()` was fundamentally broken
+`libreplan-business/.../common/daos/LimitsDAO.java`. `Limits.hbm.xml` mapped `Limits` as
+`abstract="true"` with **no subclass anywhere** in the codebase — Hibernate's `increment` id
+generator can't initialize against an abstract-mapped class, so `save()` always threw
+`SQLGrammarException`. Jeroen's answer on what `Limits` is for: it's a cloud-deployment
+per-seat-license control (e.g. a maximum-users cap for a hosted instance), and rows are meant to
+be set directly in the database by the deployment's DB administrator — no in-app GUI is needed or
+planned. That confirmed `Limits` genuinely is meant to hold real, persistable rows (it's just
+`type`/`value`, e.g. `('MAX_USERS', 10)`), so `abstract="true"` was simply wrong, not intentional.
+Removed it. `save()`/`getAll()`/`getLimitsByType()` are already read by `MachineCRUDController`/
+`WorkerCRUDController`/`UserCRUDController` to enforce these limits — that read path was always
+fine; only the (previously unused-in-practice, but broken) write path is what this fixed. Added
+two characterization tests proving `save()` + `getLimitsByType()`/`getAll()` round-trip correctly
+now.
 
 ### 2. [FIXED] Three DAO methods always threw due to an unmapped `limitingResource` property
 - `MachineDAO.findByNameOrCode` — confirmed zero callers.
@@ -39,11 +46,46 @@ codebase for all four (repo-wide grep, not just an assumption). **Deleted outrig
 methods, implementations, and their "confirms it always throws" characterization tests all
 removed. `MachineDAOTest`/`ResourceDAOTest`/`WorkerDAOTest` still pass (10/6/6 tests).
 
-### 3. [OPEN — needs a product decision] `ResourcesSearcher`: NIF matching is case-sensitive, name/surname matching is not
+### 3. [STILL OPEN — needs a product decision] `ResourcesSearcher`: NIF matching is case-sensitive, name/surname matching is not
 `libreplan-business/.../resources/daos/ResourcesSearcher.java`. `nif` uses `like`
-(case-sensitive); `name`/`surname` use `ilike` (case-insensitive). **Not fixed** — could be
-intentional (NIF is a formal identifier, arguably should be exact-case) or could be an oversight.
-Needs an explicit product decision from Jeroen rather than a unilateral code change either way.
+(case-sensitive); `name`/`surname` use `ilike` (case-insensitive). **Not fixed.** Investigated
+further while resolving item 3a below: the field labeled "NIF" in the Java/DB layer is shown to
+users only as the generic **"ID"** (worker) / **"Company ID"** (external company) — the app never
+surfaces the word "NIF" anywhere, and there's no Spanish-tax-ID format/checksum validation on it
+either, just "not blank" (now removed for `Worker`, see 3a) and "must be unique". So this isn't
+really about a formal government identifier — it's a free-text code, same in spirit as name/
+surname. Worth noting: a *different* existing lookup, `WorkerDAO.findUniqueByNif`, already does
+case-insensitive + trimmed matching (`WorkerDAOTest.findUniqueByNifMatchesTrimmedAndCaseInsensitive`)
+— i.e. this codebase already treats the field as case-insensitive elsewhere, which weakens the
+case for `ResourcesSearcher`'s case-sensitive `like` being intentional. Still Jeroen's call, not
+changed without an explicit go-ahead.
+
+### 3a. [FIXED, 2026-08-15] `Worker.getNif()` ("ID" field) was mandatory — now optional
+Prompted by the item-3 discussion: Jeroen didn't like that the worker "ID" field was mandatory,
+and asked whether it's used as a unique identifier anywhere for referential integrity. Checked
+directly: every entity has its own real, DB-generated surrogate primary key
+(`worker.worker_id`, Hibernate `increment` generator) used for all foreign keys throughout the
+app — `nif` is never a PK or FK anywhere. Checked the actual Liquibase schema too: `nif` has
+**no `NOT NULL` and no `UNIQUE` constraint at the database level at all** (for `worker`; unlike
+`external_company`, which does have a DB-level unique constraint on `nif` — not touched here).
+The "mandatory" and "must be unique" behavior was 100% a Java-layer thing
+(`@NotEmpty` + a custom `@AssertTrue` uniqueness check that already no-ops when the field is
+blank). Removed `@NotEmpty` from `Worker.getNif()` and the matching `constraint="no empty"` on
+the worker-edit form's textbox. Uniqueness is left as-is — still enforced when a value *is*
+entered, just no longer required to enter one.
+
+Fixing this exposed two latent `NullPointerException` risks that a blank ID would now actually
+reach in practice (previously only reachable via unusual paths like a WS import bypassing
+validation), both hardened as part of this fix:
+- `JiraTimesheetSynchronizer.getWorker()` — matched Jira usernames via
+  `worker.getNif().equals(nif)`; flipped to `nif.equals(worker.getNif())` (the search parameter,
+  `nif`, is never null; a worker's `getNif()` now can be).
+- `ResourcePredicate.acceptNif()` — the NIF/ID search filter called `.getNif().toLowerCase()`
+  unguarded; added a null check.
+
+Added `WorkerDAOTest.testSaveWorkerWithNoId()` proving a worker with `nif == null` saves and
+round-trips correctly. Full `libreplan-business` suite verified green (1217/1217, 0 failures/
+errors) after the change.
 
 ### 4. [FIXED] `QualityFormDAO.isUnique()` swallowed `InstanceNotFoundException`, inverting its result
 `libreplan-business/.../qualityforms/daos/QualityFormDAO.java`. The generic `catch` around the

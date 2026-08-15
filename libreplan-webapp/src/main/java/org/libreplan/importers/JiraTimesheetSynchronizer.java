@@ -350,7 +350,7 @@ public class JiraTimesheetSynchronizer implements IJiraTimesheetSynchronizer {
      */
     private Worker getWorker(String nif) {
         for (Worker worker : workers) {
-            if (worker.getNif().equals(nif)) {
+            if (nif.equals(worker.getNif())) {
                 return worker;
             }
         }

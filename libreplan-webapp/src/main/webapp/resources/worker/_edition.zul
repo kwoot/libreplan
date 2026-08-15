@@ -86,7 +86,7 @@
 
                             <row visible="@{controller.isRealWorker}">
                                 <label value="${i18n:_t('ID')}" />
-                                <textbox value="@{controller.worker.nif}" constraint="no empty"/>
+                                <textbox value="@{controller.worker.nif}"/>
                             </row>
 
                             <row visible="@{controller.isRealWorker}">

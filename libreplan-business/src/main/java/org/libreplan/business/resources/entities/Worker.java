@@ -146,7 +146,6 @@ public class Worker extends Resource {
         return getSurname() + ", " + getFirstName();
     }
 
-    @NotEmpty(message="Worker ID cannot be empty")
     public String getNif() {
         return nif;
     }

@@ -172,13 +172,16 @@ needed.
 
 ## 6.5 — Fix the cataloged pre-existing bugs from `Phase5-found-bugs.md`
 
-**Status (2026-08-15, executed): 7 of 9 done.** Items 2, 3, 5, 6, 7, 8, 9 below are fixed and
-committed — see `../Phase5-found-bugs.md` for the full writeup of each, including the discovery
-that items 7/8 (`WorkReportLineDAO`) were actually one bug, and that item 9
-(`ScenariosBootstrapTest`) was also a real production bug in `OrderModel`/`ScenarioModel`, not
-just a test artifact. `libreplan-business`'s full test suite is now **fully green: 1214 tests,
-0 failures, 0 errors** (was 1215/0/1). Items 1 and 4 below are still open — both explicitly need a
-product decision from Jeroen, not a code fix, and weren't acted on.
+**Status (2026-08-15, executed): 8 of 9 done.** Items 1, 2, 3, 5, 6, 7, 8, 9 below are fixed —
+see `../Phase5-found-bugs.md` for the full writeup of each, including the discovery that items
+7/8 (`WorkReportLineDAO`) were actually one bug, and that item 9 (`ScenariosBootstrapTest`) was
+also a real production bug in `OrderModel`/`ScenarioModel`, not just a test artifact. Item 1
+(`LimitsDAO`) needed a product decision first — Jeroen confirmed `Limits` is a real,
+DB-admin-managed cloud-deployment license control (e.g. max users), not something that needs an
+in-app GUI, which meant `abstract="true"` in its mapping was simply a bug, not intentional, and
+was safe to fix once confirmed. `libreplan-business`'s full test suite is now **fully green: 1216
+tests, 0 failures, 0 errors** (was 1215/0/1). Item 4 (`ResourcesSearcher` NIF case-sensitivity)
+is still open, pending its own product decision from Jeroen.
 
 Every item below is detailed with evidence and a suggested fix direction in
 `../Phase5-found-bugs.md` §"Data-layer bugs" — this section just turns that catalog into an
@@ -186,9 +189,11 @@ ordered work list. **Each of these changes real, observable behavior** (not just
 so the guiding rule at the top of this document applies in full: characterize first, confirm
 pre-existing vs. migration-caused, then fix.
 
-1. **`LimitsDAO.save()` fundamentally broken** (`Limits.hbm.xml` is `abstract="true"`) — needs a
-   product decision first (was `Limits` ever meant to be concretely persisted?), not just a code
-   fix. Raise with Jeroen before touching.
+1. **[DONE, 2026-08-15] `LimitsDAO.save()` fundamentally broken** (`Limits.hbm.xml` was
+   `abstract="true"` with no subclass). Jeroen confirmed `Limits` is a per-seat/per-license cloud
+   deployment control, DB-admin-managed directly, no in-app GUI needed or planned — so it is
+   meant to be concretely persisted, `abstract="true"` was just wrong. Removed it; added
+   characterization tests proving `save()` round-trips correctly now.
 2. **`MachineDAO.findByNameOrCode`** — confirmed zero callers. Safe to delete outright, no
    characterization test needed beyond confirming (again, at fix time) that it's still uncalled.
 3. **`ResourceDAO.getAllLimitingResources`/`getAllNonLimitingResources`,

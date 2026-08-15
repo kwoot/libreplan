@@ -23,6 +23,7 @@ package org.libreplan.business.test.resources.daos;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.libreplan.business.BusinessGlobalNames.BUSINESS_SPRING_CONFIG_FILE;
 import static org.libreplan.business.test.BusinessGlobalNames.BUSINESS_SPRING_CONFIG_TEST_FILE;
@@ -33,6 +34,7 @@ import java.util.UUID;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
+import org.libreplan.business.common.exceptions.ValidationException;
 import org.libreplan.business.resources.daos.IWorkerDAO;
 import org.libreplan.business.resources.entities.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +69,17 @@ public class WorkerDAOTest {
         int previous = workerDAO.getAll().size();
         workerDAO.save(createValidWorker("firstname", "surname", "nif-" + UUID.randomUUID()));
         assertEquals(previous + 1, workerDAO.getAll().size());
+    }
+
+    @Test
+    @Transactional
+    public void testSaveWorkerWithNoId() throws ValidationException, InstanceNotFoundException {
+        // Worker.getNif() is no longer @NotEmpty (Phase 6, see Phase5-found-bugs.md item 3) - the
+        // "ID" field is a free-text, optional identifier, not a mandatory unique key.
+        Worker worker = createValidWorker("firstname", "surname", null);
+        workerDAO.save(worker);
+
+        assertNull(workerDAO.find(worker.getId()).getNif());
     }
 
     @Test

@@ -177,8 +177,8 @@ public class ResourcePredicate implements IPredicate {
 
     private boolean acceptNif(String filterNif, Resource resource) {
         if (resource instanceof Worker) {
-            return ((Worker) resource).getNif().toLowerCase().contains(
-                    filterNif);
+            String nif = ((Worker) resource).getNif();
+            return nif != null && nif.toLowerCase().contains(filterNif);
         }
         return false;
     }
