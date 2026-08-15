@@ -67,6 +67,7 @@ import org.libreplan.web.common.components.finders.TaskGroupFilterEnum;
 import org.libreplan.web.planner.TaskElementAdapter;
 import org.libreplan.web.planner.TaskGroupPredicate;
 import org.libreplan.web.planner.chart.Chart;
+import org.libreplan.web.planner.chart.ChartFiller;
 import org.libreplan.web.planner.chart.EarnedValueChartFiller;
 import org.libreplan.web.planner.chart.EarnedValueChartFiller.EarnedValueType;
 import org.libreplan.web.planner.chart.IChartFiller;
@@ -209,7 +210,10 @@ public class CompanyPlanningModel implements ICompanyPlanningModel {
 
         final Tabbox chartComponent = new Tabbox();
         chartComponent.setOrient("vertical");
-        chartComponent.setHeight("200px");
+        // Tab bar + panel padding/borders on top of the chart's own height - keep in sync with
+        // ChartFiller.CHART_HEIGHT_PX rather than an independently-tuned magic number, since a
+        // mismatch here clips the tab content (e.g. the Earned Value legend) via overflow:hidden.
+        chartComponent.setHeight((ChartFiller.CHART_HEIGHT_PX + 50) + "px");
         appendTabs(chartComponent);
         appendTabpanels(chartComponent);
 

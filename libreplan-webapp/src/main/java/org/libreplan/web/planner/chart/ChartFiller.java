@@ -111,6 +111,15 @@ public abstract class ChartFiller implements IChartFiller {
      */
     private final static int DAYS_TO_THURSDAY = 3;
 
+    /**
+     * Matches the natural height of the chart's legend cell (the "Overload / Total capability /
+     * Assigned load" swatches next to it) so the chart fills its row instead of leaving blank
+     * space below - the legend, not the chart, is what determines the row's height. Public so the
+     * Tabbox wrapping these charts (CompanyPlanningModel/OrderPlanningModel/ResourceLoadController)
+     * can size itself off the same number instead of an independent, easily-stale hardcoded value.
+     */
+    public final static int CHART_HEIGHT_PX = 190;
+
     private ZoomLevel zoomLevel = ZoomLevel.DETAIL_ONE;
 
     @Override
@@ -354,10 +363,10 @@ public abstract class ChartFiller implements IChartFiller {
         payload.put("labels", labels);
         payload.put("series", series);
         payload.put("width", size);
-        payload.put("height", 150);
+        payload.put("height", CHART_HEIGHT_PX);
 
         chartDiv.setWidth(size + "px");
-        chartDiv.setHeight("150px");
+        chartDiv.setHeight(CHART_HEIGHT_PX + "px");
 
         try {
             String json = new ObjectMapper().writeValueAsString(payload);

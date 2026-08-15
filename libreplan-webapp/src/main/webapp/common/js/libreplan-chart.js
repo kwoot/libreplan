@@ -67,7 +67,7 @@ window.LibreplanChart = (function() {
         // why the chart used to render small in the top-left corner regardless of how big this
         // div actually was. Size the canvas itself, not just its wrapper.
         var width = config.width || el.clientWidth || 300;
-        var height = config.height || 150;
+        var height = config.height || 190;
 
         el.style.width = width + "px";
         el.style.height = height + "px";
@@ -100,10 +100,11 @@ window.LibreplanChart = (function() {
                     }
                 },
                 scales: {
+                    // The date labels are redundant now that hovering shows the date + each
+                    // series' value at that point (interaction.mode:'index' above); dropping the
+                    // axis entirely reclaims the vertical space it used to take.
                     x: {
-                        grid: {
-                            display: false
-                        }
+                        display: false
                     },
                     y: {
                         beginAtZero: true

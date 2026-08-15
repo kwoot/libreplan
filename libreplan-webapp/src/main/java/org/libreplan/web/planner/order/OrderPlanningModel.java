@@ -61,6 +61,7 @@ import org.libreplan.web.planner.allocation.IResourceAllocationCommand;
 import org.libreplan.web.planner.calendar.CalendarAllocationController;
 import org.libreplan.web.planner.calendar.ICalendarAllocationCommand;
 import org.libreplan.web.planner.chart.Chart;
+import org.libreplan.web.planner.chart.ChartFiller;
 import org.libreplan.web.planner.chart.ChartSeries;
 import org.libreplan.web.planner.chart.EarnedValueChartFiller;
 import org.libreplan.web.planner.chart.EarnedValueChartFiller.EarnedValueType;
@@ -350,7 +351,8 @@ public class OrderPlanningModel implements IOrderPlanningModel {
         addPrintSupport(configuration, order);
         Tabbox chartComponent = new Tabbox();
         chartComponent.setOrient("vertical");
-        chartComponent.setHeight("200px");
+        // Kept in sync with ChartFiller.CHART_HEIGHT_PX - see CompanyPlanningModel for why.
+        chartComponent.setHeight((ChartFiller.CHART_HEIGHT_PX + 50) + "px");
         appendTabs(chartComponent);
 
         setDefaultButtonState(configuration,user);

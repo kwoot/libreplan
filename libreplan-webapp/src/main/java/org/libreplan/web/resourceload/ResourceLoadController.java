@@ -50,6 +50,7 @@ import org.libreplan.web.common.components.bandboxsearch.BandboxMultipleSearch;
 import org.libreplan.web.common.components.finders.FilterPair;
 import org.libreplan.web.common.components.finders.ResourceAllocationFilterEnum;
 import org.libreplan.web.planner.chart.Chart;
+import org.libreplan.web.planner.chart.ChartFiller;
 import org.libreplan.web.planner.chart.StandardLoadChartFiller;
 import org.libreplan.web.planner.company.CompanyPlanningModel;
 import org.libreplan.web.planner.order.BankHolidaysMarker;
@@ -221,7 +222,8 @@ public class ResourceLoadController implements Composer {
         private Tabbox buildChart(Emitter<Div> timePlot) {
             Tabbox chartComponent = new Tabbox();
             chartComponent.setOrient("vertical");
-            chartComponent.setHeight("200px");
+            // Kept in sync with ChartFiller.CHART_HEIGHT_PX - see CompanyPlanningModel for why.
+            chartComponent.setHeight((ChartFiller.CHART_HEIGHT_PX + 50) + "px");
 
             Tabs chartTabs = new Tabs();
             chartTabs.appendChild(new Tab(_t("Load")));

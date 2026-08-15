@@ -25,9 +25,11 @@ Compilation requirements
   separately installed system Maven still works if you prefer it, but is no
   longer required.
 
-* *JDK 11* - Java Development Kit
+* *JDK 25* - Java Development Kit
 
-  Project depends on Java 11 and JDK is needed in order to compile it
+  The project builds and runs on JDK 25 (bytecode currently targeted at release 21 —
+  ``maven.compiler.release`` in the root ``pom.xml`` — see the comment there and
+  ``doc/technical/jdk25-migration/`` for why; the JVM itself is genuinely JDK 25 end to end).
 
 * *PostgreSQL* - Object-relational SQL database
 
@@ -57,6 +59,15 @@ Compilation requirements
 LibrePlan compilation
 ---------------------
 
+Note on ``jetty:run`` and the local dev server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The app now targets the ``jakarta.servlet`` (Jakarta EE 9+) namespace instead of ``javax.servlet``,
+so the ``jetty-maven-plugin`` used by ``jetty:run`` was bumped from the 9.4.x line (javax-only) to
+**11.0.24**, the matching Jakarta EE 9 generation. This is transparent for everyday use — nothing
+below changes — but if you're used to older LibrePlan docs mentioning Tomcat/Jetty 9, that no
+longer applies to local ``jetty:run`` testing.
+
 Setup database using docker compose
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -76,11 +87,11 @@ Debian/Ubuntu
 
 * Install requirements::
 
-    # apt-get install git-core openjdk-11-jdk postgresql postgresql-client python3-docutils make gettext cutycapt wkhtmltopdf
+    # apt-get install git-core openjdk-25-jdk postgresql postgresql-client python3-docutils make gettext cutycapt wkhtmltopdf
 
 * Set default OpenJDK version (required for Ubuntu 24.04 and newer)::
 
-    # update-java-alternatives -s java-1.11.0-openjdk-amd64
+    # update-java-alternatives -s java-1.25.0-openjdk-amd64
 
 * Connect to database::
 
@@ -134,7 +145,7 @@ Fedora (needs update)
 
 * Install requirements::
 
-    # yum install git java-1.11.0-openjdk-devel postgresql postgresql-server python3-docutils make gettext gnu-free-fonts-compat wkhtmltopdf
+    # yum install git java-25-openjdk-devel postgresql postgresql-server python3-docutils make gettext gnu-free-fonts-compat wkhtmltopdf
 
 * Start database service::
 
@@ -178,7 +189,7 @@ openSUSE (needs update)
 
 * Install requirements::
 
-    # zypper install git-core java-1_11_0-openjdk-devel postgresql-server postgresql docutils make gettext-tools wkhtmltopdf
+    # zypper install git-core java-25-openjdk-devel postgresql-server postgresql docutils make gettext-tools wkhtmltopdf
 
   A separate Maven install is no longer needed — the project's ``./mvnw``
   wrapper downloads a known-good Maven version on first use.
@@ -229,9 +240,9 @@ openSUSE (needs update)
 Microsoft Windows
 ~~~~~~~~~~~~~~~~~
 
-* Download and install latest Java Development Kit 11uXX (JDK11uXX)::
+* Download and install latest Java Development Kit 25 (JDK 25)::
 
-    # https://download.java.net/java/ga/jdk11/openjdk-11_windows-x64_bin.zip
+    # https://jdk.java.net/25/
 
 * Download and install latest Gettext runtime::
 
@@ -243,17 +254,18 @@ Microsoft Windows
 
     # http://www.enterprisedb.com/products-services-training/pgdownload#windows
 
-* Download and install Apache Tomcat 9::
+* Download and install Apache Tomcat 10 or 11::
 
-    # http://tomcat.apache.org/download-90.cgi
-    # Note: in JDK folder there is JRE folder
+    # https://tomcat.apache.org/download-10.cgi
+    # Note: Tomcat 9.x will NOT work — the app now targets the jakarta.servlet (Jakarta EE 9+)
+    # namespace, which only Tomcat 10+ implements. In JDK folder there is JRE folder.
 
 * Set up JDBC41 PostgreSQL Driver::
 
     # Download latest driver: https://jdbc.postgresql.org/download
-    # Copy downloaded *.jar file to JRE location: (e.g. C:\Program Files\Java\jre11\lib\ext)
-    # Copy downloaded *.jar file to JAVA_HOME location: (e.g. C:\Program Files\Java\jdk1.11.0_111\jre\lib\ext)
-    # Put downloaded *.jar file to Tomcat lib location: (e.g. C:\Program Files\Apache Software Foundation\Tomcat 9.0\lib)
+    # Copy downloaded *.jar file to JRE location: (e.g. C:\Program Files\Java\jre25\lib\ext)
+    # Copy downloaded *.jar file to JAVA_HOME location: (e.g. C:\Program Files\Java\jdk-25\lib\ext)
+    # Put downloaded *.jar file to Tomcat lib location: (e.g. C:\Program Files\Apache Software Foundation\Tomcat 10.1\lib)
 
 * Create database::
 
@@ -298,7 +310,7 @@ Microsoft Windows
 
     <Context antiJARLocking="true" path="">
         <Resource name="jdbc/libreplan-ds" auth="Container"
-            type="javax.sql.DataSource"
+            type="jakarta.sql.DataSource"
             maxActive="100" maxIdle="30" maxWait="10000"
             username="libreplan" password="libreplan"
             driverClassName="org.postgresql.Driver"
@@ -314,7 +326,7 @@ Microsoft Windows
 
 * Set JAVA_HOME environment variable::
 
-    # You need to set it to your JDK installed directory (e.g. C:\Program Files\Java\jdk1.11.0_111)
+    # You need to set it to your JDK installed directory (e.g. C:\Program Files\Java\jdk-25)
 
 * Compile project::
 
