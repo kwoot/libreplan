@@ -32,7 +32,9 @@ import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.common.exceptions.ValidationException;
 import org.libreplan.business.orders.daos.IOrderDAO;
 import org.libreplan.business.orders.daos.IOrderElementDAO;
+import org.libreplan.business.orders.daos.IOrderSyncInfoDAO;
 import org.libreplan.business.orders.entities.Order;
+import org.libreplan.business.orders.entities.OrderSyncInfo;
 import org.libreplan.business.scenarios.IScenarioManager;
 import org.libreplan.business.scenarios.bootstrap.PredefinedScenarios;
 import org.libreplan.business.scenarios.daos.IOrderVersionDAO;
@@ -70,6 +72,9 @@ public class ScenarioModel implements IScenarioModel {
 
     @Autowired
     private IOrderDAO orderDAO;
+
+    @Autowired
+    private IOrderSyncInfoDAO orderSyncInfoDAO;
 
     @Autowired
     private IUserDAO userDAO;
@@ -143,6 +148,12 @@ public class ScenarioModel implements IScenarioModel {
                 if (!orderElementDAO
                         .isAlreadyInUseThisOrAnyOfItsChildren(order)) {
                     try {
+                        // See OrderModel.removeOrderFromDB() and
+                        // doc/technical/jdk25-migration/Phase5-found-bugs.md item 9: OrderSyncInfo
+                        // has a non-cascading FK back to this order that must be cleaned up first.
+                        for (OrderSyncInfo each : orderSyncInfoDAO.findByOrder(order)) {
+                            orderSyncInfoDAO.remove(each.getId());
+                        }
                         orderDAO.remove(order.getId());
                     } catch (InstanceNotFoundException e) {
                         throw new RuntimeException(e);

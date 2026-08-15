@@ -106,8 +106,7 @@ public class WorkerDAOTest {
     @Transactional
     public void findByFirstNameCaseInsensitiveDoesNotMatchSubpart() {
         // Restrictions.ilike("firstName", name) uses the literal value passed as the LIKE
-        // pattern - unlike findByNameSubpartOrNifCaseInsensitive, no "%" wildcards are added
-        // here, so a partial name does NOT match.
+        // pattern - no "%" wildcards are added here, so a partial name does NOT match.
         String uniqueName = "Zqg" + UUID.randomUUID().toString().replace("-", "");
         Worker worker = createValidWorker(uniqueName, "surname", "nif-" + UUID.randomUUID());
         workerDAO.save(worker);
@@ -172,21 +171,6 @@ public class WorkerDAOTest {
         Worker found = workerDAO.getCurrentWorker(worker.getId());
         assertNotNull(found);
         assertEquals(worker.getId(), found.getId());
-    }
-
-    /*
-     * findByNameSubpartOrNifCaseInsensitive turns out to be dead/broken code, just like
-     * MachineDAO.findByNameOrCode and ResourceDAO.getAllLimitingResources: it filters on a
-     * "limitingResource" property that was never actually mapped on Worker/Resource - confirmed
-     * against the pre-Jakarta implementation, which throws org.hibernate.QueryException: could
-     * not resolve property: limitingResource. No callers exist anywhere else in the codebase.
-     * Preserved as always-throwing.
-     */
-    @Test(expected = RuntimeException.class)
-    @Transactional
-    public void findByNameSubpartOrNifCaseInsensitiveAlwaysThrows() {
-        workerDAO.save(createValidWorker("firstname", "surname", "nif-" + UUID.randomUUID()));
-        workerDAO.findByNameSubpartOrNifCaseInsensitive("first", false);
     }
 
 }

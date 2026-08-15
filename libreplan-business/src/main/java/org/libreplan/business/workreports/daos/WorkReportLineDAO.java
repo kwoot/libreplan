@@ -195,10 +195,17 @@ public class WorkReportLineDAO extends IntegrationEntityDAO<WorkReportLine>
         CriteriaQuery<WorkReportLine> cq = cb.createQuery(WorkReportLine.class);
         Root<WorkReportLine> root = cq.from(WorkReportLine.class);
 
+        // Compare by id, not by entity reference (same idiom as findByOrderElement() above).
+        // orderElement/workReport here often belong to a different Hibernate session than this
+        // one (findFinishedByOrderElementNotInWorkReportAnotherTransaction below runs in its own
+        // REQUIRES_NEW transaction), so using them directly as Criteria equality parameters makes
+        // Hibernate try to determine whether they're transient or detached - which throws
+        // TransientObjectException even for an entity with a real, persisted id. Comparing raw
+        // ids sidesteps that entirely; getId() needs no session at all.
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(cb.equal(root.get("orderElement"), orderElement));
+        predicates.add(cb.equal(root.get("orderElement").get("id"), orderElement.getId()));
         if (!workReport.isNewObject()) {
-            predicates.add(cb.notEqual(root.get("workReport"), workReport));
+            predicates.add(cb.notEqual(root.get("workReport").get("id"), workReport.getId()));
         }
         predicates.add(cb.equal(root.get("finished"), true));
 

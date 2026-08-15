@@ -186,7 +186,7 @@ public class WorkReportDAO extends IntegrationEntityDAO<WorkReport> implements I
     }
 
     @Override
-    public boolean isAnyPersonalTimesheetAlreadySaved() {
+    public boolean noPersonalTimesheetsSavedYet() {
         CriteriaBuilder cb = getSession().getCriteriaBuilder();
         CriteriaQuery<WorkReport> cq = cb.createQuery(WorkReport.class);
         Root<WorkReport> root = cq.from(WorkReport.class);

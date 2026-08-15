@@ -487,6 +487,16 @@
             <artifactId>mpxj</artifactId>
         </dependency>
 
+        <!-- javax.xml.bind shim for mpxj:9.0.0 only - see the comment on it in root pom.xml -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+
         <!-- ZK fileupload -->
         <dependency>
             <groupId>commons-io</groupId>

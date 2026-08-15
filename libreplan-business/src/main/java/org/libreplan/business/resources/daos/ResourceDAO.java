@@ -95,28 +95,6 @@ public class ResourceDAO extends IntegrationEntityDAO<Resource> implements IReso
     }
 
     @Override
-    public List<Resource> getAllLimitingResources() {
-        // "limitingResource" was never actually a mapped property on Resource, so this method
-        // always throws when called (no callers exist in the codebase) - preserved as-is.
-        CriteriaBuilder cb = getSession().getCriteriaBuilder();
-        CriteriaQuery<Resource> cq = cb.createQuery(Resource.class);
-        Root<Resource> root = cq.from(Resource.class);
-        cq.where(cb.equal(root.get("limitingResource"), true));
-        return getSession().createQuery(cq).getResultList();
-    }
-
-    @Override
-    public List<Resource> getAllNonLimitingResources() {
-        // "limitingResource" was never actually a mapped property on Resource, so this method
-        // always throws when called (no callers exist in the codebase) - preserved as-is.
-        CriteriaBuilder cb = getSession().getCriteriaBuilder();
-        CriteriaQuery<Resource> cq = cb.createQuery(Resource.class);
-        Root<Resource> root = cq.from(Resource.class);
-        cq.where(cb.equal(root.get("limitingResource"), false));
-        return getSession().createQuery(cq).getResultList();
-    }
-
-    @Override
     public List<Machine> getMachines() {
         return list(Machine.class);
     }

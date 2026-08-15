@@ -56,24 +56,6 @@ public class MachineDAO extends IntegrationEntityDAO<Machine>
     }
 
     @Override
-    public List<Machine> findByNameOrCode(String name, boolean limitingResource) {
-        final String containsName = "%" + name.toLowerCase() + "%";
-
-        CriteriaBuilder cb = getSession().getCriteriaBuilder();
-        CriteriaQuery<Machine> cq = cb.createQuery(Machine.class);
-        Root<Machine> root = cq.from(Machine.class);
-
-        Predicate matchesNameOrCode = cb.or(
-                cb.like(cb.lower(root.get("name")), containsName),
-                cb.like(cb.lower(root.get("code")), containsName));
-        // "limitingResource" was never actually a mapped property on Machine, so this method
-        // always throws when called (no callers exist in the codebase) - preserved as-is.
-        cq.where(cb.equal(root.get("limitingResource"), limitingResource), matchesNameOrCode);
-
-        return getSession().createQuery(cq).getResultList();
-    }
-
-    @Override
     public Machine findUniqueByCode(String code)
             throws InstanceNotFoundException {
 

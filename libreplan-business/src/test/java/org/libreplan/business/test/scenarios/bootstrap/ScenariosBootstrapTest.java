@@ -42,7 +42,9 @@ import org.libreplan.business.IDataBootstrap;
 import org.libreplan.business.common.daos.IConfigurationDAO;
 import org.libreplan.business.common.exceptions.InstanceNotFoundException;
 import org.libreplan.business.orders.daos.IOrderDAO;
+import org.libreplan.business.orders.daos.IOrderSyncInfoDAO;
 import org.libreplan.business.orders.entities.Order;
+import org.libreplan.business.orders.entities.OrderSyncInfo;
 import org.libreplan.business.orders.entities.TaskSource;
 import org.libreplan.business.planner.daos.ITaskSourceDAO;
 import org.libreplan.business.scenarios.bootstrap.PredefinedScenarios;
@@ -69,6 +71,9 @@ public class ScenariosBootstrapTest {
 
     @Autowired
     private IOrderDAO orderDAO;
+
+    @Autowired
+    private IOrderSyncInfoDAO orderSyncInfoDAO;
 
     @Autowired
     private IConfigurationDAO configurationDAO;
@@ -113,6 +118,13 @@ public class ScenariosBootstrapTest {
             session.flush();
 
             for (Order order : orderDAO.findAll()) {
+                // OrderSyncInfo has a non-cascading FK back to Order - left behind, it makes the
+                // delete below fail with a foreign key constraint violation. See
+                // doc/technical/jdk25-migration/Phase5-found-bugs.md item 9 and the matching
+                // production fix in OrderModel.removeOrderFromDB()/ScenarioModel.remove().
+                for (OrderSyncInfo each : orderSyncInfoDAO.findByOrder(order)) {
+                    orderSyncInfoDAO.remove(each.getId());
+                }
                 orderDAO.remove(order.getId());
             }
 

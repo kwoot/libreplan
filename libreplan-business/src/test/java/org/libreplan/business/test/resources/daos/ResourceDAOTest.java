@@ -266,31 +266,6 @@ public class ResourceDAOTest {
         });
     }
 
-    /*
-     * Characterization tests added for the Hibernate Criteria -> JPA Criteria API migration
-     * (Jakarta EE / Hibernate 6). getAllLimitingResources/getAllNonLimitingResources/getRowCount
-     * had no test coverage before. getAllLimitingResources and getAllNonLimitingResources turn
-     * out to be dead/broken code, just like MachineDAO.findByNameOrCode: they filter on a
-     * "limitingResource" property that was never actually mapped on Resource (only the derived,
-     * non-persisted isLimitingResource() getter and the "resourceType"/"limitingResourceQueue"
-     * mapped properties exist) - confirmed against the pre-Jakarta implementation, which throws
-     * org.hibernate.QueryException: could not resolve property: limitingResource. Neither method
-     * has any caller anywhere else in the codebase. Preserved as always-throwing.
-     */
-    @Test(expected = RuntimeException.class)
-    @Transactional
-    public void getAllLimitingResourcesAlwaysThrowsDueToUnmappedLimitingResourceProperty() {
-        resourceDAO.save(givenValidWorker());
-        resourceDAO.getAllLimitingResources();
-    }
-
-    @Test(expected = RuntimeException.class)
-    @Transactional
-    public void getAllNonLimitingResourcesAlwaysThrowsDueToUnmappedLimitingResourceProperty() {
-        resourceDAO.save(givenValidWorker());
-        resourceDAO.getAllNonLimitingResources();
-    }
-
     @Test
     @Transactional
     public void getRowCountReflectsSavedResources() {

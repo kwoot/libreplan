@@ -212,6 +212,15 @@ public class OrderModelTest {
                 UUID.randomUUID().toString());
 
         externalCompanyDAO.save(externalCompany);
+
+        // orderModel.save() runs inside its own new transaction (SaveCommandBuilder's
+        // transactionService.runOnTransaction), so by the time it flushes, this externalCompany
+        // instance is a real detached entity as far as that session is concerned. Without this,
+        // BaseEntity.getVersion() keeps lying and reporting null (see isNewObject()), and
+        // Hibernate 6 rejects that combination outright: "Detached entity with generated id ...
+        // has an uninitialized version value 'null'". Same fix pattern as
+        // TaskSource.RealPersistence.save() - flip right after the real save.
+        externalCompany.dontPoseAsTransientObjectAnymore();
         return externalCompany;
     }
 

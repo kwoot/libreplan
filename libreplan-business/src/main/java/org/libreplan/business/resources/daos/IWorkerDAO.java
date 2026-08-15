@@ -40,15 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 public interface IWorkerDAO extends IIntegrationEntityDAO<Worker> {
 
     /**
-     * Returns workers which name/NIF partially matches with name
-     *
-     * @param name
-     *            search worker by name(firstname or surname)/NIF
-     *
-     */
-    List<Worker> findByNameSubpartOrNifCaseInsensitive(String name, boolean limitingResource);
-
-    /**
      * Finds a {@link Worker} with the NIF param that should be unique.
      *
      * @param nif

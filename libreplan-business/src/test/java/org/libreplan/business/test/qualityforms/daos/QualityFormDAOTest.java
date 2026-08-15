@@ -215,13 +215,42 @@ public class QualityFormDAOTest extends AbstractQualityFormTest {
     }
 
     @Test
-    public void testIsUniqueFalseWhenNameNotFoundDueToSwallowedException() {
-        // isUnique() catches *all* Exceptions (not just NonUniqueResultException) around
-        // findUniqueByName(), including the InstanceNotFoundException thrown when the name
-        // isn't used by anything yet - so a genuinely "available" name surprisingly comes
-        // back false here, not true.
+    public void testIsUniqueTrueWhenNameNotUsedByAnything() {
         QualityForm notSaved = QualityForm.create("unused-" + UUID.randomUUID(), "desc");
-        assertFalse(qualityFormDAO.isUnique(notSaved));
+        assertTrue(qualityFormDAO.isUnique(notSaved));
+    }
+
+    @Test
+    public void testIsUniqueTrueWhenOnlyMatchIsItself() {
+        final String name = "name-" + UUID.randomUUID();
+
+        QualityForm qualityForm = transactionService.runOnAnotherTransaction(new IOnTransaction<QualityForm>() {
+            @Override
+            public QualityForm execute() {
+                QualityForm result = QualityForm.create(name, UUID.randomUUID().toString());
+                qualityFormDAO.save(result);
+                return result;
+            }
+        });
+
+        assertTrue(qualityFormDAO.isUnique(qualityForm));
+    }
+
+    @Test
+    public void testIsUniqueFalseWhenNameUsedByAnotherQualityForm() {
+        final String name = "name-" + UUID.randomUUID();
+
+        transactionService.runOnAnotherTransaction(new IOnTransaction<Void>() {
+            @Override
+            public Void execute() {
+                QualityForm existing = QualityForm.create(name, UUID.randomUUID().toString());
+                qualityFormDAO.save(existing);
+                return null;
+            }
+        });
+
+        QualityForm another = QualityForm.create(name, "different description");
+        assertFalse(qualityFormDAO.isUnique(another));
     }
 
 }

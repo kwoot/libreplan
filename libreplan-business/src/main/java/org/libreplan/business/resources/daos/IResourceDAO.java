@@ -85,22 +85,6 @@ public interface IResourceDAO extends IIntegrationEntityDAO<Resource> {
     List<Worker> getWorkers();
 
     /**
-     *
-     * Returns all {@link Resource} which are limiting
-     *
-     * @return
-     */
-    List<Resource> getAllLimitingResources();
-
-    /**
-     *
-     * Returns all {@link Resource} which are not limiting
-     *
-     * @return
-     */
-    List<Resource> getAllNonLimitingResources();
-
-    /**
      * Returns all {@link HoursWorkedPerResourceDTO} per {@link Resource} between
      * the specified dates.
      * @return

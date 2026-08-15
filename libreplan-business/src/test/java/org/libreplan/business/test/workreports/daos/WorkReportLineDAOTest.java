@@ -223,25 +223,38 @@ public class WorkReportLineDAOTest extends AbstractWorkReportTest {
         assertFalse(workReportLineDAO.isFinished(line.getOrderElement()));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     @Transactional
-    public void findFinishedByOrderElementNotInWorkReportAnotherTransactionAlwaysThrows() {
-        // findFinishedByOrderElementNotInWorkReportAnotherTransaction is REQUIRES_NEW, which
-        // opens a brand new Hibernate session - any real OrderElement passed in (whether from
-        // the same still-open outer transaction, or re-fetched after a separate commit) belongs
-        // to a different persistence context, and the legacy Criteria restriction on it throws
-        // org.hibernate.TransientObjectException: object references an unsaved transient
-        // instance, even though the entity has a real, persisted id. Confirmed against the
-        // pre-Jakarta implementation too - this method is broken for any real invocation,
-        // independent of the Criteria migration. isOrderElementFinishedInAnotherWorkReportConstraint()
-        // (the only production caller, via bean validation) is unreachable anyway, since saving
-        // finished=true already fails first with a separate, unrelated validator reflection bug
-        // (see savingAFinishedLineAlwaysThrowsDueToBrokenValidatorReflection).
+    public void isFinishedTrueWhenFinishedLineExists() {
+        // Only reachable since the item 7/8 fix above - saving finished=true always threw before.
+        WorkReportLine line = createValidWorkReportLine();
+        line.setFinished(true);
+        workReportLineDAO.save(line);
+
+        assertTrue(workReportLineDAO.isFinished(line.getOrderElement()));
+    }
+
+    @Test
+    @Transactional
+    public void findFinishedByOrderElementNotInWorkReportAnotherTransactionEmptyWhenNoneFinished() {
+        // Fixed during Phase 6 of the JDK25/Jakarta migration (see Phase5-found-bugs.md item 7):
+        // this method is REQUIRES_NEW (opens a brand new Hibernate session), and the legacy
+        // Criteria restriction compared directly against the OrderElement/WorkReport entity
+        // references, which belong to a different persistence context by the time this runs -
+        // Hibernate threw TransientObjectException even for an entity with a real, persisted id.
+        // Rewritten to compare by id (root.get("orderElement").get("id"), same idiom already used
+        // by findByOrderElement() in this same class), which needs no session at all. Confirmed
+        // this was pre-existing (reproduced against the pinned pre-Jakarta baseline too, not
+        // migration-caused) and that isOrderElementFinishedInAnotherWorkReportConstraint() (the
+        // only production caller, via bean validation) is fixed by this too - see
+        // savingAFinishedLineSucceedsWhenNoOtherWorkReportHasFinishedIt below.
         WorkReportLine line = createValidWorkReportLine();
         workReportLineDAO.save(line);
 
-        workReportLineDAO.findFinishedByOrderElementNotInWorkReportAnotherTransaction(
+        List<WorkReportLine> result = workReportLineDAO.findFinishedByOrderElementNotInWorkReportAnotherTransaction(
                 line.getOrderElement(), WorkReport.create(createValidWorkReportType()));
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -280,21 +293,22 @@ public class WorkReportLineDAOTest extends AbstractWorkReportTest {
         assertEquals(null, reloaded.getClockFinish());
     }
 
-    @Test(expected = jakarta.validation.ValidationException.class)
+    @Test
     @Transactional
-    public void savingAFinishedLineAlwaysThrowsDueToBrokenValidatorReflection() {
-        // WorkReportLine.isOrderElementFinishedInAnotherWorkReportConstraint() (an @AssertTrue
-        // bean-validation method) is invoked by Hibernate Validator via reflection whenever
-        // finished=true is saved, and it always fails with "HV000090: Unable to access
-        // isOrderElementFinishedInAnotherWorkReportConstraint" - confirmed against the
-        // pre-Jakarta implementation too, so this is a pre-existing environment/reflection bug,
-        // not something introduced by the Criteria migration. This means isFinished() and
-        // findFinishedByOrderElementNotInWorkReportAnotherTransaction() can only be
-        // characterized for the "no finished lines" branch - there is no way to persist a
-        // finished=true line to exercise the positive branch.
+    public void savingAFinishedLineSucceedsWhenNoOtherWorkReportHasFinishedIt() {
+        // Fixed as a side effect of the findFinishedByOrderElementNotInWorkReportAnotherTransaction
+        // fix above (Phase 6, Phase5-found-bugs.md item 8): isOrderElementFinishedInAnotherWorkReportConstraint()
+        // (an @AssertTrue bean-validation method) calls exactly that DAO method, and Hibernate
+        // Validator was reporting the resulting TransientObjectException as "HV000090: Unable to
+        // access isOrderElementFinishedInAnotherWorkReportConstraint" - it wasn't a reflection/
+        // accessibility problem with the validator method itself, just Hibernate Validator's own
+        // wrapping of whatever exception the constraint method throws. With the DAO method fixed,
+        // this constraint - and saving a finished=true line - now works.
         WorkReportLine line = createValidWorkReportLine();
         line.setFinished(true);
         workReportLineDAO.save(line);
+
+        assertTrue(line.isFinished());
     }
 
     @Test

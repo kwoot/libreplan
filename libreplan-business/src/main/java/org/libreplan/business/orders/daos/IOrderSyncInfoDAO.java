@@ -33,6 +33,19 @@ import org.libreplan.business.orders.entities.OrderSyncInfo;
 public interface IOrderSyncInfoDAO extends IGenericDAO<OrderSyncInfo, Long> {
 
     /**
+     * Finds every {@link OrderSyncInfo} for the specified {@link Order}, regardless of connector.
+     * Needed before deleting an {@link Order}: {@code order_sync_info.order_element_id} has a
+     * foreign key back to {@code order_table} with no cascade, so any {@link OrderSyncInfo} rows
+     * left behind will make the delete fail with a constraint violation.
+     *
+     * @param order
+     *            the order to search for
+     *
+     * @return every {@link OrderSyncInfo} referencing this order
+     */
+    List<OrderSyncInfo> findByOrder(Order order);
+
+    /**
      * Search last synchronized info for the specified
      * <code>{@link Order}</code> and <code>connectorName</code>
      *

@@ -54,9 +54,11 @@ import org.libreplan.business.externalcompanies.entities.ExternalCompany;
 import org.libreplan.business.labels.daos.ILabelDAO;
 import org.libreplan.business.labels.entities.Label;
 import org.libreplan.business.orders.daos.IOrderDAO;
+import org.libreplan.business.orders.daos.IOrderSyncInfoDAO;
 import org.libreplan.business.orders.daos.IOrderElementDAO;
 import org.libreplan.business.orders.entities.HoursGroup;
 import org.libreplan.business.orders.entities.Order;
+import org.libreplan.business.orders.entities.OrderSyncInfo;
 import org.libreplan.business.orders.entities.OrderElement;
 import org.libreplan.business.orders.entities.OrderLineGroup;
 import org.libreplan.business.orders.entities.OrderStatusEnum;
@@ -128,6 +130,9 @@ public class OrderModel extends IntegrationEntityModel implements IOrderModel {
 
     @Autowired
     private IOrderDAO orderDAO;
+
+    @Autowired
+    private IOrderSyncInfoDAO orderSyncInfoDAO;
 
     @Autowired
     private PlanningStateCreator planningStateCreator;
@@ -616,6 +621,13 @@ public class OrderModel extends IntegrationEntityModel implements IOrderModel {
 
     private void removeOrderFromDB(Order order) {
         try {
+            // OrderSyncInfo has an unmapped, non-cascading FK back to this order
+            // (order_sync_info.order_element_id) - left behind, it makes the delete below fail
+            // with a foreign key constraint violation. See
+            // doc/technical/jdk25-migration/Phase5-found-bugs.md item 9.
+            for (OrderSyncInfo each : orderSyncInfoDAO.findByOrder(order)) {
+                orderSyncInfoDAO.remove(each.getId());
+            }
             orderDAO.remove(order.getId());
         } catch (InstanceNotFoundException e) {
             throw new RuntimeException(e);

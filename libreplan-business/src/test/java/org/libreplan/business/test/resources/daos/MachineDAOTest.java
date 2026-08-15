@@ -180,21 +180,4 @@ public class MachineDAOTest {
         });
     }
 
-    /*
-     * Characterization test added for the Hibernate Criteria -> JPA Criteria API migration
-     * (Jakarta EE / Hibernate 6). findByNameOrCode had no test coverage before, and it turns
-     * out to be dead/broken code: it filters on a "limitingResource" property that was never
-     * actually mapped on Machine (only "limitingResourceQueue", a different property, exists),
-     * so it always throws when called - confirmed against the pre-Jakarta implementation, which
-     * throws org.hibernate.QueryException: could not resolve property: limitingResource.
-     * findByNameOrCode has no callers anywhere else in the codebase. Preserved as always-throwing.
-     */
-    @Test(expected = RuntimeException.class)
-    @Transactional
-    public void findByNameOrCodeAlwaysThrowsDueToUnmappedLimitingResourceProperty() {
-        Machine machine = createValidMachine();
-        machineDAO.save(machine);
-        machineDAO.findByNameOrCode("name", false);
-    }
-
 }

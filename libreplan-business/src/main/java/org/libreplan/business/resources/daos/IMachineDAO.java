@@ -37,15 +37,6 @@ import org.libreplan.business.resources.entities.Machine;
 public interface IMachineDAO extends IIntegrationEntityDAO<Machine> {
 
     /**
-     * Returns machines which name/NIF partially matches with name
-     *
-     * @param name
-     *            search machine by name/Code
-     *
-     */
-    List<Machine> findByNameOrCode(String name, boolean limitingResource);
-
-    /**
      * Finds a {@link Machine} with the Code param that should be unique.
      *
      * @param code

@@ -70,10 +70,10 @@ public class QualityFormDAO extends GenericDAOHibernate<QualityForm, Long> imple
     public boolean isUnique(QualityForm qualityForm) {
         try {
             QualityForm result = findUniqueByName(qualityForm);
-            return result == null || result.getId().equals(qualityForm.getId());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            return result.getId().equals(qualityForm.getId());
+        } catch (InstanceNotFoundException e) {
+            // No QualityForm uses this name yet - it's unique.
+            return true;
         }
     }
 

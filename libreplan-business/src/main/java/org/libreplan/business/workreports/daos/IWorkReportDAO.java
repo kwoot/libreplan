@@ -57,7 +57,15 @@ public interface IWorkReportDAO extends IIntegrationEntityDAO<WorkReport> {
     WorkReport getPersonalTimesheetWorkReport(Resource resource, LocalDate date,
             PersonalTimesheetsPeriodicityEnum periodicity);
 
-    boolean isAnyPersonalTimesheetAlreadySaved();
+    /**
+     * Returns {@code true} if no {@link WorkReport} of the "personal timesheets" type has been
+     * saved yet - despite the similarly-named
+     * {@link org.libreplan.web.common.IConfigurationModel#isAnyPersonalTimesheetAlreadySaved()}
+     * at the webapp layer, this is NOT "is any personal timesheet already saved" - it's the
+     * negation of that. Renamed from that exact (backwards) name during Phase 6 of the JDK25/
+     * Jakarta migration - see doc/technical/jdk25-migration/Phase5-found-bugs.md item 6.
+     */
+    boolean noPersonalTimesheetsSavedYet();
 
     List<WorkReport> findPersonalTimesheetsByResourceAndOrderElement(
             Resource resource);

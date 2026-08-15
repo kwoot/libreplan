@@ -87,26 +87,6 @@ public class WorkerDAO extends IntegrationEntityDAO<Worker>
     }
 
     @Override
-    public List<Worker> findByNameSubpartOrNifCaseInsensitive(String name, boolean limitingResource) {
-        final String containsName = "%" + name.toLowerCase() + "%";
-
-        CriteriaBuilder cb = getSession().getCriteriaBuilder();
-        CriteriaQuery<Worker> cq = cb.createQuery(Worker.class);
-        Root<Worker> root = cq.from(Worker.class);
-
-        Predicate matchesNameOrNif = cb.or(
-                cb.or(
-                        cb.like(cb.lower(root.get("firstName")), containsName),
-                        cb.like(cb.lower(root.get("surname")), containsName)),
-                cb.like(root.get("nif"), "%" + name + "%"));
-        // "limitingResource" was never actually a mapped property on Worker/Resource, so this
-        // method always throws when called (no callers exist in the codebase) - preserved as-is.
-        cq.where(cb.equal(root.get("limitingResource"), limitingResource), matchesNameOrNif);
-
-        return getSession().createQuery(cq).getResultList();
-    }
-
-    @Override
     public List<Worker> findByFirstNameCaseInsensitive(String name) {
         CriteriaBuilder cb = getSession().getCriteriaBuilder();
         CriteriaQuery<Worker> cq = cb.createQuery(Worker.class);

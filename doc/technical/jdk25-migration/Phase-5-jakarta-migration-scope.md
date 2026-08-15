@@ -108,12 +108,32 @@ rather than assumed:
   [ZK Installation Guide — New to Jakarta Servlet](https://www.zkoss.org/wiki/ZK_Installation_Guide/Before_You_Start/New_to_Jakarta_Servlet),
   [org.zkoss.zk:zk:10.0.0-jakarta on MvnRepository](https://mvnrepository.com/artifact/org.zkoss.zk/zk/10.0.0-jakarta)
 
-**Not yet verified — worth checking before committing to a plan:** ZK's
-licensing model has shifted across major versions historically. The
-Maven Central artifact being under the free coordinate is a good sign, but
-it should be explicitly confirmed that whatever LibrePlan actually needs
-from ZK 9.6+/10.x is still available under the same license LibrePlan
-currently relies on, before scoping real work around it.
+**[RESOLVED, Phase 6.6.1, 2026-08-15]** ZK's licensing model has shifted across major versions
+historically, so this was checked directly rather than assumed from the free Maven coordinate
+alone. Pulled the actual `<licenses>` block out of the published POM (not a marketing page — the
+authoritative metadata for what's actually distributed) for every core ZK artifact this project
+depends on, at the exact version pinned in `pom.xml` (`10.3.0.1-jakarta`):
+
+```
+curl -s https://repo1.maven.org/maven2/org/zkoss/zk/zk/10.3.0.1-jakarta/zk-10.3.0.1-jakarta.pom \
+  | grep -A3 "<license>"
+```
+
+`zk`, `zul`, `zkbind`, `zkplus` (groupId `org.zkoss.zk`) and `zcommon`, `zweb` (groupId
+`org.zkoss.common`) are all published under:
+
+```
+<license>
+    <name>GNU LESSER GENERAL PUBLIC LICENSE, Version 3</name>
+    <url>https://www.gnu.org/licenses/lgpl.html</url>
+    <distribution>repo</distribution>
+</license>
+```
+
+This is ZK CE's license (free for open-source and commercial development/deployment), not the
+GPL-compliant-only ZOL tier or a commercial-only license — same free tier the pre-migration ZK
+8.6.0.1 relied on. Nothing about the `-jakarta` line changes this; it's the same open-source
+artifact, just built against the Jakarta EE 9 namespace.
 
 ## Infrastructure outside this repo
 

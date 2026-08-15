@@ -45,6 +45,15 @@ public class OrderSyncInfoDAO extends GenericDAOHibernate<OrderSyncInfo, Long>
         implements IOrderSyncInfoDAO {
 
     @Override
+    public List<OrderSyncInfo> findByOrder(Order order) {
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<OrderSyncInfo> cq = cb.createQuery(OrderSyncInfo.class);
+        Root<OrderSyncInfo> root = cq.from(OrderSyncInfo.class);
+        cq.where(cb.equal(root.get("order"), order));
+        return getSession().createQuery(cq).getResultList();
+    }
+
+    @Override
     public OrderSyncInfo findLastSynchronizedInfoByOrderAndConnectorName(
             Order order, String connectorName) {
         List<OrderSyncInfo> orderSyncInfoList = findLastSynchronizedInfosByOrderAndConnectorName(

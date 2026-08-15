@@ -648,7 +648,7 @@ public class ConfigurationModel implements IConfigurationModel {
     @Override
     @Transactional(readOnly = true)
     public boolean isAnyPersonalTimesheetAlreadySaved() {
-        return !workReportDAO.isAnyPersonalTimesheetAlreadySaved();
+        return !workReportDAO.noPersonalTimesheetsSavedYet();
     }
 
     @Override

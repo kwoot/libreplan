@@ -158,13 +158,13 @@ public class WorkReportDAOTest extends AbstractWorkReportTest {
 
     @Test
     @Transactional
-    public void isAnyPersonalTimesheetAlreadySavedTrueWhenTypeExistsButUnused() throws InstanceNotFoundException {
-        // isAnyPersonalTimesheetAlreadySaved() literally returns list.isEmpty() - so despite the
-        // name, it returns true when the personal-timesheets WorkReportType exists but nothing
-        // uses it yet. Preserved exactly as-is (surprising but not something this migration
-        // should silently "fix").
+    public void noPersonalTimesheetsSavedYetTrueWhenTypeExistsButUnused() throws InstanceNotFoundException {
+        // Renamed from isAnyPersonalTimesheetAlreadySaved() (Phase 6, see
+        // Phase5-found-bugs.md item 6) - the old name was backwards from what the method
+        // actually returns. Behavior itself is unchanged: true when the personal-timesheets
+        // WorkReportType exists but no WorkReport uses it yet.
         personalTimesheetsType();
-        assertTrue(workReportDAO.isAnyPersonalTimesheetAlreadySaved());
+        assertTrue(workReportDAO.noPersonalTimesheetsSavedYet());
     }
 
     @Test

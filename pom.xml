@@ -40,19 +40,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!--
-            JDK 11->25 migration (see JDK25_MIGRATION_PLAN.md). Deliberately capped at 21,
-            NOT 25: Spring Framework 5.3.x (the last javax-namespace generation this project
-            is staying on, an EOL branch that won't be patched further) bundles its own
-            private, shaded copy of ASM inside spring-core.jar for classpath component
-            scanning - not a swappable dependency - and that bundled ASM cannot parse Java
-            25's class file format (major version 69) at all. This does NOT block reaching
-            JDK 25 as the actual goal: a JDK 25 JVM runs class-file-version-65 (release 21)
-            bytecode natively, so the app still genuinely runs on JDK 25 end to end (build,
-            test, deploy) - only the bytecode format itself stays one notch back, which is
-            invisible to everything except Spring's own bundled tooling. See
-            jdk25-migration-baseline/CHANGES-and-WHY.md for the full reasoning.
+            JDK 11->25 migration (see JDK25_MIGRATION_PLAN.md). Was capped at 21 during Phase 4
+            because Spring Framework 5.3.x (javax-namespace generation) bundled its own private
+            ASM that couldn't parse Java 25 class files (major version 69) - see
+            jdk25-migration-baseline/CHANGES-and-WHY.md for that original reasoning. Phase 5's
+            Jakarta migration moved to Spring 6.2.19, which ships a modern ASM, so this was
+            re-tested (Phase 6, step 6.3) and bumped for real: full reactor `mvn clean install`
+            compiles clean at release 25, and the full test suite (libreplan-business 1215
+            tests, ganttzk, libreplan-webapp 222 tests) produces results byte-for-byte identical
+            to the release-21 run - same single pre-existing libreplan-business failure, same
+            known libreplan-webapp failures (see Phase5-found-bugs.md), nothing new either way.
         -->
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
 
         <jetty-port>8080</jetty-port>
         <jetty-stop-port>9967</jetty-stop-port>
@@ -155,22 +154,31 @@
         <profile>
             <id>mysql</id>
             <properties>
-                <!-- JDBC driver properties -->
-
                 <!--
-                If 6.X driver will not throw exceptions (with Timezone), use this configuration:
-
-                <jdbcDriver.className>com.mysql.cj.jdbc.Driver</jdbcDriver.className>
-                <dataSource.url>jdbc:mysql://localhost/libreplan${libreplan.mode}?useSSL=false</dataSource.url>
+                JDBC driver properties. Bumped from mysql:mysql-connector-java:5.1.46 (2018) to
+                the current com.mysql:mysql-connector-j:26.7.0 during Phase 6 of the JDK25/
+                Jakarta migration (see doc/technical/jdk25-migration/phase6/) - the artifact
+                itself was renamed along the way (mysql:mysql-connector-java -> com.mysql:
+                mysql-connector-j). Switched to the driver/URL combination this file's own
+                previous comment already flagged as the correct modern one (com.mysql.cj.jdbc.Driver
+                + useSSL=false), instead of the ancient com.mysql.jdbc.Driver class. Compiles
+                clean; not smoke-tested against a real MySQL instance as part of this change -
+                MySQL is the deprecated/alternate profile (see HACKING.rst), PostgreSQL is what
+                this project actually tests against day to day.
                 -->
-
-                <jdbcDriver.groupId>mysql</jdbcDriver.groupId>
-                <jdbcDriver.artifactId>mysql-connector-java</jdbcDriver.artifactId>
-                <jdbcDriver.version>5.1.46</jdbcDriver.version>
-                <jdbcDriver.className>com.mysql.jdbc.Driver</jdbcDriver.className>
-                <!-- Data source properties -->
-                <dataSource.url>jdbc:mysql://localhost/libreplan${libreplan.mode}</dataSource.url>
-                <testDataSource.url>${dataSource.url}test</testDataSource.url>
+                <jdbcDriver.groupId>com.mysql</jdbcDriver.groupId>
+                <jdbcDriver.artifactId>mysql-connector-j</jdbcDriver.artifactId>
+                <jdbcDriver.version>26.7.0</jdbcDriver.version>
+                <jdbcDriver.className>com.mysql.cj.jdbc.Driver</jdbcDriver.className>
+                <!--
+                Data source properties. Note: testDataSource.url can no longer be derived as
+                "${dataSource.url}test" now that dataSource.url carries a "?useSSL=false" query
+                string - appending "test" after the query string would build an invalid URL
+                (...?useSSL=falsetest). Both spelled out explicitly instead, each with the
+                database name (including the "test" suffix) before its own query string.
+                -->
+                <dataSource.url>jdbc:mysql://localhost/libreplan${libreplan.mode}?useSSL=false</dataSource.url>
+                <testDataSource.url>jdbc:mysql://localhost/libreplan${libreplan.mode}test?useSSL=false</testDataSource.url>
                 <!-- Hibernate properties -->
                 <hibernate.dialect>org.hibernate.dialect.MySQLDialect</hibernate.dialect>
                 <databasetable.prefix/>
@@ -786,7 +794,40 @@
             <dependency>
                 <groupId>net.sf.mpxj</groupId>
                 <artifactId>mpxj</artifactId>
+                <!--
+                    Deliberately still 9.0.0, not bumped: every later mpxj release changes real API
+                    surface this project actually uses (13.0.0, the last on the old net.sf.mpxj
+                    package name, already replaced java.util.Date with java.time.LocalDate/
+                    LocalDateTime across ProjectCalendar/ProjectCalendarWeek/Task, and dropped/
+                    renamed several methods MPXJProjectFileConverter.java calls; 14.0.0+ additionally
+                    renames the whole net.sf.mpxj package to org.mpxj). That's a real, behavior-
+                    sensitive rewrite of this project's own calendar/date-conversion logic, not a
+                    version-number bump - out of scope here, see javax.xml.bind-api below for the
+                    actual fix to the JDK-11-removed-JAXB crash. Revisit as its own scoped piece of
+                    work (Phase 6, item 6.1.2 follow-up).
+                -->
                 <version>9.0.0</version>
+            </dependency>
+
+            <!--
+                mpxj:9.0.0 (above) reflectively references javax.xml.bind.JAXBException
+                (net.sf.mpxj.reader.ProjectReaderUtility.getProjectReader), which no longer ships
+                with the JDK since Java 11 and isn't provided anywhere else on this project's
+                classpath (everything else moved to jakarta.xml.bind for the Jakarta migration).
+                This is purely a compatibility shim for mpxj's benefit, scoped to libreplan-webapp
+                only (see its pom.xml) - nothing in org.libreplan.* imports javax.xml.bind.
+            -->
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>2.3.1</version>
+            </dependency>
+            <!-- jaxb-api alone isn't enough - JAXBContext.newInstance() needs a real implementation
+                 on the classpath too, which nothing else here provides any more. -->
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>2.3.3</version>
             </dependency>
 
             <!-- ZK fileupload -->
