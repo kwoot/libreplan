@@ -96,6 +96,18 @@
                 <value>
                     org/libreplan/business/common/entities/Connector.hbm.xml
                 </value>
+                <value>
+                    org/libreplan/business/common/entities/JobSchedulerConfiguration.hbm.xml
+                </value>
+                <value>
+                    org/libreplan/business/common/entities/Limits.hbm.xml
+                </value>
+                <value>
+                    org/libreplan/business/expensesheets/entities/ExpenseSheets.hbm.xml
+                </value>
+                <value>
+                    org/libreplan/business/logs/entities/Logs.hbm.xml
+                </value>
             </list>
         </property>
 

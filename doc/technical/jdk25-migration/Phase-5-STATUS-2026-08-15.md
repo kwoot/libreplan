@@ -181,6 +181,21 @@ render indefinitely).
 
 ## 6. Suggested next steps
 
+- **`libreplan-webapp`'s own test suite had never been run this migration** — running it for the
+  first time (2026-08-15) found a config gap that failed 201 of 222 tests via a cascading
+  `ApplicationContext` load failure; fixed (see `Phase5-found-bugs.md` #10), dropping that to 18
+  genuine remaining failures (§11 of the same file) that still need the same
+  characterization-and-fix treatment the DAO migration used, just scoped to `libreplan-webapp`
+  instead of `libreplan-business`.
+- **Two dependencies flagged since Phase 0 as outdated were never actually touched**:
+  `mysql-connector-java` (still 5.1.46, 2018 — MySQL is the deprecated/alternate profile, Postgres
+  is the real one, which is likely why this got skipped) and `net.sf.mpxj` (still 9.0.0, and
+  confirmed by the finding above to still be javax-JAXB-based — this one's a real bug, not just
+  staleness, see `Phase5-found-bugs.md` #11).
+- **`Phase5-found-bugs.md`** (new, alongside this file) collects every pre-existing bug found
+  during Phase 5's characterization testing that was deliberately left unfixed (data-layer bugs
+  found during the DAO Criteria migration, plus the Earned Value cosmetic issue from §5) — a
+  standing to-do list, not something to action as part of this report.
 - **`maven.compiler.release` is still capped at 21**, with a comment in `pom.xml` explaining the
   cap was needed because Spring 5.3.x's bundled ASM couldn't parse Java 25 class files. Spring is
   now on **6.2.19** (see `pom.xml` dependency management) — the library that justified the cap is
