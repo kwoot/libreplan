@@ -26,7 +26,7 @@ window.LibreplanChart = (function() {
 
     var charts = {};
 
-    function toDataset(series) {
+    function toDataset(series, index, seriesArray) {
         var hasFill = !!series.fillColor;
         var hasLine = series.lineWidth > 0;
         return {
@@ -37,7 +37,16 @@ window.LibreplanChart = (function() {
             backgroundColor: hasFill ? series.fillColor : "transparent",
             fill: hasFill,
             pointRadius: 0,
-            tension: 0
+            tension: 0,
+            // The server relies on full-height overlapping fills painted background-to-
+            // foreground (e.g. the load chart's "overload" series is capacity+excess, drawn
+            // first/bottom; "capability" is an opaque white fill drawn on top of it to erase
+            // everything below the capacity line; "load" is drawn last/top of that). Chart.js
+            // datasets all default to order:0 and do NOT paint in array order when tied - lower
+            // order is drawn later (on top), so give the FIRST series in the array (meant to be
+            // the bottom layer) the HIGHEST order, counting down to the LAST series (meant to be
+            // the top layer) getting the lowest.
+            order: seriesArray.length - 1 - index
         };
     }
 
