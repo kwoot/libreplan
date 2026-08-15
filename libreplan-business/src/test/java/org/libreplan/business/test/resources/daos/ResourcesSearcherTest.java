@@ -101,9 +101,12 @@ public class ResourcesSearcherTest {
 
     @Test
     @Transactional
-    public void byNameMatchesWorkerNifCaseSensitivelyOnly() {
-        // addQueryByName() uses Restrictions.like (case-sensitive) for nif, unlike the
-        // ilike (case-insensitive) used for firstName/surname - preserved exactly.
+    public void byNameMatchesWorkerNifCaseInsensitively() {
+        // addQueryByName() used to use a case-sensitive like() for nif, unlike the case-
+        // insensitive ilike() already used for firstName/surname - inconsistent, and confirmed
+        // (per Jeroen) not intentional: the "ID" field is free text, not a formal identifier with
+        // a fixed case. Fixed to match firstName/surname's case-insensitive behavior (Phase 6, see
+        // Phase5-found-bugs.md item 3).
         String unique = "NIF" + UUID.randomUUID().toString().replace("-", "").toUpperCase();
         Worker worker = createValidWorker("firstname", "surname", unique);
         workerDAO.save(worker);
@@ -112,7 +115,8 @@ public class ResourcesSearcherTest {
         List<Worker> lowerCaseResult = resourcesSearcher.searchWorkers().byName(unique.toLowerCase()).execute();
 
         assertEquals(1, exactCaseResult.size());
-        assertTrue(lowerCaseResult.isEmpty());
+        assertEquals(1, lowerCaseResult.size());
+        assertEquals(worker.getId(), lowerCaseResult.get(0).getId());
     }
 
     @Test

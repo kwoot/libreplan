@@ -1,4 +1,4 @@
-# Phase 5 — bugs found, deliberately not fixed (mostly fixed now, in Phase 6)
+# Phase 5 — bugs found, deliberately not fixed (all 9 fixed now, in Phase 6)
 
 Companion to `Phase-5-dao-criteria-punchlist.md`, `Phase-5-STATUS-2026-08-14.md`,
 `Phase-5-STATUS-2026-08-15.md`, and `phase6/Phase6-remaining-points-plan.md`. Phase 5's rule for
@@ -8,12 +8,14 @@ than silently fix it — fixing behavior while also changing the underlying API 
 verifiable migration" turns into an unreviewable one. This file exists so those findings don't
 just live in prose buried inside the punch list and get forgotten.
 
-**Status as of 2026-08-15 (Phase 6 execution): 8 of the 9 original data-layer bugs are now fixed**
+**Status as of 2026-08-15 (Phase 6 execution): all 9 original data-layer bugs are now fixed**
 (characterization tests updated to assert the corrected behavior instead of the bug).
-`libreplan-business`'s full test suite is **fully green: 1216 tests, 0 failures, 0 errors** — the
-one long-standing pre-existing failure (`ScenariosBootstrapTest`, item 9) is gone. Item 1
-(`LimitsDAO`) needed and got a product decision from Jeroen first, then was fixed. Item 3
-(`ResourcesSearcher`) is still open pending a product decision.
+`libreplan-business`'s full test suite is **fully green: 1217 tests, 0 failures, 0 errors** — the
+one long-standing pre-existing failure (`ScenariosBootstrapTest`, item 9) is gone. Items 1
+(`LimitsDAO`) and 3 (`ResourcesSearcher`) each needed a product decision from Jeroen first
+(given directly, not guessed at), then were fixed. Item 3's investigation also surfaced and fixed
+a related, previously-undiscovered issue: the `Worker`/external "ID" field being mandatory
+(item 3a).
 
 Each entry: what's wrong, where, how it was confirmed pre-existing (not migration-caused), and
 either the fix that landed or why it's still waiting on a decision.
@@ -46,19 +48,21 @@ codebase for all four (repo-wide grep, not just an assumption). **Deleted outrig
 methods, implementations, and their "confirms it always throws" characterization tests all
 removed. `MachineDAOTest`/`ResourceDAOTest`/`WorkerDAOTest` still pass (10/6/6 tests).
 
-### 3. [STILL OPEN — needs a product decision] `ResourcesSearcher`: NIF matching is case-sensitive, name/surname matching is not
-`libreplan-business/.../resources/daos/ResourcesSearcher.java`. `nif` uses `like`
-(case-sensitive); `name`/`surname` use `ilike` (case-insensitive). **Not fixed.** Investigated
-further while resolving item 3a below: the field labeled "NIF" in the Java/DB layer is shown to
-users only as the generic **"ID"** (worker) / **"Company ID"** (external company) — the app never
-surfaces the word "NIF" anywhere, and there's no Spanish-tax-ID format/checksum validation on it
-either, just "not blank" (now removed for `Worker`, see 3a) and "must be unique". So this isn't
-really about a formal government identifier — it's a free-text code, same in spirit as name/
-surname. Worth noting: a *different* existing lookup, `WorkerDAO.findUniqueByNif`, already does
-case-insensitive + trimmed matching (`WorkerDAOTest.findUniqueByNifMatchesTrimmedAndCaseInsensitive`)
-— i.e. this codebase already treats the field as case-insensitive elsewhere, which weakens the
-case for `ResourcesSearcher`'s case-sensitive `like` being intentional. Still Jeroen's call, not
-changed without an explicit go-ahead.
+### 3. [FIXED, 2026-08-15] `ResourcesSearcher`: NIF matching was case-sensitive, name/surname matching wasn't
+`libreplan-business/.../resources/daos/ResourcesSearcher.java`. `nif` used a plain `like`
+(case-sensitive); `name`/`surname` used `ilike` (case-insensitive). Investigated first (see 3a
+below): the field labeled "NIF" in the Java/DB layer is shown to users only as the generic
+**"ID"** (worker) / **"Company ID"** (external company) — the app never surfaces the word "NIF"
+anywhere, and there's no Spanish-tax-ID format/checksum validation on it either, just "must be
+unique" (the "not blank" requirement was removed for `Worker`, see 3a). So it isn't a formal
+government identifier in practice — it's a free-text code, same in spirit as name/surname. Also
+found a *different* existing lookup, `WorkerDAO.findUniqueByNif`, that already does
+case-insensitive + trimmed matching — this codebase already treats the field as case-insensitive
+elsewhere. Presented this to Jeroen; he agreed case-insensitive makes more sense. Fixed by
+wrapping the `nif` predicate in `cb.lower(...)`, same as `firstName`/`surname` right above it.
+`ResourcesSearcherTest.byNameMatchesWorkerNifCaseSensitivelyOnly` (which had asserted the old
+behavior on purpose) rewritten to `byNameMatchesWorkerNifCaseInsensitively`, asserting the
+corrected behavior.
 
 ### 3a. [FIXED, 2026-08-15] `Worker.getNif()` ("ID" field) was mandatory — now optional
 Prompted by the item-3 discussion: Jeroen didn't like that the worker "ID" field was mandatory,

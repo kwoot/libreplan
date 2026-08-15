@@ -172,16 +172,20 @@ needed.
 
 ## 6.5 — Fix the cataloged pre-existing bugs from `Phase5-found-bugs.md`
 
-**Status (2026-08-15, executed): 8 of 9 done.** Items 1, 2, 3, 5, 6, 7, 8, 9 below are fixed —
-see `../Phase5-found-bugs.md` for the full writeup of each, including the discovery that items
-7/8 (`WorkReportLineDAO`) were actually one bug, and that item 9 (`ScenariosBootstrapTest`) was
-also a real production bug in `OrderModel`/`ScenarioModel`, not just a test artifact. Item 1
-(`LimitsDAO`) needed a product decision first — Jeroen confirmed `Limits` is a real,
-DB-admin-managed cloud-deployment license control (e.g. max users), not something that needs an
-in-app GUI, which meant `abstract="true"` in its mapping was simply a bug, not intentional, and
-was safe to fix once confirmed. `libreplan-business`'s full test suite is now **fully green: 1216
-tests, 0 failures, 0 errors** (was 1215/0/1). Item 4 (`ResourcesSearcher` NIF case-sensitivity)
-is still open, pending its own product decision from Jeroen.
+**Status (2026-08-15, executed): 9 of 9 done — all cataloged items fixed.** See
+`../Phase5-found-bugs.md` for the full writeup of each, including the discovery that items 7/8
+(`WorkReportLineDAO`) were actually one bug, and that item 9 (`ScenariosBootstrapTest`) was also
+a real production bug in `OrderModel`/`ScenarioModel`, not just a test artifact. Items 1
+(`LimitsDAO`) and 4 (`ResourcesSearcher` NIF case-sensitivity) both needed a product decision
+from Jeroen first: `Limits` turned out to be a real, DB-admin-managed cloud-deployment license
+control (e.g. max users) with `abstract="true"` simply wrong in its mapping, not intentional; the
+NIF/"ID" field turned out to be free text with no actual government-ID validation anywhere,
+confirmed via investigation and agreed by Jeroen, so case-insensitive matching (consistent with
+name/surname, and with the already-case-insensitive `findUniqueByNif` elsewhere) was the right
+call. That same investigation also surfaced and fixed a related issue Jeroen raised directly:
+the `Worker`/external "ID" field being mandatory when nothing in the app actually needs it to
+be (see item 3a in `Phase5-found-bugs.md`). `libreplan-business`'s full test suite is now
+**fully green: 1217 tests, 0 failures, 0 errors** (was 1215/0/1 at the start of Phase 6).
 
 Every item below is detailed with evidence and a suggested fix direction in
 `../Phase5-found-bugs.md` §"Data-layer bugs" — this section just turns that catalog into an
@@ -200,8 +204,12 @@ pre-existing vs. migration-caused, then fix.
    `WorkerDAO.findByNameSubpartOrNifCaseInsensitive`** — same unmapped-property bug as #2, but
    callers weren't confirmed absent. Check for real callers first; if any exist, understand how
    they're currently tolerating the permanent exception before changing anything.
-4. **`ResourcesSearcher` NIF case-sensitivity inconsistency** — needs a product decision (is
-   case-sensitive NIF matching intentional?), not a unilateral code change.
+4. **[DONE, 2026-08-15] `ResourcesSearcher` NIF case-sensitivity inconsistency.** Investigated
+   first: the field is shown to users only as generic "ID"/"Company ID", never "NIF", and has no
+   government-ID format validation — just "must be unique". Jeroen agreed case-insensitive is the
+   right call (consistent with name/surname matching right next to it, and with the
+   already-case-insensitive `WorkerDAO.findUniqueByNif` elsewhere). Fixed by wrapping the `nif`
+   predicate in `cb.lower(...)`.
 5. **`QualityFormDAO.isUnique()` inverted logic on `InstanceNotFoundException`** — narrow the
    `catch`, return `true` specifically for "not found" instead of swallowing it as `false`. Add a
    characterization test for the corrected behavior first.

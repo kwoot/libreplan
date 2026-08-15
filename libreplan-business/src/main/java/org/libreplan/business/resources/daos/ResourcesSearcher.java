@@ -164,7 +164,7 @@ public class ResourcesSearcher implements IResourcesSearcher {
                         cb.or(
                                 cb.like(cb.lower(root.get("firstName")), nameWithWildcards),
                                 cb.like(cb.lower(root.get("surname")), nameWithWildcards)),
-                        cb.like(root.get("nif"), "%" + name + "%")));
+                        cb.like(cb.lower(root.get("nif")), nameWithWildcards)));
 
             } else if ( klass.equals(Machine.class) ) {
                 predicates.add(cb.or(
