@@ -29,7 +29,7 @@
     </zscript>
 
     <div height="100%" style="overflow:visible">
-        <style src="/dashboard/css/dashboard.css" dynamic="true" />
+        <style src="/dashboard/css/dashboard.css" />
 
         <div height="30px" sclass="toolbar-box">
             <hbox id="logsFilter" visible="false" />

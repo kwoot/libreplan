@@ -24,7 +24,7 @@
         width="800px" border="normal" mode="modal"
         apply="org.libreplan.web.error.PageForErrorOnEvent">
 
-    <panel title="${i18n:__t('Message - {0}', requestScope['javax.servlet.error.message'])}"
+    <panel title="${i18n:__t('Message - {0}', requestScope['jakarta.servlet.error.message'])}"
            border="normal" style="overflow:auto">
 
         <panelchildren>
@@ -38,12 +38,12 @@
                 <rows>
                     <row>
                         <label value="${i18n:_t('Exception type')}" />
-                        <label value="${requestScope['javax.servlet.error.exception_type']}" />
+                        <label value="${requestScope['jakarta.servlet.error.exception_type']}" />
                     </row>
 
                     <row>
                         <label value="${i18n:_t('Status code')}" />
-                        <label value="${requestScope['javax.servlet.error.status_code']}" />
+                        <label value="${requestScope['jakarta.servlet.error.status_code']}" />
                     </row>
 
                     <row>
