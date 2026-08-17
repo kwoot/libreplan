@@ -21,10 +21,10 @@
 -->
 
 <window id="${arg.top_id}" title="${i18n:_t('Projects list')}">
-    <grid id="listing" model="@{controller.orders}" mold="paging"
+    <grid id="listing" model="@load(controller.orders)" mold="paging"
           emptyMessage="${i18n:_t('No projects')}"
           pageSize="15" span="0" sizedByContent="false"
-          rowRenderer= "@{controller.ordersRowRender}"
+          rowRenderer= "@load(controller.ordersRowRender)"
           onInitRender ="controller.sortOrders();" sclass="clickable-rows projects-list">
         <columns sizable="true">
             <column label="${i18n:_t('Name')}" sort="auto(lower(name))" sclass="name"/>

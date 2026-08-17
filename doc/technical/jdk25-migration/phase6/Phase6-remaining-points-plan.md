@@ -150,6 +150,26 @@ Steps:
 Exit criteria either way: the `pom.xml` comment reflects the current, verified truth — not
 Phase 4's now-possibly-stale reasoning.
 
+**Update (2026-08-17): a real regression from this step was found and fixed.** `mvn clean
+install` passing (the only verification originally done for this step) does **not** exercise
+`jetty:run`'s own annotation-scanning code path, and that path broke: Jetty's `jetty-annotations`
+module bundles `org.ow2.asm:asm`, and `jetty-maven-plugin:11.0.24` pins ASM 9.7, which cannot
+parse Java 25 (major class file version 69) at all — every `jetty:run` startup failed with
+`IllegalArgumentException: Unsupported class file major version 69` on every one of this
+project's own compiled classes, and the webapp never came up (503). Verified the root cause
+directly, not just by reading changelogs: fed the same compiled `.class` file to ASM 9.7 (fails)
+and ASM 9.8 (parses fine) via a standalone test program. `jetty-maven-plugin:11.0.26` is the
+first 11.0.x release bundling ASM 9.8 instead of 9.7 (confirmed by diffing the `asm.version`
+property between the two releases' `jetty-project` POMs on Maven Central). Bumped
+`jetty-maven-plugin` 11.0.24 → 11.0.26 in root `pom.xml`; `jetty:run` now starts cleanly with
+zero errors and the app was verified working end-to-end (login, planner page) via Playwright.
+This has nothing to do with `maven.compiler.release` itself (that's a javac/JVM bytecode-target
+setting) — it's purely that a *build-time tool* (Jetty's own embedded annotation scanner) needed
+to be new enough to read the bytecode this project now produces. Worth remembering for any
+future JDK bump: `mvn test`/`mvn install` alone doesn't prove `jetty:run` still works — always
+do the real manual smoke test too, same lesson Phase 2 step 9 already taught with the
+`StrictHttpFirewall` semicolon issue.
+
 ## 6.4 — `mysql-connector-java` staleness (low priority — MySQL is the deprecated profile)
 
 Still `5.1.46` (2018), flagged as ancient since the Phase 0 baseline audit and never touched

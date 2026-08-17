@@ -57,6 +57,7 @@
         -->
         <script src="/webjars/chart.js/4.4.0/dist/chart.umd.js"/>
         <script src="/common/js/libreplan-chart.js"/>
+        <script src="/common/js/bandbox-search.js"/>
         <timer repeats="true" running="true" delay="20000" onTimer=""/>
         <borderlayout height="100%" width="100%">
             <north border="none">

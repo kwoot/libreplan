@@ -1032,8 +1032,25 @@
                     9.4.x is javax.servlet-based and predates Jakarta EE entirely - it cannot serve
                     this app's jakarta.servlet 5.0 (Jakarta EE 9) classes. 11.0.x is the matching
                     Jakarta EE 9 generation.
+
+                    Bumped 11.0.24 -> 11.0.26 (Phase 6 follow-up, JDK25/Jakarta migration): once
+                    maven.compiler.release went to 25, jetty:run's own annotation scanner
+                    (jetty-annotations, used to discover Servlet 3.0+ annotations at startup)
+                    started failing with "Unsupported class file major version 69" on every one of
+                    this project's own compiled classes, taking the whole webapp down (503). Root
+                    cause: jetty-annotations bundles org.ow2.asm:asm, and 11.0.24 pins ASM 9.7,
+                    which doesn't understand Java 25 class files at all. Verified directly
+                    (not just inferred from changelogs): fed the exact same compiled .class file to
+                    ASM 9.7 (throws IllegalArgumentException: Unsupported class file major version
+                    69) and ASM 9.8 (parses it fine) via a standalone test. 11.0.26 is the first
+                    11.0.x release that bundles ASM 9.8 instead of 9.7 - confirmed by diffing the
+                    asm.version property between the two releases' jetty-project poms on Maven
+                    Central. This has no bearing on maven.compiler.release itself - that's a
+                    javac/JVM bytecode-target setting; this is purely about a build-time tool
+                    (Jetty's own embedded annotation scanner) needing to be new enough to read the
+                    bytecode this project now produces.
                 -->
-                <version>11.0.24</version>
+                <version>11.0.26</version>
                 <configuration>
                     <systemProperties>
                         <systemProperty>

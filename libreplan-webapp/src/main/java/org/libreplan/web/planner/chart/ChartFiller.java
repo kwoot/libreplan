@@ -335,6 +335,22 @@ public abstract class ChartFiller implements IChartFiller {
      * all of them regardless of how sparse each series's underlying data is.
      */
     protected void renderChart(Div chartDiv, List<ChartSeries> seriesList, Interval interval, Integer size) {
+        renderChart(chartDiv, seriesList, interval, size, false);
+    }
+
+    /**
+     * @param stepped
+     *            Whether each series holds its value flat across the gap to the next data point
+     *            instead of interpolating a straight line between them - correct for a chart
+     *            like the load chart, where the underlying quantity (capacity/load on a given
+     *            day) is genuinely constant for that whole day and only jumps at day boundaries,
+     *            not something that changes gradually within a day. The Earned Value chart's
+     *            series (BCWS, ACWP, ...) are real continuously-evolving cumulative metrics, so
+     *            they keep the default straight-line interpolation instead.
+     */
+    protected void renderChart(
+            Div chartDiv, List<ChartSeries> seriesList, Interval interval, Integer size, boolean stepped) {
+
         List<LocalDate> calendar = computeDateRange(interval);
 
         List<String> labels = new ArrayList<String>();
@@ -365,6 +381,7 @@ public abstract class ChartFiller implements IChartFiller {
         payload.put("series", series);
         payload.put("width", size);
         payload.put("height", CHART_HEIGHT_PX);
+        payload.put("stepped", stepped);
 
         chartDiv.setWidth(size + "px");
         chartDiv.setHeight(CHART_HEIGHT_PX + "px");

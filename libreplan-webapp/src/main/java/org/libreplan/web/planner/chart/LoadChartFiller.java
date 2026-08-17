@@ -42,7 +42,10 @@ public abstract class LoadChartFiller extends ChartFiller {
             Clients.evalJavaScript(getOptionalJavascriptCall());
         }
 
-        renderChart(chart, Arrays.asList(getPlotInfo(interval)), interval, size);
+        // Capacity/load/overload are constant for a given day, not gradually changing within it
+        // - render as a step (flat-topped, no diagonal transition between days), not a straight-
+        // line interpolation. See ChartFiller.renderChart(..., boolean stepped).
+        renderChart(chart, Arrays.asList(getPlotInfo(interval)), interval, size, true);
     }
 
 

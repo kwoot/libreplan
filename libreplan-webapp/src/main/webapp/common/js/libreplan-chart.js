@@ -26,7 +26,8 @@ window.LibreplanChart = (function() {
 
     var charts = {};
 
-    function toDataset(series, index, seriesArray) {
+    function toDataset(stepped) {
+      return function(series, index, seriesArray) {
         var hasFill = !!series.fillColor;
         var hasLine = series.lineWidth > 0;
         return {
@@ -38,6 +39,13 @@ window.LibreplanChart = (function() {
             fill: hasFill,
             pointRadius: 0,
             tension: 0,
+            // "after": hold each point's value flat from that point through to the next one,
+            // instead of interpolating a diagonal line - correct for a quantity (e.g. capacity/
+            // load on a given day) that's genuinely constant across the interval and only jumps
+            // at the boundary. Only set for charts whose series really work that way (the load
+            // chart); the Earned Value chart's continuously-evolving cumulative metrics keep the
+            // default straight-line interpolation (stepped: false).
+            stepped: stepped ? "after" : false,
             // The server relies on full-height overlapping fills painted background-to-
             // foreground (e.g. the load chart's "overload" series is capacity+excess, drawn
             // first/bottom; "capability" is an opaque white fill drawn on top of it to erase
@@ -48,6 +56,7 @@ window.LibreplanChart = (function() {
             // the top layer) getting the lowest.
             order: seriesArray.length - 1 - index
         };
+      };
     }
 
     function render(divId, config) {
@@ -84,7 +93,7 @@ window.LibreplanChart = (function() {
             type: "line",
             data: {
                 labels: config.labels,
-                datasets: (config.series || []).map(toDataset)
+                datasets: (config.series || []).map(toDataset(config.stepped))
             },
             options: {
                 responsive: false,
