@@ -21,8 +21,8 @@
 -->
 
 <window id="${arg.top_id}" title="${i18n:_t('Calendars List')}">
-    <tree id="tree" model="@{calendarController.baseCalendarsTreeModel}"
-          treeitemRenderer="@{calendarController.baseCalendarsTreeitemRenderer}"
+    <tree id="tree" model="@load(calendarController.baseCalendarsTreeModel)"
+          itemRenderer="@load(calendarController.baseCalendarsTreeitemRenderer)"
           nonselectableTags="*">
 
         <treecols sizable="true">

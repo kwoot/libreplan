@@ -43,9 +43,9 @@
         </grid>
         <separator bar="true"/>
         <hbox style="margin-left:auto; margin-right:auto">
-            <button id="btnOk" identity="${arg.OK}" sclass="z-messagebox-btn"
+            <button id="btnOk" button="${arg.OK}" sclass="z-messagebox-btn"
                 use="org.zkoss.zul.impl.MessageboxDlg$Button" />
-            <button id="btnCancel" identity="${arg.CANCEL}" sclass="z-messagebox-btn"
+            <button id="btnCancel" button="${arg.CANCEL}" sclass="z-messagebox-btn"
                 use="org.zkoss.zul.impl.MessageboxDlg$Button" />
         </hbox>
 </window>

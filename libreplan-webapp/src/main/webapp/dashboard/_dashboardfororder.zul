@@ -138,7 +138,7 @@
     </div>
 
     <!-- The variable for containing the 'global progress' has to be global and created before defer -->
-    <script type="text/javascript">
+    <script>
         var global_progress = { };
     </script>
 

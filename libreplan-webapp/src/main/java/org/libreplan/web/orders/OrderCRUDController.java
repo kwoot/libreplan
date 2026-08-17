@@ -395,9 +395,6 @@ public class OrderCRUDController extends GenericForwardComposer {
 
         editOrderElementWindow =
                 (Window) Executions.createComponents("/orders/_editOrderElement.zul", parent, editOrderElementArgs);
-
-        Util.createBindingsFor(editOrderElementWindow);
-        Util.reloadBindings(editOrderElementWindow);
     }
 
     private void addEditWindowIfNecessary() {
@@ -577,6 +574,11 @@ public class OrderCRUDController extends GenericForwardComposer {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+
+            // Only now does editOrderElementWindow have a "controller" attribute (set by
+            // doAfterCompose above), which Util.createBindingsFor requires to create a binder.
+            Util.createBindingsFor(editOrderElementWindow);
+            Util.reloadBindings(editOrderElementWindow);
 
             // Prepare tree, attach edit window to tree
             orderElementTreeController =

@@ -34,8 +34,7 @@
 
                         <comboitem self="@{each='externalCompany'}"
                                    value="@{externalCompany}"
-                                   label="@{externalCompany.name}"
-                                   readonly="@{subController.sent}" />
+                                   label="@{externalCompany.name}" />
                     </combobox>
                     <label value="@{subController.subcontractedTaskData.externalCompany.name}"
                            visible="@{subController.sent}"/>

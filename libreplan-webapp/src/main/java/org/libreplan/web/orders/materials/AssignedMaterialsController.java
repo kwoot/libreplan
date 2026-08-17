@@ -452,8 +452,8 @@ public abstract class AssignedMaterialsController<T, A> extends GenericForwardCo
         Map<String, java.io.Serializable> args = new HashMap<>();
         args.put("message", message);
         args.put("title", _t("Split new assignment"));
-        args.put("OK", Messagebox.OK);
-        args.put("CANCEL", Messagebox.CANCEL);
+        args.put("OK", Messagebox.Button.OK);
+        args.put("CANCEL", Messagebox.Button.CANCEL);
         args.put("icon", Messagebox.QUESTION);
 
         dialogSplitAssignment = (MessageboxDlg) Executions.createComponents("/orders/_splitMaterialAssignmentDlg.zul",
