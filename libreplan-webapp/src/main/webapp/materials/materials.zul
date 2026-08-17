@@ -54,7 +54,7 @@
 
 
                 <tree id="categoriesTree" zclass="z-dottree"
-                      rows="5" vflex="1" multiple="false"
+                      rows="5" multiple="false"
                       model="@{materialsController.materialCategories}"
                       itemRenderer="@{materialsController.materialCategoryRenderer}"
                       onSelect="materialsController.refreshMaterials()">
