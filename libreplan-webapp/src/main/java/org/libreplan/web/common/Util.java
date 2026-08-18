@@ -230,6 +230,20 @@ public class Util {
             return;
         }
 
+        if (result.getAttribute("binder") != null) {
+            // AnnotateBinderInit's own <?init?> page-level pass calls this again, unconditionally,
+            // for every page root - it runs AFTER every composer's own doAfterCompose (including
+            // any, like BaseCalendarCRUDController's, that already called this eagerly to get an
+            // immediate first reload, since AnnotateBinderInit never reloads on its own). ZK's own
+            // AnnotateBinderHelper#processAllComponentsBindings already treats an already-bound
+            // root as a no-op internally (it bails out as soon as BinderUtil.getBinder(root) is
+            // non-null), but without this guard this method still went ahead and built a brand
+            // new, empty AnnotateBinder and overwrote the "binder" attribute with it - silently
+            // discarding the first, fully-populated binder and leaving every later
+            // Util.reloadBindings(...) call against that root a no-op forever after.
+            return;
+        }
+
         // The removed AnnotateDataBinder(Component, boolean) resolved "controller.xxx" bind
         // expressions against whatever ZK's own apply="ControllerClass" composer machinery had
         // already put in scope. AnnotateBinder needs that object explicitly: BaseCRUDController

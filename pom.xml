@@ -597,6 +597,24 @@
                 <version>3.32.0-GA</version>
             </dependency>
 
+            <!--
+                jqplot4java 1.3.3 (used for the Dashboard's pie/task-status charts) declares
+                com.thoughtworks.xstream:xstream:1.4.7 as a direct dependency - a 2015-era
+                version, from before JDK 9 module encapsulation existed. XStream's
+                setupConverters() reflectively grabs java.util.TreeMap's private final
+                "comparator" field to build its default TreeMap converter, which fails under
+                JDK 9+ with "InaccessibleObjectException: module java.base does not \"opens
+                java.util\" to unnamed module" - reproduced live via the Dashboard tab
+                (ExceptionInInitializerError wrapping the InaccessibleObjectException).
+                Forcing a current XStream version reactor-wide fixes it: 1.4.10+ added a
+                JDK9+-safe reflection provider that no longer needs this to be opened.
+            -->
+            <dependency>
+                <groupId>com.thoughtworks.xstream</groupId>
+                <artifactId>xstream</artifactId>
+                <version>1.4.21</version>
+            </dependency>
+
             <!-- JGraphT -->
             <dependency>
                 <groupId>org.jgrapht</groupId>

@@ -522,11 +522,11 @@ public class WorkerCRUDController extends GenericForwardComposer implements IWor
     }
 
     private void setWidthOfUserBandBoxSearch() {
-        Bandbox userBandboxComponent = (Bandbox) this.userBandbox.getChildren().get(1);
+        Bandbox userBandboxComponent = (Bandbox) this.userBandbox.getChildren().get(0);
         userBandboxComponent.setWidth("300px");
 
         Listbox userListbox = (Listbox)
-                userBandbox.getChildren().get(1).getChildren().get(0).getChildren().get(0).getChildren().get(0);
+                userBandbox.getChildren().get(0).getChildren().get(0).getChildren().get(0).getChildren().get(0);
         userListbox.setWidth("300px");
     }
 

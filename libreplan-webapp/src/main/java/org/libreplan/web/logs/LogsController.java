@@ -45,7 +45,7 @@ public class LogsController extends GenericForwardComposer {
 
     private Window riskLogWindow;
 
-    private Window logWindow;
+    private Component logWindow;
 
     private IssueLogCRUDController issueLogController;
 
@@ -63,7 +63,7 @@ public class LogsController extends GenericForwardComposer {
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         comp.setAttribute("logsController", this, true);
-        logWindow = (Window) comp.getFellowIfAny("logWindow");
+        logWindow = comp;
         Util.createBindingsFor(logWindow);
         setupIssueLogController();
         setupRiskLogController();

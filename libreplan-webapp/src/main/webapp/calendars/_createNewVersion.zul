@@ -20,7 +20,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<window visible="@{calendarController.editionController.creatingNewVersion}"
+<window visible="@load(calendarController.editionController.creatingNewVersion)"
         id="createNewVersion" title="${i18n:_t('Create new Workweek')}" width="452px"
         closable="true" border="normal"
         onClose = "calendarController.editionController.cancelNewVersion();">
