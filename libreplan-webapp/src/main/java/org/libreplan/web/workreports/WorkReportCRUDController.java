@@ -145,7 +145,7 @@ public class WorkReportCRUDController
 
     private BandboxSearch bandboxSelectOrderElementInHead;
 
-    private ListModel allHoursType;
+    private List<TypeOfWorkHours> allHoursType;
 
     private static final String ITEM = "item";
 
@@ -229,7 +229,7 @@ public class WorkReportCRUDController
     }
 
     private void initializeHoursType() {
-        allHoursType = new SimpleListModel<>(workReportModel.getAllHoursType());
+        allHoursType = workReportModel.getAllHoursType();
     }
 
     /**
@@ -1223,28 +1223,52 @@ public class WorkReportCRUDController
             final WorkReportLine workReportLine = row.getValue();
             final Listbox lbHoursType = new Listbox();
             lbHoursType.setMold("select");
-            lbHoursType.setModel(allHoursType);
-            lbHoursType.renderAll();
-            lbHoursType.applyProperties();
 
-            if ( lbHoursType.getItems().isEmpty() ) {
+            if ( allHoursType.isEmpty() ) {
+                lbHoursType.setModel(new SimpleListModel<>(allHoursType));
+                lbHoursType.renderAll();
+                lbHoursType.applyProperties();
                 row.appendChild(lbHoursType);
 
                 return;
             }
 
-            // First time is rendered, select first item
+            // Pick which TypeOfWorkHours should be pre-selected: the existing value if the line
+            // already has one, otherwise (for a brand new row) the first available option.
+            // Compared by name (like ComponentsFinder.findItemByValue below does), not equals():
+            // TypeOfWorkHours has no equals()/hashCode() override, and `type` here almost never
+            // is the exact same object instance as its counterpart in the shared `allHoursType`
+            // list (different query/association), so reference-equality would never match.
             TypeOfWorkHours type = workReportLine.getTypeOfWorkHours();
-            if ( workReportLine.isNewObject() && type == null)  {
-                Listitem item = lbHoursType.getItemAtIndex(0);
-                item.setSelected(true);
-                setHoursType(workReportLine, item);
-            } else {
-                // If workReportLine has a type, select item with that type
-                Listitem item = ComponentsFinder.findItemByValue(lbHoursType, type);
-                if ( item != null ) {
-                    lbHoursType.selectItem(item);
-                }
+            boolean isNewSelection = workReportLine.isNewObject() && type == null;
+            final String nameToSelect = isNewSelection ? allHoursType.get(0).getName() : type.toString();
+
+            // A fresh ListModel per row is required here, not the shared `allHoursType` list
+            // wrapped once: org.zkoss.zul.AbstractListModel (the base of SimpleListModel)
+            // implements Selectable and stores the current selection INSIDE the model instance
+            // itself. Sharing one SimpleListModel across every row's Listbox meant selecting an
+            // item in any row mutated that one shared model's selection, which every other row's
+            // Listbox (bound to the same instance) then reflected too.
+            //
+            // Selection is set via an ItemRenderer (item.setSelected(...) called per-item, as
+            // each Listitem is actually created) rather than via a post-hoc
+            // Listbox.selectItem()/Listitem.setSelected() call on an already fully-built but
+            // still-unattached component tree: that approach left the Java-side flag set but the
+            // rendered <select> showing no <option selected> - the "select" mold only reflects
+            // whichever item the renderer itself marked selected while building each option, not
+            // a flag flipped on an existing Listitem afterwards.
+            lbHoursType.setModel(new SimpleListModel<>(allHoursType));
+            lbHoursType.setItemRenderer((item, data, index) -> {
+                TypeOfWorkHours hoursType = (TypeOfWorkHours) data;
+                item.setLabel(hoursType.toString());
+                item.setValue(hoursType);
+                item.setSelected(hoursType.toString().equals(nameToSelect));
+            });
+            lbHoursType.renderAll();
+            lbHoursType.applyProperties();
+
+            if ( isNewSelection ) {
+                setHoursType(workReportLine, ComponentsFinder.findItemByValue(lbHoursType, allHoursType.get(0)));
             }
 
             lbHoursType.addEventListener(Events.ON_SELECT, event -> {

@@ -50,7 +50,6 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Decimalbox;
 import org.zkoss.zul.Grid;
-import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
@@ -76,7 +75,7 @@ public class CostCategoryCRUDController extends BaseCRUDController<CostCategory>
 
     private Grid listCostCategories;
 
-    private ListModel allHoursType;
+    private List<TypeOfWorkHours> allHoursType;
 
     private HourCostListRenderer hourCostListRenderer = new HourCostListRenderer();
 
@@ -126,7 +125,7 @@ public class CostCategoryCRUDController extends BaseCRUDController<CostCategory>
     }
 
     private void initializeHoursType() {
-        allHoursType = new SimpleListModel<>(costCategoryModel.getAllHoursType());
+        allHoursType = costCategoryModel.getAllHoursType();
     }
 
     /**
@@ -285,27 +284,53 @@ public class CostCategoryCRUDController extends BaseCRUDController<CostCategory>
         final HourCost hourCost = row.getValue();
         final Listbox lbHoursType = new Listbox();
         lbHoursType.setMold("select");
-        lbHoursType.setModel(allHoursType);
-        lbHoursType.renderAll();
-        lbHoursType.applyProperties();
 
-        if (lbHoursType.getItems().isEmpty()) {
+        if ( allHoursType.isEmpty() ) {
+            lbHoursType.setModel(new SimpleListModel<>(allHoursType));
+            lbHoursType.renderAll();
+            lbHoursType.applyProperties();
             row.appendChild(lbHoursType);
+
             return;
         }
 
-        // First time is rendered, select first item
+        // Pick which TypeOfWorkHours should be pre-selected: the existing value if the line
+        // already has one, otherwise (for a brand new row) the first available option.
+        // Compared by name (like ComponentsFinder.findItemByValue below does), not equals():
+        // TypeOfWorkHours has no equals()/hashCode() override, and `type` here almost never is
+        // the exact same object instance as its counterpart in the shared `allHoursType` list
+        // (different query/association), so reference-equality would never match.
         TypeOfWorkHours type = hourCost.getType();
-        if ( hourCost.isNewObject() && type == null ) {
-            Listitem item = lbHoursType.getItemAtIndex(0);
-            item.setSelected(true);
-            setHoursType(hourCost, item);
-        } else {
-            // If hoursCost has a type, select item with that type
-            Listitem item = ComponentsFinder.findItemByValue(lbHoursType, type);
-            if (item != null) {
-                lbHoursType.selectItem(item);
-            }
+        boolean isNewSelection = hourCost.isNewObject() && type == null;
+        final String nameToSelect = isNewSelection ? allHoursType.get(0).getName() : type.toString();
+
+        // A fresh ListModel per row is required here, not a single shared instance across every
+        // row's Listbox: org.zkoss.zul.AbstractListModel (the base of SimpleListModel)
+        // implements Selectable and stores the current selection INSIDE the model instance
+        // itself. Sharing one SimpleListModel across every row's Listbox means selecting an item
+        // in any row mutates that one shared model's selection, which every other row's Listbox
+        // (bound to the same instance) then reflects too - see WorkReportCRUDController's
+        // near-identical appendHoursType() for the same bug, found and fixed first.
+        //
+        // Selection is set via an ItemRenderer (item.setSelected(...) called per-item, as each
+        // Listitem is actually created) rather than via a post-hoc
+        // Listbox.selectItem()/Listitem.setSelected() call on an already fully-built but
+        // still-unattached component tree: that approach leaves the Java-side flag set but the
+        // rendered <select> shows no <option selected> - the "select" mold only reflects
+        // whichever item the renderer itself marked selected while building each option, not a
+        // flag flipped on an existing Listitem afterwards.
+        lbHoursType.setModel(new SimpleListModel<>(allHoursType));
+        lbHoursType.setItemRenderer((item, data, index) -> {
+            TypeOfWorkHours hoursType = (TypeOfWorkHours) data;
+            item.setLabel(hoursType.toString());
+            item.setValue(hoursType);
+            item.setSelected(hoursType.toString().equals(nameToSelect));
+        });
+        lbHoursType.renderAll();
+        lbHoursType.applyProperties();
+
+        if ( isNewSelection ) {
+            setHoursType(hourCost, ComponentsFinder.findItemByValue(lbHoursType, allHoursType.get(0)));
         }
 
         lbHoursType.addEventListener(Events.ON_SELECT, new EventListener() {
