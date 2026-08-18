@@ -103,11 +103,15 @@
                                                 <rows>
                                                     <row>
                                                         <label value="${i18n:_t('Select scenario')}" />
+                                                        <!-- No @save on selectedElement: accept() below
+                                                             reads scenarioBandboxSearch.getSelectedElement()
+                                                             directly instead, there's no
+                                                             setScenario(Scenario) to save to anyway. -->
                                                         <bandboxSearch
                                                                 id="scenarioBandboxSearch"
                                                                 finder="ScenarioBandboxFinder"
-                                                                model="@{templateCtrl.scenarios}"
-                                                                selectedElement="@{templateCtrl.scenario}" />
+                                                                model="@load(templateCtrl.scenarios)"
+                                                                selectedElement="@load(templateCtrl.scenario)" />
                                                     </row>
                                                 </rows>
                                             </grid>

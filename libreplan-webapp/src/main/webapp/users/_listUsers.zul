@@ -21,9 +21,9 @@
 -->
 
 <window id="${arg.top_id}" title="${i18n:_t('Users List')}">
-    <newdatasortablegrid id="listing" model="@{controller.users}" mold="paging"
+    <newdatasortablegrid id="listing" model="@load(controller.users)" mold="paging"
         pageSize="10" sclass="clickable-rows"
-        rowRenderer="@{controller.usersRenderer}">
+        rowRenderer="@load(controller.usersRenderer)">
         <columns sizable="true">
             <newdatasortablecolumn label="${i18n:_t('Username')}" 
             sort="auto(lower(loginName))" sortDirection="ascending"/>
@@ -35,8 +35,11 @@
             <newdatasortablecolumn label="${i18n:_t('Actions')}" />
         </columns>
     </newdatasortablegrid>
+    <!-- Was "@{controller.getShowCreateFormLabel}"/"@{controller.isCreateButtonDisabled}" - EL
+         property names don't include the accessor prefix (should be "showCreateFormLabel"/
+         "createButtonDisabled"), a second pre-existing bug independent of the @{...} binder issue. -->
     <button id="show_create_form" onClick="controller.goToCreateForm();"
-        label="@{controller.getShowCreateFormLabel}" sclass="create-button global-action"
-        disabled="@{controller.isCreateButtonDisabled}">
+        label="@load(controller.showCreateFormLabel)" sclass="create-button global-action"
+        disabled="@load(controller.createButtonDisabled)">
     </button>
 </window>

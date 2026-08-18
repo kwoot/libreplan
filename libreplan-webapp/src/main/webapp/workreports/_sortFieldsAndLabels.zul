@@ -29,12 +29,12 @@
             style="overflow:auto">
             <panelchildren>
                 <grid id="headingFieldsAndLabels" mold="paging" pageSize="5"
-                    model="@{controller.headingFieldsAndLabels}"
-                    rowRenderer= "@{controller.orderedFieldsAndLabelsRowRenderer}">
+                    model="@load(controller.headingFieldsAndLabels)"
+                    rowRenderer= "@load(controller.orderedFieldsAndLabelsRowRenderer)">
                     <columns>
                       <column label="${i18n:_t('Name')}" />
                       <column label="${i18n:_t('Type')}" width="200px" align="center"/>
-                      <column visible = "@{controller.editable}" label="${i18n:_t('Operations')}" width="150px" align="center"/>
+                      <column visible = "@load(controller.editable)" label="${i18n:_t('Operations')}" width="150px" align="center"/>
                     </columns>
                 </grid>
                 </panelchildren>
@@ -45,12 +45,12 @@
         <panel title="${i18n:_t('Lines')}" border="normal" style="overflow:auto">
             <panelchildren>
                 <grid id="linesFieldsAndLabels" mold="paging" pageSize="5"
-                    model="@{controller.linesFieldsAndLabels}"
-                    rowRenderer= "@{controller.orderedFieldsAndLabelsRowRenderer}">
+                    model="@load(controller.linesFieldsAndLabels)"
+                    rowRenderer= "@load(controller.orderedFieldsAndLabelsRowRenderer)">
                     <columns>
                       <column label="${i18n:_t('Name')}"/>
                       <column label="${i18n:_t('Type')}" width="200px" align="center"/>
-                      <column visible = "@{controller.editable}" label="${i18n:_t('Operations')}" width="150px" align="center"/>
+                      <column visible = "@load(controller.editable)" label="${i18n:_t('Operations')}" width="150px" align="center"/>
                     </columns>
                 </grid>
             </panelchildren>

@@ -23,8 +23,8 @@
 <window id="${arg.id}">
 
     <newdatasortablegrid id="listExceptionDayTypes"
-                         model="@{controller.exceptionDayTypes}"
-                         rowRenderer="@{controller.exceptionDayTypeRenderer}"
+                         model="@load(controller.exceptionDayTypes)"
+                         rowRenderer="@load(controller.exceptionDayTypeRenderer)"
                          mold="paging" pageSize="10" class="clickable-rows">
 
         <columns>

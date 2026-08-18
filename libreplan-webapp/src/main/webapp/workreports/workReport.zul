@@ -45,12 +45,8 @@
                     <label value="${i18n:_t('Template')}"/>
 
                     <listbox id="listType" mold="select" rows="1"
-                             model="@{controller.filterWorkReportTypes}" width="150px">
-
-                        <listitem self="@{each='workReportType'}" value="@{workReportType}">
-                            <listcell label="@{workReportType.name}" />
-                        </listitem>
-
+                             model="@load(controller.filterWorkReportTypes)"
+                             itemRenderer="@load(controller.workReportTypeRenderer)" width="150px">
                     </listbox>
 
                     <label value="${i18n:_t('from')}"/>
@@ -66,7 +62,8 @@
             <separator bar="false" spacing="20px" orient="horizontal"/>
 
             <grid id="listing"  mold="paging" pageSize="10"
-                  model="@{controller.workReportDTOs}" sclass="clickable-rows"
+                  model="@load(controller.workReportDTOs)"
+                  rowRenderer="@load(controller.workReportDTORenderer)" sclass="clickable-rows"
                   onInitRender ="controller.sortWorkReports();">
 
                 <columns sizable="true">
@@ -79,30 +76,6 @@
                     <column label="${i18n:_t('Code')}" />
                     <column label="${i18n:_t('Actions')}" />
                 </columns>
-                <rows>
-                    <row self="@{each='workReportDTO'}" value="@{workReportDTO}"
-                         onClick="controller.goToEditForm(self.value);">
-                        <label value="@{workReportDTO.dateStart, converter='org.libreplan.web.common.typeconverters.DateConverter'}" />
-                        <label value="@{workReportDTO.dateFinish, converter='org.libreplan.web.common.typeconverters.DateConverter'}"/>
-                        <label value="@{workReportDTO.type}" />
-                        <label value="@{workReportDTO.hours.toFormattedString}" />
-                        <label value="@{workReportDTO.code}" />
-
-                        <hbox>
-                            <button sclass="icono" image="/common/img/ico_editar1.png"
-                                    hoverImage="/common/img/ico_editar.png"
-                                    tooltiptext="${i18n:_t('Edit')}"
-                                    onClick="controller.goToEditForm(self.parent.parent.value);">
-                            </button>
-
-                            <button sclass="icono" image="/common/img/ico_borrar1.png"
-                                    hoverImage="/common/img/ico_borrar.png"
-                                    tooltiptext="${i18n:_t('Delete')}"
-                                    onClick="controller.showConfirmDelete(self.parent.parent.value);">
-                            </button>
-                        </hbox>
-                    </row>
-                </rows>
             </grid>
 
             <separator bar="false" spacing="20px" orient="horizontal"/>
@@ -114,11 +87,9 @@
                     <label value="${i18n:_t('Select template')}:"/>
 
                     <listbox id="listTypeToAssign" mold="select" rows="1"
-                             model="@{controller.workReportTypes}" width="150px"
-                             selectedItem="@{controller.firstType}">
-                        <listitem self="@{each='workReportType'}" value="@{workReportType}">
-                            <listcell label="@{workReportType.name}" />
-                        </listitem>
+                             model="@load(controller.workReportTypes)"
+                             itemRenderer="@load(controller.workReportTypeRenderer)" width="150px"
+                             selectedItem="@load(controller.firstType)">
                     </listbox>
 
                     <button label="${i18n:_t('New timesheet')}" sclass="add-button" style="margin-top: -4px"
@@ -171,17 +142,17 @@
                                     <rows>
                                         <row>
                                             <label value="${i18n:_t('Type')}" />
-                                            <label value="@{controller.workReport.workReportType.name}" />
+                                            <label value="@load(controller.workReport.workReportType.name)" />
                                         </row>
                                         <row>
                                             <label value="${i18n:_t('Code')}" />
                                             <hbox>
-                                                <textbox width="350px" value="@{controller.workReport.code}"
+                                                <textbox width="350px" value="@load(controller.workReport.code) @save(controller.workReport.code)"
                                                          constraint="no empty:${i18n:_t('cannot be empty')}"
-                                                         disabled="@{controller.workReport.codeAutogenerated}" />
+                                                         disabled="@load(controller.workReportCodeAutogenerated)" />
                                                 <checkbox id="generateCode" label="${i18n:_t('Generate code')}"
                                                           onCheck="controller.onCheckGenerateCode(event)"
-                                                          checked="@{controller.workReport.codeAutogenerated}" />
+                                                          checked="@load(controller.workReportCodeAutogenerated) @save(controller.workReportCodeAutogenerated)" />
                                             </hbox>
                                         </row>
                                     </rows>
@@ -200,26 +171,35 @@
                                     </columns>
 
                                     <rows>
-                                        <row visible = "@{controller.workReport.workReportType.dateIsSharedByLines}">
+                                        <row visible = "@load(controller.workReport.workReportType.dateIsSharedByLines)">
                                             <label value="${i18n:_t('Date')}" />
-                                            <datebox id="date" value="@{controller.workReport.date}" />
+                                            <datebox id="date" value="@load(controller.workReport.date) @save(controller.workReport.date)" />
                                         </row>
 
-                                        <row visible = "@{controller.workReport.workReportType.resourceIsSharedInLines}">
+                                        <row visible = "@load(controller.workReport.workReportType.resourceIsSharedInLines)">
                                             <label value="${i18n:_t('Resource')}" />
+                                            <!-- No @save here: onChange/changeResource() below already saves the
+                                                 selection back to controller.workReport.resource manually. -->
                                             <autocomplete id="autocompleteResource" buttonVisible="true"
-                                                          value = "@{controller.workReport.resource}"
+                                                          value = "@load(controller.workReport.resource)"
                                                           onChange ="controller.changeResource(self.selectedItem);"
                                                           finder="ResourceFinder" width="300px"
-                                                          selectedItem="@{controller.workReport.resource}"/>
+                                                          selectedItem="@load(controller.workReport.resource)"/>
                                         </row>
 
-                                        <row visible = "@{controller.workReport.workReportType.orderElementIsSharedInLines}">
+                                        <row visible = "@load(controller.workReport.workReportType.orderElementIsSharedInLines)">
                                             <label value="${i18n:_t('Task')}" />
+                                            <!-- No @save here: the ON_SELECT/ON_OK listeners registered in
+                                                 loadComponents() already save the selection back to
+                                                 controller.workReport.orderElement manually. Also,
+                                                 BandboxSearch.setSelectedElement() unconditionally fires
+                                                 Util.saveBindings() when a binder is present, which throws
+                                                 "Callable only in the event listener" if @save made the binder
+                                                 call this setter during its own load pass (outside any event). -->
                                             <bandboxSearch id="bandboxSelectOrderElementInHead"
                                                            finder="OrderElementBandboxFinder" widthBandbox="300px"
-                                                           model="@{controller.orderElements}"
-                                                           selectedElement="@{controller.workReport.orderElement}"/>
+                                                           model="@load(controller.orderElements)"
+                                                           selectedElement="@load(controller.workReport.orderElement)"/>
                                         </row>
 
                                     </rows>
@@ -227,8 +207,8 @@
 
                                 <grid id="headingFieldsAndLabels" mold="paging" pageSize="4"
                                       style="border-top:0;"
-                                      model="@{controller.fieldsAndLabelsHeading}"
-                                      rowRenderer= "@{controller.orderedFieldsAndLabelsRowRenderer}">
+                                      model="@load(controller.fieldsAndLabelsHeading)"
+                                      rowRenderer= "@load(controller.orderedFieldsAndLabelsRowRenderer)">
                                     <columns>
                                         <column width="200px"/>
                                         <column />
@@ -246,9 +226,14 @@
                                             onClick="controller.addWorkReportLine()" />
                                 </hbox>
 
+                                <!-- rowRenderer is set imperatively in
+                                     WorkReportCRUDController.prepareWorkReportList() instead of
+                                     via a binding here - "@{controller.renderer}" never registers
+                                     with AnnotateBinder (no "load"/"save" keyword), which used to
+                                     leave the grid falling back to showing each row as a single
+                                     cell with WorkReportLine's raw Object.toString(). -->
                                 <newdatasortablegrid id="listWorkReportLines"
                                                      sizedByContent="true"
-                                                     rowRenderer="@{controller.renderer}"
                                                      sclass="listWorkReportLines report-margin"/>
                             </groupbox>
                         </vbox>

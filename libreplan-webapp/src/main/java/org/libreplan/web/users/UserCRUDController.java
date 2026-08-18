@@ -130,6 +130,26 @@ public class UserCRUDController extends BaseCRUDController<User> implements IUse
 
         final EntryPointsHandler<IUserCRUDController> handler = URLHandlerRegistry.getRedirectorFor(IUserCRUDController.class);
         handler.register(this, page);
+
+        // BaseCRUDController.doAfterCompose() already calls showListWindow() (which reloads
+        // listWindow's bindings), but that happens before AnnotateBinderInit's own later
+        // page-level pass has created any binder at all, so it's a no-op. Redo it here, now that
+        // the binder exists. Only listWindow is reloaded - editWindow's bindings reference
+        // controller.user, which is still null at this point (only set up by
+        // initCreate()/initEdit(), called later); showEditWindow() reloads editWindow's own
+        // bindings once that has happened.
+        Util.createBindingsFor(comp);
+        Util.reloadBindings(listWindow);
+    }
+
+    /**
+     * areRolesAndProfilesDisabled() has no "is"/"get" prefix, so it doesn't satisfy the JavaBean
+     * property naming convention EL property resolution requires - "controller.areRolesAndProfilesDisabled"
+     * would never resolve. This wrapper is purely for that binding; internal Java callers keep
+     * using the unprefixed method above unchanged.
+     */
+    public boolean isAreRolesAndProfilesDisabled() {
+        return areRolesAndProfilesDisabled();
     }
 
     private void injectsObjects() {
@@ -182,7 +202,10 @@ public class UserCRUDController extends BaseCRUDController<User> implements IUse
     }
 
     public List<User> getUsers() {
-        return userModel.getUsers();
+        // The grid's "model" property is declared as org.zkoss.zul.ListModel - AnnotateBinder has
+        // no automatic List->ListModel coercion, so returning a plain List here throws a
+        // ClassCastException when the binder tries to load it.
+        return new org.zkoss.zul.ListModelList<>(userModel.getUsers());
     }
 
     @Override
@@ -196,7 +219,10 @@ public class UserCRUDController extends BaseCRUDController<User> implements IUse
     }
 
     public List<UserRole> getRoles() {
-        return userModel.getRoles();
+        // The grid's "model" property is declared as org.zkoss.zul.ListModel - AnnotateBinder has
+        // no automatic List->ListModel coercion, so returning a plain List here throws a
+        // ClassCastException when the binder tries to load it.
+        return new org.zkoss.zul.ListModelList<>(userModel.getRoles());
     }
 
     public void addSelectedRole() {
@@ -247,7 +273,32 @@ public class UserCRUDController extends BaseCRUDController<User> implements IUse
     }
 
     public List<Profile> getProfiles() {
-        return userModel.getProfiles();
+        // The grid's "model" property is declared as org.zkoss.zul.ListModel - AnnotateBinder has
+        // no automatic List->ListModel coercion, so returning a plain List here throws a
+        // ClassCastException when the binder tries to load it.
+        return new org.zkoss.zul.ListModelList<>(userModel.getProfiles());
+    }
+
+    /**
+     * The profiles-list rows used to be declared with a ZUML "each" template (self="@{each=...}") -
+     * under this app's AnnotateBinder/ZK 10 stack that only ever clones the row's FIRST child for
+     * each iteration. Building rows programmatically via RowRenderer sidesteps that "each" bug
+     * entirely.
+     */
+    public RowRenderer getProfilesRenderer() {
+        return (row, data, index) -> {
+            final Profile profile = (Profile) data;
+            row.setValue(profile);
+
+            Util.appendLabel(row, profile.getProfileName());
+
+            org.zkoss.zul.Button removeButton =
+                    Util.createRemoveButton(event -> removeProfile(profile));
+            removeButton.setDisabled(areRolesAndProfilesDisabled());
+            org.zkoss.zul.Hbox hbox = new org.zkoss.zul.Hbox();
+            hbox.appendChild(removeButton);
+            row.appendChild(hbox);
+        };
     }
 
     public void addSelectedProfile() {
@@ -395,7 +446,10 @@ public class UserCRUDController extends BaseCRUDController<User> implements IUse
         return usersRenderer;
     }
 
-    public String hasBoundResource() {
+    // Was "hasBoundResource()" - no "get"/"is" prefix means it doesn't satisfy the JavaBean
+    // property naming convention EL property resolution requires, a pre-existing dead reference
+    // independent of the @{...} binder issue ("controller.hasBoundResource" could never resolve).
+    public String getHasBoundResource() {
         User user = getUser();
         return user != null && user.isBound() ? _t("Yes") : _t("No");
     }

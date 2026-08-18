@@ -41,7 +41,7 @@
                             <row>
                                 <label value="${i18n:_t('Name')}" />
                                 <textbox id="name"
-                                         value="@{controller.profile.profileName}" width="300px"
+                                         value="@load(controller.profile.profileName) @save(controller.profile.profileName)" width="300px"
                                          constraint="no empty:${i18n:_t('cannot be empty')}"
                                          onBlur="controller.updateWindowTitle()"  sclass="focus-element" />
                             </row>
@@ -55,8 +55,8 @@
                         <combobox id="userRolesCombo" autodrop="true"/>
                         <button label="${i18n:_t('Add role')}" sclass="add-button" onClick="controller.addSelectedRole()"/>
                     </hbox>
-                    <grid id="listing" model="@{controller.roles}"
-                          rowRenderer="@{controller.rolesRenderer}">
+                    <grid id="listing" model="@load(controller.roles)"
+                          rowRenderer="@load(controller.rolesRenderer)">
                         <columns sizable="true">
                             <column label="${i18n:_t('Role name')}" />
                             <column label="${i18n:_t('Actions')}" />

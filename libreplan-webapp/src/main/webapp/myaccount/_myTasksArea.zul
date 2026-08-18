@@ -25,9 +25,9 @@
 
     <caption label="${i18n:_t('My tasks')}" />
 
-    <grid model="@{controller.tasks}"
+    <grid model="@load(controller.tasks)"
           mold="paging" pageSize="10"
-          rowRenderer="@{controller.tasksRenderer}"
+          rowRenderer="@load(controller.tasksRenderer)"
           sclass="clickable-rows">
 
         <columns sizable="true">

@@ -153,6 +153,17 @@ public class LogsController extends GenericForwardComposer {
         return projectNameVisibility;
     }
 
+    /**
+     * Instance wrapper for the "logsController.projectNameVisibility" EL binding:
+     * java.beans.Introspector (which BeanELResolver relies on) never considers static methods
+     * when building property descriptors, so "controller.projectNameVisibility" could never
+     * resolve to the static getProjectNameVisibility() above, independent of the @{...} binder
+     * issue - it needs a real instance method.
+     */
+    public boolean isProjectNameVisibility() {
+        return getProjectNameVisibility();
+    }
+
     public static Order getOrder() {
         return order;
     }

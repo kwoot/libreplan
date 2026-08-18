@@ -25,8 +25,8 @@
 
     <grid id="expenseSheetsList"
           mold="paging" pageSize="10"
-          model="@{controller.personalExpenseSheets}"
-          rowRenderer="@{controller.expenseSheetsRenderer}"
+          model="@load(controller.personalExpenseSheets)"
+          rowRenderer="@load(controller.expenseSheetsRenderer)"
           sclass="clickable-rows" >
 
         <columns sizable="true">

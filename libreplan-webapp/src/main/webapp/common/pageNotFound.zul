@@ -51,7 +51,13 @@
 
             <label value="${i18n:_t('Sorry for the inconvenience.')}" />
 
-            <vbox visible="@{pageErrorController.VisibleOnHelpPage}">
+            <!-- Set directly in PageForErrorOnEvent.doAfterCompose() rather than via a binder
+                 "visible" binding: this vbox's apply= composer's own doAfterCompose runs before
+                 the page-level AnnotateBinderInit pass has created any binder, so a binding here
+                 couldn't be loaded from that same doAfterCompose anyway - and isHelpLink is
+                 already fully determined by then, so there's nothing to gain from going through
+                 the binder for a value that never changes afterwards. -->
+            <vbox id="helpPageNotGeneratedBox">
 
                 <separator height="5px"/>
 

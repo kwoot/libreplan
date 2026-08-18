@@ -67,15 +67,6 @@
         <component-name>newdatasortablegrid</component-name>
         <component-class>org.libreplan.web.common.components.NewDataSortableGrid</component-class>
         <extends>grid</extends>
-        <annotation>
-            <annotation-name>default-bind</annotation-name>
-            <property-name>model</property-name>
-            <attribute>
-                <attribute-name>converter</attribute-name>
-                <!-- TODO resolve deprecated -->
-                <attribute-value>org.zkoss.zkplus.databind.ListModelConverter</attribute-value>
-            </attribute>
-        </annotation>
     </component>
 
     <component>

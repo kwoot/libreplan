@@ -35,10 +35,17 @@ import org.libreplan.web.common.Util;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.CheckEvent;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
+import org.zkoss.zul.Hbox;
+import org.zkoss.zul.Label;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Row;
+import org.zkoss.zul.RowRenderer;
 import org.zkoss.zul.Tree;
 import org.zkoss.zkplus.spring.SpringUtil;
 
@@ -61,16 +68,24 @@ public class CriterionAdminController extends BaseCRUDController<CriterionType> 
 
     private CriterionTreeController editionTree;
 
+    public CriterionAdminController() {
+        // The list's "each" template needs criterionsModel to be ready at compose time (it
+        // evaluates the model's collection synchronously while the page's components are being
+        // built, before doAfterCompose ever runs) - fetching it lazily in doAfterCompose is too
+        // late, so it's fetched here instead, matching AdvanceTypeCRUDController/
+        // LabelTypeCRUDController's constructors.
+        criterionsModel = (ICriterionsModel) SpringUtil.getBean("criterionsModel");
+    }
+
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
 
-        if ( criterionsModel == null ) {
-            criterionsModel = (ICriterionsModel) SpringUtil.getBean("criterionsModel");
-        }
-
         cbHierarchy = (Checkbox) editWindow.getFellow("cbHierarchy");
         setupResourceCombobox((Combobox) editWindow.getFellowIfAny("resourceCombobox"));
+
+        Util.createBindingsFor(comp);
+        Util.reloadBindings(comp);
     }
 
     public void confirmDisabledHierarchy() {
@@ -129,7 +144,48 @@ public class CriterionAdminController extends BaseCRUDController<CriterionType> 
     }
 
     public List<CriterionType> getCriterionTypes() {
-        return criterionsModel.getTypes();
+        return new ListModelList<>(criterionsModel.getTypes());
+    }
+
+    /**
+     * The list's rows used to be declared with a ZUML "each" template (self="@{each=...}") - under
+     * this app's AnnotateBinder/ZK 10 stack that only ever clones the row's FIRST child for each
+     * iteration (confirmed by dumping the live server-side component tree: every cloned row had
+     * exactly 1 child, no exception thrown). Building rows programmatically via RowRenderer, like
+     * AdvanceTypeCRUDController already does, sidesteps that "each" bug entirely.
+     */
+    public RowRenderer getCriterionTypeRenderer() {
+        return new RowRenderer() {
+
+            @Override
+            public void render(Row row, Object data, int index) {
+                final CriterionType criterionType = (CriterionType) data;
+
+                Label nameLabel = new Label(criterionType.getName());
+                nameLabel.setTooltiptext(criterionType.getDescription());
+                row.appendChild(nameLabel);
+
+                row.appendChild(new Label(criterionType.getCode()));
+                row.appendChild(new Label(criterionType.getResource().toString()));
+
+                Checkbox checkbox = new Checkbox();
+                checkbox.setChecked(criterionType.isEnabled());
+                checkbox.setDisabled(true);
+                row.appendChild(checkbox);
+
+                Hbox hbox = new Hbox();
+                hbox.appendChild(Util.createEditButton(event -> goToEditForm(criterionType)));
+
+                Button removeButton = Util.createRemoveButton(event -> confirmDelete(criterionType));
+                removeButton.setDisabled(criterionType.isImmutable());
+                hbox.appendChild(removeButton);
+
+                row.appendChild(hbox);
+
+                row.addEventListener(Events.ON_CLICK, event -> goToEditForm(criterionType));
+            }
+
+        };
     }
 
     public ICriterionType<?> getCriterionType() {

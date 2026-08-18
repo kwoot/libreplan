@@ -21,9 +21,9 @@
 -->
 
 <window id="${arg.top_id}">
-    <newdatasortablegrid id="listing" model="@{controller.unitTypes}" mold="paging"
+    <newdatasortablegrid id="listing" model="@load(controller.unitTypes)" mold="paging"
         pageSize="10" sclass="clickable-rows"
-        rowRenderer="@{controller.unitTypeRenderer}" >
+        rowRenderer="@load(controller.unitTypeRenderer)" >
         <columns>
             <newdatasortablecolumn label="${i18n:_t('Material Unit')}"
             sortDirection="ascending" sort="auto(measure)"/>

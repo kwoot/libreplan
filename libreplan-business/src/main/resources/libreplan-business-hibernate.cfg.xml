@@ -30,15 +30,19 @@
         -->
 
         <!--
-            Configure second level cache. hibernate-ehcache/EhCacheRegionFactory never reached GA
-            for Hibernate 6 (see the dependency comment in the root pom.xml) - replaced with
-            hibernate-jcache's JCacheRegionFactory. provider_configuration_file_resource_path was
-            EhCacheRegionFactory-specific (for ehcache.xml, itself the incompatible ehcache 2.x
-            schema); JCacheRegionFactory doesn't recognize it, so it's removed rather than left
-            silently ignored - falls back to a default-tuned JCache CacheManager.
+            Second level cache disabled. It was previously on via hibernate-jcache's
+            JCacheRegionFactory (hibernate-ehcache/EhCacheRegionFactory never reached GA for
+            Hibernate 6 - see the dependency comment in the root pom.xml), falling back to a
+            default-tuned JCache CacheManager since the old ehcache.xml is 2.x-schema and
+            unreadable by JCacheRegionFactory. That combination was found to silently hand back
+            hollow entities (every field null, not just lazy associations) on a second read of the
+            same nonstrict-read-write-cached rows within one request - e.g. LabelTypeModel.getLabels()
+            reads the same Label rows twice per edit-form load and the second read came back empty,
+            confirmed via direct DEBUG logging of the fetched entities. Silent data corruption is a
+            materially worse failure mode than a bit of lost read performance, so caching is off
+            entirely until this is properly root-caused and reconfigured.
         -->
-        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.jcache.internal.JCacheRegionFactory</property>
-        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.use_second_level_cache">false</property>
         <property name="hibernate.cache.use_query_cache">false</property>
 
     </session-factory>

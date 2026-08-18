@@ -36,6 +36,7 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Vbox;
 
 public class PageForErrorOnEvent extends GenericForwardComposer {
 
@@ -55,6 +56,11 @@ public class PageForErrorOnEvent extends GenericForwardComposer {
         modalWindow = comp;
         if ( stacktrace != null ) {
             stacktrace.setValue(getStacktrace());
+        }
+
+        Vbox helpPageNotGeneratedBox = (Vbox) comp.getFellowIfAny("helpPageNotGeneratedBox");
+        if ( helpPageNotGeneratedBox != null ) {
+            helpPageNotGeneratedBox.setVisible(isHelpLink);
         }
     }
 

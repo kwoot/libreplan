@@ -37,8 +37,10 @@ import org.libreplan.web.common.Util;
 import org.libreplan.web.common.components.finders.IBandboxFinder;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.zkoss.bind.Binder;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlMacroComponent;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.InputEvent;
@@ -165,10 +167,14 @@ public class BandboxSearch extends HtmlMacroComponent {
 
         // The old DataBinder.saveAttribute(Component, String) saved one specific bound attribute;
         // AnnotateBinder has no per-attribute equivalent, only saving a whole component's
-        // save-bindings (see Util.saveBindings). SELECTED_ELEMENT_ATTRIBUTE is the only bound
-        // property this component saves, so that's equivalent here.
+        // save-bindings. SELECTED_ELEMENT_ATTRIBUTE is the only bound property this component
+        // saves, so that's equivalent here. Unlike Util.saveBindings (which uses the synchronous
+        // Events.sendEvent), this posts the save event instead: setSelectedElement can be called
+        // from outside any event-listener context - e.g. by a "@load" binding pushing the current
+        // value into this component while a page is still composing - and Events.sendEvent throws
+        // "Callable only in the event listener" in that case. postEvent is always safe to call.
         if (Util.getBinder(this) != null) {
-            Util.saveBindings(this);
+            Events.postEvent(new Event(Binder.SAVE_EVENT, this, null));
         }
     }
 
