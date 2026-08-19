@@ -170,25 +170,20 @@ future JDK bump: `mvn test`/`mvn install` alone doesn't prove `jetty:run` still 
 do the real manual smoke test too, same lesson Phase 2 step 9 already taught with the
 `StrictHttpFirewall` semicolon issue.
 
-## 6.4 — `mysql-connector-java` staleness (low priority — MySQL is the deprecated profile)
+## 6.4 — `mysql-connector-java` staleness (low priority — MySQL is the deprecated profile) — [DONE]
 
-Still `5.1.46` (2018), flagged as ancient since the Phase 0 baseline audit and never touched
-because the project's real, default-tested path is PostgreSQL — `HACKING.rst` itself labels the
-MySQL section "(Deprecated)". Lower priority than 6.1–6.3, but still an open item.
-
-Steps:
-1. Bump to a current `mysql-connector-j` (note the artifact renamed from `mysql-connector-java` to
-   `mysql-connector-j` at some point — check current Maven Central coordinates).
-2. Confirm `hibernate.dialect` (`org.hibernate.dialect.MySQLDialect`, already updated from the old
-   `MySQL5InnoDBDialect` name during the Hibernate 6 bump) is still correct for the new driver.
-3. This can't be verified by the existing test suite (no MySQL test profile is exercised in CI) —
-   needs a manual smoke test against a real MySQL instance, same caveat as every other
-   manual-smoke-test step in this migration. If no MySQL instance is readily available, it's
-   reasonable to bump the version, confirm it compiles, and flag the manual verification as still
-   outstanding rather than block on it.
-
-Exit criteria: driver bumped, compiles, manual MySQL smoke test done or explicitly flagged as still
-needed.
+**Status (closed 2026-08-19, bump itself landed earlier in Phase 6): driver bumped, current,
+Jeroen confirmed closing this.** Was `mysql:mysql-connector-java:5.1.46` (2018); now
+`com.mysql:mysql-connector-j:26.7.0` (the artifact renamed groupId/artifactId along the way) —
+re-verified against Maven Central on 2026-08-19, still the current release. Also switched to the
+modern driver class/URL combo (`com.mysql.cj.jdbc.Driver` + `useSSL=false`) the old pom comment
+had already flagged as correct but never applied. `hibernate.dialect` already reads
+`org.hibernate.dialect.MySQLDialect` (updated from the old `MySQL5InnoDBDialect` name during the
+Hibernate 6 bump) and needed no further change. Compiles clean; **no MySQL instance available to
+manually smoke-test against** (same caveat as every other manual-smoke-test step in this
+migration) — Jeroen accepted closing on that basis rather than blocking on it, since the real,
+default-tested path has always been PostgreSQL (`HACKING.rst` labels the MySQL section
+"(Deprecated)").
 
 ## 6.5 — Fix the cataloged pre-existing bugs from `Phase5-found-bugs.md`
 

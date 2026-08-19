@@ -12,6 +12,16 @@ don't mean minor updates, but crossing several years of back log?"
 execution (if/when Jeroen wants it) is its own follow-up, same discipline as every other phase —
 small, independently-verified steps, not a big-bang rewrite.
 
+**Update (2026-08-19): the two drop-in Category 1 bumps are done.** `commons-collections4`
+4.1 → 4.6.0 and `quartz` 2.3.2 → 2.5.2, both in root `pom.xml`'s `dependencyManagement`. Full
+reactor `clean install`, then the full test suite for both modules: `libreplan-business`
+1217/1217 (0 failures, 0 errors, unchanged), `libreplan-webapp` 222 tests / 1 failure (the
+same pre-existing, already-confirmed-unrelated `ResourceServiceTest` failure from Phase 6 —
+nothing new). The 13 "skipped" webapp tests are pre-existing `@Ignore("Only working if you
+have a JIRA server configured")`/Tim-SOAP-server markers, unrelated to this change. `jgrapht-core`
+(0.9.2 → 1.5.3) deliberately **not** touched here — still flagged below as a real 0.x→1.x API
+break needing its own dedicated pass, not a routine bump.
+
 ## Methodology
 
 For every dependency in the root `pom.xml`'s `dependencyManagement` (the effective source of
@@ -27,8 +37,8 @@ truth for every module's actual resolved version), checked:
 | Library | Installed | Latest (checked 2026-08-15) | Gap | Used where |
 |---|---|---|---|---|
 | `org.jgrapht:jgrapht-core` | 0.9.2 | 1.5.3 | ~8 years, **0.x→1.x is a real API break**, not a drop-in bump | `ganttzk/.../data/GanttDiagramGraph.java`, `libreplan-webapp/.../limitingresources/QueuesState.java`, `.../LimitingResourceQueueModel.java` |
-| `org.apache.commons:commons-collections4` | 4.1 | 4.6.0 | ~9 years | (not individually enumerated here — widely used utility library, standard collections helpers) |
-| `org.quartz-scheduler:quartz` | 2.3.2 | 2.5.2 | ~5 years | Scheduled jobs (`SchedulerManager`, `JobSchedulerConfiguration`) |
+| `org.apache.commons:commons-collections4` | ~~4.1~~ **4.6.0 [DONE, 2026-08-19]** | 4.6.0 | ~9 years | (not individually enumerated here — widely used utility library, standard collections helpers) |
+| `org.quartz-scheduler:quartz` | ~~2.3.2~~ **2.5.2 [DONE, 2026-08-19]** | 2.5.2 | ~5 years | Scheduled jobs (`SchedulerManager`, `JobSchedulerConfiguration`) |
 
 These are genuinely maintained, actively-released libraries where the gap is just accumulated
 neglect, not a deliberate/frozen state. `jgrapht-core` is the one to treat carefully — going from a
@@ -142,8 +152,8 @@ every other phase in this migration used:
 1. **Category 2 deletion** (`commons-lang` only — `jfreechartengine`/`jfreechart`/`jcommon`
    turned out to be load-bearing, see the revised Category 2 section above) — zero functional
    risk, confirmed-unused-everywhere code removal, shrinks the dependency tree for free.
-2. **`commons-collections4` and Quartz bumps** — likely close to drop-in; compile, full test
-   suite, done.
+2. **[DONE, 2026-08-19] `commons-collections4` and Quartz bumps** — were close to drop-in as
+   predicted; full reactor compile + both modules' full test suites, zero regressions.
 3. **BoneCP → HikariCP** (test-scope only) — contained blast radius (only touches the two
    test Spring configs), but needs its own care since it's a real behavioral swap of the
    connection-pool implementation used by the whole test suite, not just a version bump.
