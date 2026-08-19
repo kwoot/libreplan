@@ -113,6 +113,15 @@ public class ProjectDetailsController extends GenericForwardComposer<Component> 
         window = (Window) comp;
         window.setAttribute("projectController", this, true);
 
+        // This window has no apply="..." - it's built directly via Executions.createComponents(),
+        // so ZK never wires up the usual "controller" EL variable a composer-applied page gets for
+        // free. Util.createBindingsFor() specifically looks up a "controller" attribute to build
+        // the binder (see its guard in Util.java) and silently no-ops without it, which left every
+        // @load/@save binding in _projectDetails.zul inert - Name/Code/etc. never actually reached
+        // the Order object. The ZUML's bind expressions reference "projectController.xxx", which
+        // still resolves fine via plain EL variable lookup once a binder exists at all.
+        window.setAttribute("controller", this, true);
+
         // BandboxSearch is a custom HtmlMacroComponent - its self-posted Binder.SAVE_EVENT isn't
         // recognized by AnnotateBinder as a save-trigger for a custom widget's property, so
         // selectedElement= in the ZUML is @load-only; the selection has to be saved manually here.
