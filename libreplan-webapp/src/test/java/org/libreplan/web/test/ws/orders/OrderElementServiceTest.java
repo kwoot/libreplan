@@ -67,6 +67,7 @@ import org.libreplan.business.materials.entities.MaterialAssignment;
 import org.libreplan.business.orders.daos.IOrderDAO;
 import org.libreplan.business.orders.daos.IOrderElementDAO;
 import org.libreplan.business.orders.entities.HoursGroup;
+import org.libreplan.business.orders.entities.Order;
 import org.libreplan.business.orders.entities.OrderElement;
 import org.libreplan.business.orders.entities.OrderLine;
 import org.libreplan.business.requirements.entities.CriterionRequirement;
@@ -1465,6 +1466,8 @@ public class OrderElementServiceTest {
 
         assertNotNull(orderElement);
         assertThat(orderElement.getCriterionRequirements().size(), equalTo(1));
+
+        deleteOrderByCode(code);
     }
 
     @Test
@@ -1559,6 +1562,8 @@ public class OrderElementServiceTest {
         assertNotNull(orderElement2);
         assertThat(orderElement2.getCriterionRequirements().size(), equalTo(1));
         assertFalse(orderElement2.getCriterionRequirements().iterator().next().isValid());
+
+        deleteOrderByCode(code);
     }
 
     @Test
@@ -1659,6 +1664,8 @@ public class OrderElementServiceTest {
             assertThat(criterionRequirement.getCriterion().getType().getName(), equalTo(type));
             assertTrue(criterionRequirement instanceof DirectCriterionRequirement);
         }
+
+        deleteOrderByCode(code);
     }
 
     @Test
@@ -1814,6 +1821,8 @@ public class OrderElementServiceTest {
         assertNotNull(orderElement3);
         assertThat(orderElement3.getCriterionRequirements().size(), equalTo(1));
         assertFalse(orderElement3.getCriterionRequirements().iterator().next().isValid());
+
+        deleteOrderByCode(code);
     }
 
     @Test
@@ -1908,6 +1917,30 @@ public class OrderElementServiceTest {
         assertNotNull(orderElement);
         assertThat(orderElement.getCriterionRequirements().size(), equalTo(1));
         assertFalse(orderElement.getCriterionRequirements().iterator().next().isValid());
+
+        deleteOrderByCode(code);
+    }
+
+    // These tests deliberately aren't @Transactional (they need addOrders()'s save to survive
+    // across the separate transactions used to verify it afterward), so whatever they create here
+    // is genuinely, permanently committed - unlike every other test in this class. Left uncleaned,
+    // a later @Transactional test's cleanCriteria() (which deletes and recreates all Criteria)
+    // can end up auto-flushing mid-way through loading this leftover Order's still-live
+    // CriterionRequirement -> Criterion association, throwing a spurious
+    // "unsaved transient instance of Criterion" on a completely unrelated test.
+    private void deleteOrderByCode(final String code) {
+        transactionService.runOnTransaction(new IOnTransaction<Void>() {
+            @Override
+            public Void execute() {
+                try {
+                    Order order = orderDAO.findByCode(code);
+                    orderDAO.remove(order.getId());
+                } catch (InstanceNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        });
     }
 
     private OrderListDTO createOrderListDTO(OrderDTO... orderDTOs) {
