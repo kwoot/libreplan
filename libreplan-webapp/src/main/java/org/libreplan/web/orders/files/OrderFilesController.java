@@ -107,7 +107,7 @@ public class OrderFilesController extends GenericForwardComposer {
         messages = new MessagesForUser(messagesContainer);
     }
 
-    private boolean isRepositoryExists() {
+    public boolean isRepositoryExists() {
         configurationModel.init();
 
         File repositoryDirectory = null;

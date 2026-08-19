@@ -42,6 +42,8 @@ import org.zkoss.zk.ui.Desktop;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.SuspendNotAllowedException;
 import org.zkoss.zk.ui.WrongValueException;
+import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.SelectEvent;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zkplus.spring.SpringUtil;
 import org.zkoss.zul.Checkbox;
@@ -49,6 +51,7 @@ import org.zkoss.zul.ComboitemRenderer;
 import org.zkoss.zul.Constraint;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
@@ -77,6 +80,8 @@ public class ProjectDetailsController extends GenericForwardComposer<Component> 
     private Datebox initDate;
 
     private BandboxSearch bdProjectTemplate;
+
+    private BandboxSearch bdExternalCompanies;
 
     private Textbox txtName;
 
@@ -107,6 +112,14 @@ public class ProjectDetailsController extends GenericForwardComposer<Component> 
         orderDAO = (IOrderDAO) SpringUtil.getBean("orderDAO");
         window = (Window) comp;
         window.setAttribute("projectController", this, true);
+
+        // BandboxSearch is a custom HtmlMacroComponent - its self-posted Binder.SAVE_EVENT isn't
+        // recognized by AnnotateBinder as a save-trigger for a custom widget's property, so
+        // selectedElement= in the ZUML is @load-only; the selection has to be saved manually here.
+        bdExternalCompanies.setListboxEventListener(Events.ON_SELECT, event -> {
+            Listitem selectedItem = (Listitem) ((SelectEvent) event).getSelectedItems().iterator().next();
+            getOrder().setCustomer((ExternalCompany) selectedItem.getValue());
+        });
     }
 
     public void showWindow(OrderCRUDController orderController, MultipleTabsPlannerController tabs) {
@@ -239,7 +252,7 @@ public class ProjectDetailsController extends GenericForwardComposer<Component> 
         };
     }
 
-    public Constraint checkConstraintStartDate() {
+    public Constraint getCheckConstraintStartDate() {
         return (comp, value) -> {
             Date startDate = (Date) value;
 

@@ -170,13 +170,13 @@
                                         <intbox id="projectsFilterPeriodSince"
                                                 value="@load(settingsController.projectsFilterPeriodSince) @save(settingsController.projectsFilterPeriodSince)"
                                                 width="50px"
-                                                constraint="@{settingsController.checkMonthsMaxValue}"/>
+                                                constraint="@load(settingsController.checkMonthsMaxValue())"/>
 
                                         <label value="${i18n:_t('months to')}" />
                                         <intbox id="projectsFilterPeriodTo"
                                                 value="@load(settingsController.projectsFilterPeriodTo) @save(settingsController.projectsFilterPeriodTo)"
                                                 width="50px"
-                                                constraint="@{settingsController.checkMonthsMaxValue}"/>
+                                                constraint="@load(settingsController.checkMonthsMaxValue())"/>
                                         <checkbox id="projectsFilterFinishedOn"
                                                           label="${i18n:_t('Exclude finished projects')}"
                                                           checked="@load(settingsController.projectsFilterFinishedOn) @save(settingsController.projectsFilterFinishedOn)"/>
@@ -203,13 +203,13 @@
                                         <intbox id="resourcesLoadFilterPeriodSince"
                                                 value="@load(settingsController.resourcesLoadFilterPeriodSince) @save(settingsController.resourcesLoadFilterPeriodSince)"
                                                 width="50px"
-                                                constraint="@{settingsController.checkMonthsMaxValue}"/>
+                                                constraint="@load(settingsController.checkMonthsMaxValue())"/>
 
                                         <label value="${i18n:_t('months to')}" />
                                         <intbox id="resourcesLoadFilterPeriodTo"
                                                 value="@load(settingsController.resourcesLoadFilterPeriodTo) @save(settingsController.resourcesLoadFilterPeriodTo)"
                                                 width="50px"
-                                                constraint="@{settingsController.checkMonthsMaxValue}"/>
+                                                constraint="@load(settingsController.checkMonthsMaxValue())"/>
                                     </hbox>
                                 </row>
                             </rows>

@@ -220,6 +220,8 @@ public class OrderCRUDController extends GenericForwardComposer {
 
     private EndDatesRenderer endDatesRenderer = new EndDatesRenderer();
 
+    private DeliverDatesRenderer deliverDatesRenderer = new DeliverDatesRenderer();
+
     private Textbox filterProjectName;
 
     private Checkbox filterExcludeFinishedProject;
@@ -1405,7 +1407,7 @@ public class OrderCRUDController extends GenericForwardComposer {
      * Operations to filter the orders by multiple filters.
      */
 
-    public Constraint checkConstraintFinishDate() {
+    public Constraint getCheckConstraintFinishDate() {
         return (comp, value) -> {
             Date finishDate = (Date) value;
 
@@ -1417,7 +1419,7 @@ public class OrderCRUDController extends GenericForwardComposer {
         };
     }
 
-    public Constraint checkConstraintStartDate() {
+    public Constraint getCheckConstraintStartDate() {
         return (comp, value) -> {
             Date startDate = (Date) value;
 
@@ -1608,7 +1610,22 @@ public class OrderCRUDController extends GenericForwardComposer {
         return getOrder() != null ? getOrder().getDeliveringDates() : new TreeSet<>(new DeliverDateComparator());
     }
 
-    public Constraint checkValidProjectName() {
+    public DeliverDatesRenderer getDeliverDatesRenderer() {
+        return this.deliverDatesRenderer;
+    }
+
+    private class DeliverDatesRenderer implements RowRenderer {
+        @Override
+        public void render(Row row, Object o, int i) throws Exception {
+            DeadlineCommunication deliverDate = (DeadlineCommunication) o;
+            row.setValue(deliverDate);
+
+            row.appendChild(new Label(Util.formatDate(deliverDate.getDeliverDate())));
+            row.appendChild(new Label(Util.formatDateTime(deliverDate.getSaveDate())));
+        }
+    }
+
+    public Constraint getCheckValidProjectName() {
         return (comp, value) -> {
 
             if ( StringUtils.isBlank((String) value) ) {
@@ -1624,7 +1641,7 @@ public class OrderCRUDController extends GenericForwardComposer {
         };
     }
 
-    public Constraint checkValidProjectCode() {
+    public Constraint getCheckValidProjectCode() {
         return (comp, value) -> {
 
             if ( StringUtils.isBlank((String) value) ) {

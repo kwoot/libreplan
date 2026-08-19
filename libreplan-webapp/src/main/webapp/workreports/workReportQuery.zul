@@ -53,15 +53,15 @@
                         <label value="${i18n:_t('task')}"/>
                         <bandboxSearch id="bandboxFilterOrderElement" widthBandbox="285px" widthListbox="700px"
                                        finder="OrderElementBandboxFinder"
-                                       model="@{controller.orderElements}"/>
+                                       model="@load(controller.orderElements)"/>
 
                         <!-- From -->
                         <label value="${i18n:_t('from')}"/>
-                        <datebox id="filterStartDateLine" constraint = "@{controller.checkConstraintStartDateLine}"/>
+                        <datebox id="filterStartDateLine" constraint = "@load(controller.checkConstraintStartDateLine())"/>
 
                         <!-- To -->
                         <label value="${i18n:_t('to')}"/>
-                        <datebox id="filterFinishDateLine" constraint = "@{controller.checkConstraintFinishDateLine}"/>
+                        <datebox id="filterFinishDateLine" constraint = "@load(controller.checkConstraintFinishDateLine())"/>
                     </hbox>
 
                     <!-- More options -->

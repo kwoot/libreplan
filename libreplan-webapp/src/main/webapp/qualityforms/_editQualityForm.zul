@@ -43,7 +43,7 @@
                                 <label value="${i18n:_t('Name')}" />
                                 <textbox id="qualityFormName"
                                          width="500px" value="@load(controller.qualityForm.name) @save(controller.qualityForm.name)"
-                                         constraint="@{controller.checkConstraintUniqueQualityFormName}"
+                                         constraint="@load(controller.checkConstraintUniqueQualityFormName())"
                                          onBlur="controller.updateWindowTitle()" sclass="focus-element" />
                             </row>
                             <row>

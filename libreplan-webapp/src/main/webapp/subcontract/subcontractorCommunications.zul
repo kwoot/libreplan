@@ -39,8 +39,8 @@
             <label sclass="subtitulo" value="${i18n:_t('Show')}:" />
 
             <listbox id="listFilter" mold="select" rows="1"
-                     model="@{controller.filterItems}"
-                     selectedItem="@{controller.currentFilterItem}"
+                     model="@load(controller.filterItems)"
+                     selectedItem="@load(controller.currentFilterItem)@save(controller.currentFilterItem)"
                      itemRenderer="org.libreplan.web.common.EnumsListitemRenderer">
             </listbox>
 
@@ -51,8 +51,8 @@
         <separator bar="false" spacing="20px" orient="horizontal"/>
 
         <grid id="listing"
-              model="@{controller.subcontractorCommunications}"
-              rowRenderer="@{controller.subcontractorCommunicationRenderer}"
+              model="@load(controller.subcontractorCommunications)"
+              rowRenderer="@load(controller.subcontractorCommunicationRenderer)"
               mold="paging" pageSize="10">
             <columns>
                 <column label="${i18n:_t('Communication Type')}" align="center" width="140px"
@@ -90,10 +90,6 @@
                     <column label="${i18n:_t('Date')}" width="150px"/>
                 </columns>
                 <rows>
-                    <row self="@{each='value'}" value="@{value}">
-                        <label value="@{value.progress}"/>
-                        <label value="@{value.date,converter='org.libreplan.web.common.typeconverters.DateConverter'}" />
-                    </row>
                 </rows>
             </grid>
         </popup>

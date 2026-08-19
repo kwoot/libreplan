@@ -135,14 +135,13 @@ public abstract class AssignedMaterialsController<T, A> extends GenericForwardCo
      * On selecting category, refresh {@link MaterialAssignment} associated with selected {@link MaterialCategory}.
      */
     public void refreshMaterialAssignments() {
-        final List<A> materials = getAssignedMaterials();
-        gridMaterials.setModel(new SimpleListModel<>(materials));
+        gridMaterials.setModel(getAssignedMaterials());
         reloadGridMaterials();
     }
 
-    public List<A> getAssignedMaterials() {
+    public org.zkoss.zul.ListModel<A> getAssignedMaterials() {
         final Treeitem treeitem = categoriesTree.getSelectedItem();
-        return getAssignedMaterials(treeitem);
+        return new SimpleListModel<>(getAssignedMaterials(treeitem));
     }
 
     private List<A> getAssignedMaterials(Treeitem treeitem) {
@@ -223,6 +222,24 @@ public abstract class AssignedMaterialsController<T, A> extends GenericForwardCo
      */
     public List<Material> getMatchingMaterials() {
         return getModel().getMatchingMaterials();
+    }
+
+    public ListitemRenderer getMatchingMaterialsRenderer() {
+        return (Listitem item, Object data, int i) -> {
+            final Material material = (Material) data;
+            item.setValue(material);
+
+            item.appendChild(new Listcell(material.getCode()));
+            item.appendChild(new Listcell(material.getDescription()));
+            item.appendChild(new Listcell(material.getUnitType().getMeasure()));
+
+            Listcell priceCell = new Listcell();
+            priceCell.appendChild(new Label(material.getDefaultUnitPrice().toString()));
+            priceCell.appendChild(new Label(getCurrencySymbol()));
+            item.appendChild(priceCell);
+
+            item.appendChild(new Listcell(material.getCategory().getName()));
+        };
     }
 
     /**

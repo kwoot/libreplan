@@ -36,7 +36,7 @@
                         <label value="${i18n:_t('Assign quality form')}" />
                         <hbox style="margin-left: 5px;">
                             <bandboxSearch id="qualityFormFinder" finder="QualityFormBandboxFinder"
-                                           model="@{assignedQualityForms.notAssignedQualityForms}" widthBandbox="200px" widthListbox="600px" />
+                                           model="@load(assignedQualityForms.notAssignedQualityForms)" widthBandbox="200px" widthListbox="600px" />
                             <button label="${i18n:_t('Assign')}" sclass="add-button"
                                     onClick="assignedQualityForms.onAssignTaskQualityForm()"
                             />
@@ -44,7 +44,8 @@
                     </vbox>
                     <separator bar="false" spacing="40px" orient="vertical"/>
                     <grid height="300px" style="margin: 0 5px 0 5px;"
-                          model="@{assignedQualityForms.assigned}">
+                          model="@load(assignedQualityForms.assigned)"
+                          rowRenderer="@load(assignedQualityForms.assignedRenderer)">
                         <columns>
                             <column width="25px"/>
                             <column label="${i18n:_t('Name')}" sort="auto(lower(name))" sortDirection="descending"/>
@@ -52,17 +53,6 @@
                             <column label="${i18n:_t('Operations')}" />
                         </columns>
                         <rows>
-                            <row self="@{each='qualityForm'}" value="@{qualityForm}">
-                                <label />
-                                <label value="@{qualityForm.name}"/>
-                                <label value="@{qualityForm.qualityFormType}"/>
-                                <hbox>
-                                    <button sclass="icono" image="/common/img/ico_borrar1.png"
-                                            hoverImage="/common/img/ico_borrar.png"
-                                            onClick="assignedQualityForms.remove(self.parent.parent.value);"
-                                    />
-                                </hbox>
-                            </row>
                         </rows>
                     </grid>
 

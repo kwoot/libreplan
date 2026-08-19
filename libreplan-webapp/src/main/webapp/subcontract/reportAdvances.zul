@@ -38,8 +38,8 @@
     <vbox id="messagesContainer" />
 
     <grid id="listing"
-        model="@{controller.ordersWithExternalCodeInAnyOrderElement}"
-        rowRenderer="@{controller.reportAdvancesOrderRenderer}"
+        model="@load(controller.ordersWithExternalCodeInAnyOrderElement)"
+        rowRenderer="@load(controller.reportAdvancesOrderRenderer)"
         mold="paging" pageSize="10" sizedByContent="true">
         <columns>
             <column label="${i18n:_t('Project code')}" />

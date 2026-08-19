@@ -24,7 +24,7 @@
 <?component name="createNewVersion" inline="true" macroURI="/calendars/_createNewVersion.zul"?>
 <vbox id="resourceCalendarContainer" width="100%">
 
-    <div visible="@{controller.isCalendarNull}">
+    <div visible="@load(controller.calendarNull)">
 
         <grid>
             <columns>
@@ -36,8 +36,8 @@
                 <row>
                     <label value="${i18n:_t('Select parent calendar')}" />
                     <combobox id="createDerivedCalendar"
-                              model="@{controller.baseCalendars}"
-                              itemRenderer="@{controller.baseCalendarsComboitemRenderer}" />
+                              model="@load(controller.baseCalendars)"
+                              itemRenderer="@load(controller.baseCalendarsComboitemRenderer)" />
                 </row>
             </rows>
         </grid>
@@ -45,7 +45,7 @@
     </div>
 
 
-    <div visible="@{controller.isCalendarNotNull}">
+    <div visible="@load(controller.calendarNotNull)">
 
         <calendarEdition top_id="editCalendarWindow" title="${i18n:_t('Edit Calendar')}"
                          save_button_label="${i18n:_t('Save changes')}"

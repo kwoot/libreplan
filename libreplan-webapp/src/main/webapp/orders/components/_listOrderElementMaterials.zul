@@ -114,7 +114,8 @@
 
                                 <listbox id="lbFoundMaterials"
                                          multiple="true" sclass="margin-border"
-                                         model="@{assignedMaterialsController.matchingMaterials}" >
+                                         model="@load(assignedMaterialsController.matchingMaterials)"
+                                         itemRenderer="@load(assignedMaterialsController.matchingMaterialsRenderer)" >
                                     <listhead sizable="false" >
                                         <listheader label="${i18n:_t('Code')}" width="230px"/>
                                         <listheader label="${i18n:_t('Name')}" hflex="1"/>
@@ -122,16 +123,6 @@
                                         <listheader label="${i18n:_t('Unit price')}" width="70px"/>
                                         <listheader label="${i18n:_t('Category')}" width="120px"/>
                                     </listhead>
-                                    <listitem self="@{each='material'}" value="@{material}">
-                                        <listcell label="@{material.code}" />
-                                        <listcell label="@{material.description}" />
-                                        <listcell label="@{material.unitType.measure}" />
-                                        <listcell>
-                                            <label value="@{material.defaultUnitPrice}" />
-                                            <label value="@{assignedMaterialsController.currencySymbol}" />
-                                        </listcell>
-                                        <listcell label="@{material.category.name}" />
-                                    </listitem>
                                 </listbox>
                             </panelchildren>
                         </panel>

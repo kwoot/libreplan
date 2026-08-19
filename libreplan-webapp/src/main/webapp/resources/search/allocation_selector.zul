@@ -34,7 +34,7 @@
 
                     <tree id="criterionsTree" width="420px"
                           height="459px" multiple="true"
-                          model="@{selectorController.criterions}"
+                          model="@load(selectorController.criterions)"
                           sclass="allocationTreeCol"
                           zclass="z-dottree" style="margin-top:5px;margin-bottom:5px;">
                         <treecols>
@@ -102,8 +102,8 @@
                         }
                     </style>
                     <listbox id="listBoxResources" hflex="1" height="340px"
-                             multiple="@{selectorController.allowSelectMultipleResources}" style="margin:5px;"
-                             itemRenderer="@{selectorController.listitemRenderer}" >
+                             multiple="@load(selectorController.allowSelectMultipleResources)" style="margin:5px;"
+                             itemRenderer="@load(selectorController.listitemRenderer)" >
                         <listhead>
                             <listheader label="${i18n:_t('Found resources')}"
                                         tooltiptext="${i18n:_t('Resources matching selected criteria')}"

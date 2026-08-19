@@ -38,8 +38,8 @@
     <vbox id="messagesContainer" />
 
     <grid id="listing"
-        model="@{controller.subcontractedTasks}"
-        rowRenderer="@{controller.subcontractedTasksRenderer}"
+        model="@load(controller.subcontractedTasks)"
+        rowRenderer="@load(controller.subcontractedTasksRenderer)"
         mold="paging" pageSize="10"
         onInitRender="controller.initRender();">
         <columns>

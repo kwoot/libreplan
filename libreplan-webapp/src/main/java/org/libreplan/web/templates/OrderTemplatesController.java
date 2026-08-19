@@ -39,6 +39,7 @@ import org.libreplan.web.common.Level;
 import org.libreplan.web.common.MessagesForUser;
 import org.libreplan.web.common.OnlyOneVisible;
 import org.libreplan.web.common.Util;
+import org.libreplan.web.common.components.bandboxsearch.BandboxSearch;
 import org.libreplan.web.common.entrypoints.EntryPointsHandler;
 import org.libreplan.web.common.entrypoints.IURLHandlerRegistry;
 import org.libreplan.web.planner.tabs.IGlobalViewEntryPoints;
@@ -58,10 +59,12 @@ import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zkplus.spring.SpringUtil;
+import org.zkoss.zk.ui.event.SelectEvent;
 import org.zkoss.zul.Constraint;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabpanel;
@@ -115,11 +118,48 @@ public class OrderTemplatesController extends GenericForwardComposer implements 
 
         handler.register(this, page);
 
+        // EntryPointsHandler.applyIfMatches wraps the matched @EntryPoint method (register(),
+        // above) in Util.executeIgnoringCreationOfBindings, which makes Util.createBindingsFor a
+        // no-op for the duration - so the binder has to be created here, after register() has
+        // already returned, not any earlier.
+        Util.createBindingsFor(comp);
+        Util.reloadBindings(listWindow);
+
         setBreadcrumbs(comp);
     }
 
-    public List<OrderElementTemplate> getTemplates() {
-        return model.getRootTemplates();
+    public org.zkoss.zul.ListModel<OrderElementTemplate> getTemplates() {
+        return new org.zkoss.zul.ListModelList<>(model.getRootTemplates());
+    }
+
+    /**
+     * The list's rows used to be declared with a ZUML "each" template (self="@{each=...}") -
+     * under this app's AnnotateBinder/ZK 10 stack that only ever clones the row's FIRST child for
+     * each iteration. Building rows programmatically via RowRenderer sidesteps that "each" bug
+     * entirely (same fix pattern as elsewhere in this sweep, e.g.
+     * WorkerCRUDController.getWorkersRenderer()).
+     */
+    public org.zkoss.zul.RowRenderer getTemplatesRenderer() {
+        return (row, data, i) -> {
+            final OrderElementTemplate template = (OrderElementTemplate) data;
+            row.setValue(template);
+
+            row.addEventListener(Events.ON_CLICK, event -> goToEditForm(template));
+
+            Integer start = template.getStartAsDaysFromBeginning();
+            Integer deadline = template.getDeadlineAsDaysFromBeginning();
+
+            row.appendChild(new Label(template.getType()));
+            row.appendChild(new Label(template.getName()));
+            row.appendChild(new Label(start == null ? "" : start.toString()));
+            row.appendChild(new Label(deadline == null ? "" : deadline.toString()));
+            row.appendChild(new Label(template.getDescription()));
+
+            org.zkoss.zul.Hbox hbox = new org.zkoss.zul.Hbox();
+            hbox.appendChild(Util.createEditButton(event -> goToEditForm(template)));
+            hbox.appendChild(Util.createRemoveButton(event -> confirmDelete(template)));
+            row.appendChild(hbox);
+        };
     }
 
     private OnlyOneVisible getVisibility() {
@@ -156,7 +196,21 @@ public class OrderTemplatesController extends GenericForwardComposer implements 
         bindEditTemplateWindowWithController();
         bindHistoricalArragenmentWithCurrentTemplate();
         bindHistoricalStatisticsWithCurrentTemplate();
+        bindCalendarBandboxListener();
         show(editWindow);
+    }
+
+    // BandboxSearch is a custom HtmlMacroComponent - its self-posted Binder.SAVE_EVENT isn't
+    // recognized by AnnotateBinder as a save-trigger for a custom widget's property, so
+    // selectedElement= in the ZUML is @load-only; the selection has to be saved manually here.
+    private void bindCalendarBandboxListener() {
+        BandboxSearch calendarBandbox = (BandboxSearch) editWindow.getFellowIfAny("calendar");
+        if (calendarBandbox != null) {
+            calendarBandbox.setListboxEventListener(Events.ON_SELECT, event -> {
+                Listitem selectedItem = (Listitem) ((SelectEvent) event).getSelectedItems().iterator().next();
+                setCalendar(selectedItem.getValue());
+            });
+        }
     }
 
     private <T extends Component> T findAtEditWindow(String id, Class<T> type) {
@@ -350,7 +404,7 @@ public class OrderTemplatesController extends GenericForwardComposer implements 
         tree.setItemRenderer(orderElementsTree.getController().getRenderer());
     }
 
-    public Constraint validateTemplateName() {
+    public Constraint getValidateTemplateName() {
         return (comp, value) -> {
             try {
                 model.validateTemplateName((String) value);

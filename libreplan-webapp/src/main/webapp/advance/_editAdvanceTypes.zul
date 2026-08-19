@@ -39,7 +39,7 @@
                             <label value="${i18n:_t('Unit name')}" />
                             <textbox id="unitName"
                                      value="@load(controller.advanceType.unitName) @save(controller.advanceType.unitName)"
-                                     constraint="@{controller.distinctNames}"
+                                     constraint="@load(controller.distinctNames())"
                                      width="300px"
                                      disabled="@load(controller.immutable)"
                                      onBlur="controller.updateWindowTitle()"
@@ -56,7 +56,7 @@
                                         scale="2"
                                         width="300px"
                                         value="@load(controller.defaultMaxValue) @save(controller.defaultMaxValue)"
-                                        constraint="@{controller.greaterThanPrecision}"
+                                        constraint="@load(controller.greaterThanPrecision())"
                                         disabled="@load(controller.percentage)" />
                         </row>
                         <row>
@@ -65,7 +65,7 @@
                                         scale="4"
                                         width="300px"
                                         value = "@load(controller.advanceType.unitPrecision) @save(controller.advanceType.unitPrecision)"
-                                        constraint = "@{controller.lessThanDefaultMaxValue}"
+                                        constraint = "@load(controller.lessThanDefaultMaxValue())"
                                         disabled="@load(controller.immutable)" />
                         </row>
                         <row>

@@ -37,7 +37,7 @@
             <foot>
                 <footer label=""/>
                 <footer label="${i18n:_t('Total estimated hours')}:"/>
-                <footer id="totalEstimatedHours" label="@{taskInformationController.totalHours}"/>
+                <footer id="totalEstimatedHours" label="@load(taskInformationController.totalHours)"/>
             </foot>
         </grid>
 

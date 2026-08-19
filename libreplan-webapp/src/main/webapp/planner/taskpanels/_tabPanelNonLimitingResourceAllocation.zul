@@ -68,7 +68,7 @@
                         <button label="${i18n:_t('Add')}"
                                 onClick="allocationController.onSelectWorkers(newAllocationSelectorCombo)"
                                 sclass="add-button"
-                                disabled="@{allocationController.isAnyManualOrTaskUpdatedFromTimesheets}" />
+                                disabled="@load(allocationController.anyManualOrTaskUpdatedFromTimesheets)" />
 
                         <button id="advancedSearchButton" label="${i18n:_t('Advanced search')}"
                                 sclass="add-button"
@@ -82,8 +82,8 @@
                     <separator spacing="20px"/>
 
                     <grid id="allocationsGrid"
-                          model="@{allocationController.resourceAllocations}"
-                          rowRenderer="@{allocationController.resourceAllocationRenderer}"
+                          model="@load(allocationController.resourceAllocations)"
+                          rowRenderer="@load(allocationController.resourceAllocationRenderer)"
                           style="margin-bottom: 5px">
 
                         <auxhead>
@@ -95,7 +95,7 @@
                             <auxheader label="${i18n:_t('Resources Per Day')}" colspan="3" align="center"/>
 
                             <auxheader label="${i18n:_t('Function')}" colspan="1" align="center"
-                                       visible="@{allocationController.anyNotFlat}" />
+                                       visible="@load(allocationController.anyNotFlat)" />
 
                             <auxheader label="${i18n:_t('Op.')}" colspan="1" align="center"/>
                         </auxhead>
@@ -105,26 +105,26 @@
                             <column />
 
                             <column label="${i18n:_t('Original')}" align="center"
-                                    visible="@{allocationController.extendedView}" width="70px"/>
+                                    visible="@load(allocationController.extendedView)" width="70px"/>
 
                             <column label="${i18n:_t('Total')}" align="center"
-                                    visible="@{allocationController.extendedView}" width="70px"/>
+                                    visible="@load(allocationController.extendedView)" width="70px"/>
 
                             <column label="${i18n:_t('Consolidated')}" align="center"
-                                    visible="@{allocationController.extendedView}" width="75px"/>
+                                    visible="@load(allocationController.extendedView)" width="75px"/>
 
                             <column label="${i18n:_t('Non Consolidated')}" align="center" width="120px"/>
 
                             <column label="${i18n:_t('Total')}" align="center"
-                                    visible="@{allocationController.extendedView}" width="70px"/>
+                                    visible="@load(allocationController.extendedView)" width="70px"/>
 
                             <column label="${i18n:_t('Consolidated')}" align="center"
-                                    visible="@{allocationController.extendedView}" width="75px"/>
+                                    visible="@load(allocationController.extendedView)" width="75px"/>
 
                             <column label="${i18n:_t('Non Consolidated')}" align="center" width="120px"/>
 
                             <column label="" align="center" width="95px"
-                                    visible="@{allocationController.anyNotFlat}" />
+                                    visible="@load(allocationController.anyNotFlat)" />
 
                             <column label="" align="center" width="40px"/>
                         </columns>

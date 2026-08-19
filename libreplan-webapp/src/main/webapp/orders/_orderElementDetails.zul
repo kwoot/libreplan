@@ -47,7 +47,7 @@
                 <hbox>
                     <datebox id="initDate"
                              value="@load(detailsController.orderElement.initDate) @save(detailsController.orderElement.initDate)"
-                             constraint="@{detailsController.checkConstraintStartDate}"/>
+                             constraint="@load(detailsController.checkConstraintStartDate)"/>
                 </hbox>
             </row>
             <row>
@@ -55,7 +55,7 @@
                 <hbox>
                     <datebox id="deadline"
                              value="@load(detailsController.orderElement.deadline) @save(detailsController.orderElement.deadline)"
-                             constraint="@{detailsController.checkConstraintFinishDate}"/>
+                             constraint="@load(detailsController.checkConstraintFinishDate)"/>
                 </hbox>
             </row>
             <row>

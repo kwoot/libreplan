@@ -51,17 +51,17 @@
                             <rows>
                                 <row>
                                     <label value="${i18n:_t('Start date')}:" />
-                                    <datebox id="startingDate" width="150px" value="@{controller.startingDate}"/>
+                                    <datebox id="startingDate" width="150px" value="@load(controller.startingDate)@save(controller.startingDate)"/>
                                 </row>
                                 <row>
                                     <label value="${i18n:_t('End date')}:" />
-                                    <datebox id="endingDate" width="150px" value="@{controller.endingDate}"/>
+                                    <datebox id="endingDate" width="150px" value="@load(controller.endingDate)@save(controller.endingDate)"/>
                                 </row>
                                 <row>
                                     <label value="${i18n:_t('Status')}:" />
                                     <listbox id="listStatus" mold="select" rows="1"
-                                             model="@{controller.materialStatus}" width="150px"
-                                             selectedItem="@{controller.selectedStatus}">
+                                             model="@load(controller.materialStatus)" width="150px"
+                                             selectedItem="@load(controller.selectedStatus)@save(controller.selectedStatus)">
 
                                     </listbox>
                                 </row>
@@ -78,7 +78,7 @@
                             <separator spacing="5px"/>
                             <hbox>
                                 <bandboxSearch id="bdOrders" finder="OrderBandboxFinder"
-                                               model="@{controller.allOrders}"
+                                               model="@load(controller.allOrders)"
                                                widthListbox="580px"
                                                widthBandbox="450px"
                                                sclass="bandbox-margin"/>
@@ -92,7 +92,8 @@
                         <listbox id="lbOrders"
                                  width="700px"
                                  multiple="true"
-                                 model="@{controller.selectedOrders}"
+                                 model="@load(controller.selectedOrders)"
+                                 itemRenderer="@load(controller.ordersRenderer)"
                                  sclass="margin-border">
                             <listhead>
                                 <listheader label="${i18n:_t('Name')}" align="center" sort="auto(name)" />
@@ -100,19 +101,6 @@
                                 <listheader label="${i18n:_t('Start date')}" sort="auto(initDate)" align="center" />
                                 <listheader label="${i18n:_t('Operations')}" sort="auto(initDate)" align="center" width="100px"/>
                             </listhead>
-                            <listitem self="@{each='order'}" value="@{order}">
-                                <listcell label="@{order.name}" />
-                                <listcell label="@{order.code}" />
-                                <listcell label="@{order.initDate, converter='org.libreplan.web.common.typeconverters.DateConverter'}" />
-                                <listcell>
-                                    <button sclass="icono" image="/common/img/ico_borrar1.png"
-                                            hoverImage="/common/img/ico_borrar.png"
-                                            tooltiptext="${i18n:_t('Delete')}"
-                                            onClick="controller.onRemoveOrder(self.parent.parent.value);">
-
-                                    </button>
-                                </listcell>
-                            </listitem>
                         </listbox>
                     </panelchildren>
                 </panel>

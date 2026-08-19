@@ -75,7 +75,7 @@
                                 <row>
                                     <label value="${i18n:_t('Password confirmation')}" />
                                     <textbox id="passwordConfirmation" type="password"
-                                             constraint="@{controller.validatePasswordConfirmation}"
+                                             constraint="@load(controller.validatePasswordConfirmation())"
                                              width="300px"
                                              disabled="@load(controller.ldapUserLdapConfiguration)"/>
                                 </row>

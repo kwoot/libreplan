@@ -31,7 +31,7 @@
                     <label value="${i18n:_t('Assign quality form')}" />
                     <hbox style="margin-left: 5px;">
                         <bandboxSearch id="bdQualityForms" finder="QualityFormBandboxFinder"
-                                       model="@{assignedTaskQualityFormsController.notAssignedQualityForms}"
+                                       model="@load(assignedTaskQualityFormsController.notAssignedQualityForms)"
                                        widthBandbox="200px"
                                        widthListbox="600px"/>
                         <button label="${i18n:_t('Assign')}" sclass="add-button"
@@ -42,8 +42,8 @@
                 <separator bar="false" spacing="40px" orient="vertical"/>
 
                 <grid id="assignedTaskQualityForms" height="300px"
-                      rowRenderer = "@{assignedTaskQualityFormsController.taskQualityFormsRowRenderer}"
-                      model="@{assignedTaskQualityFormsController.taskQualityForms}"
+                      rowRenderer = "@load(assignedTaskQualityFormsController.taskQualityFormsRowRenderer)"
+                      model="@load(assignedTaskQualityFormsController.taskQualityForms)"
                       onInitRender ="assignedTaskQualityFormsController.sortTaskQualityForms();">
                     <columns>
                         <column width="25px"/>

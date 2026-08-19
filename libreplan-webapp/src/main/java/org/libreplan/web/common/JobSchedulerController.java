@@ -45,11 +45,15 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zkplus.spring.SpringUtil;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Comboitem;
+import org.zkoss.zul.ComboitemRenderer;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Groupbox;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.ListModel;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Popup;
 import org.zkoss.zul.RowRenderer;
 import org.zkoss.zul.SimpleListModel;
@@ -152,6 +156,18 @@ public class JobSchedulerController extends BaseCRUDController<JobSchedulerConfi
         return JobClassNameEnum.values();
     }
 
+    public ListModel<JobClassNameEnum> getJobNamesModel() {
+        return new ListModelList<>(java.util.Arrays.asList(getJobNames()));
+    }
+
+    public ComboitemRenderer getJobNamesRenderer() {
+        return (Comboitem item, Object data, int index) -> {
+            final JobClassNameEnum jobClassName = (JobClassNameEnum) data;
+            item.setValue(jobClassName);
+            item.setLabel(jobClassName.getName());
+        };
+    }
+
     /**
      * Returns list of connectorNames.
      */
@@ -164,6 +180,14 @@ public class JobSchedulerController extends BaseCRUDController<JobSchedulerConfi
         }
 
         return connectorNames;
+    }
+
+    public ComboitemRenderer getConnectorNamesRenderer() {
+        return (Comboitem item, Object data, int index) -> {
+            final String connectorName = (String) data;
+            item.setValue(connectorName);
+            item.setLabel(connectorName);
+        };
     }
 
     /**

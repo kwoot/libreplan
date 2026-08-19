@@ -36,6 +36,9 @@ import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Grid;
+import org.zkoss.zul.ListModel;
+import org.zkoss.zul.RowRenderer;
+import org.zkoss.zul.SimpleListModel;
 import org.zkoss.zul.Textbox;
 
 /**
@@ -168,12 +171,42 @@ public abstract class AssignedLabelsController<T, M> extends GenericForwardCompo
         return getModel().getLabels();
     }
 
+    /**
+     * NewDataSortableGrid.setModel(ListModel) is a strict, non-generic override - unlike plain
+     * Grid, ZK Bind's List-&gt;ListModel auto-wrap does not apply, so directLabels' "model=" needs
+     * an already-wrapped ListModel explicitly.
+     */
+    public ListModel<Label> getLabelsModel() {
+        return new SimpleListModel<>(getLabels());
+    }
+
     public List<Label> getInheritedLabels() {
         return getModel().getInheritedLabels();
     }
 
     public List<Label> getAllLabels() {
         return getModel().getAllLabels();
+    }
+
+    public RowRenderer getInheritedLabelsRenderer() {
+        return (row, data, i) -> {
+            final Label label = (Label) data;
+            row.setValue(label);
+
+            row.appendChild(new org.zkoss.zul.Label(label.getType().getName()));
+            row.appendChild(new org.zkoss.zul.Label(label.getName()));
+        };
+    }
+
+    public RowRenderer getDirectLabelsRenderer() {
+        return (row, data, i) -> {
+            final Label label = (Label) data;
+            row.setValue(label);
+
+            row.appendChild(new org.zkoss.zul.Label(label.getType().getName()));
+            row.appendChild(new org.zkoss.zul.Label(label.getName()));
+            row.appendChild(Util.createRemoveButton(event -> deleteLabel(label)));
+        };
     }
 
 }

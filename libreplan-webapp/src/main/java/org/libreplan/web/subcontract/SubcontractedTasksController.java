@@ -57,6 +57,8 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Column;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.ListModel;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.ext.Sortable;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.RowRenderer;
@@ -95,10 +97,13 @@ public class SubcontractedTasksController extends GenericForwardComposer {
         window = (Window) comp;
         window.setAttribute("controller", this, true);
         messagesForUser = new MessagesForUser(messagesContainer);
+
+        Util.createBindingsFor(comp);
+        Util.reloadBindings(comp);
     }
 
-    public List<SubcontractedTaskData> getSubcontractedTasks() {
-        return subcontractedTasksModel.getSubcontractedTasks();
+    public ListModel<SubcontractedTaskData> getSubcontractedTasks() {
+        return new ListModelList<>(subcontractedTasksModel.getSubcontractedTasks());
     }
 
     public SubcontractedTasksRenderer getSubcontractedTasksRenderer() {

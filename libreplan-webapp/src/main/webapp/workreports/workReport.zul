@@ -50,9 +50,9 @@
                     </listbox>
 
                     <label value="${i18n:_t('from')}"/>
-                    <datebox id="filterStartDate" constraint = "@{controller.checkConstraintStartDate}"/>
+                    <datebox id="filterStartDate" constraint = "@load(controller.checkConstraintStartDate())"/>
                     <label value="${i18n:_t('to')}"/>
-                    <datebox id="filterFinishDate" constraint = "@{controller.checkConstraintFinishDate}"/>
+                    <datebox id="filterFinishDate" constraint = "@load(controller.checkConstraintFinishDate())"/>
 
                     <button label="${i18n:_t('Filter')}" style="margin-top: -4px"
                             onClick="controller.onApplyFilter()" sclass="add-button"/>
@@ -112,7 +112,7 @@
                             <label value="${i18n:_t('Worker')}" />
                             <bandboxSearch id="personalTimesheetsBandboxSearch"
                                            finder="ResourceBandboxFinder"
-                                           model="@{controller.boundWorkers}"
+                                           model="@load(controller.boundWorkers)"
                                            widthBandbox="200px"
                                            widthListbox="400px" />
                         </row>

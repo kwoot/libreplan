@@ -31,17 +31,12 @@
             <panel title="${i18n:_t('Inherited labels')}" border="normal">
                 <panelchildren>
                     <grid id="inheritedLabels" sclass="margin-border"
-                          model="@{assignedLabelsController.inheritedLabels}">
+                          model="@load(assignedLabelsController.inheritedLabels)"
+                          rowRenderer="@load(assignedLabelsController.inheritedLabelsRenderer)">
                         <columns>
                             <column label="${i18n:_t('Label type')}" />
                             <column label="${i18n:_t('Value')}" />
                         </columns>
-                        <rows>
-                            <row self="@{each='label'}" value="@{label}">
-                                <label value="@{label.type.name}" />
-                                <label value="@{label.name}" />
-                            </row>
-                        </rows>
                     </grid>
                 </panelchildren>
             </panel>
@@ -52,26 +47,13 @@
             <panel title="${i18n:_t('Direct labels')}" border="normal">
                 <panelchildren>
                     <newdatasortablegrid id="directLabels" sclass="margin-border"
-                                         model="@{assignedLabelsController.labels}">
+                                         model="@load(assignedLabelsController.labelsModel)"
+                                         rowRenderer="@load(assignedLabelsController.directLabelsRenderer)">
                         <columns>
                             <newdatasortablecolumn label="${i18n:_t('Label type')}" sort="auto(lower(type.name))"/>
                             <newdatasortablecolumn label="${i18n:_t('Value')}" />
                             <newdatasortablecolumn label="${i18n:_t('Operations')}" />
                         </columns>
-                        <rows>
-                            <row self="@{each='label'}" value="@{label}">
-                                <label value="@{label.type.name}" />
-                                <label value="@{label.name}" />
-
-                                <button sclass="icono"
-                                        image="/common/img/ico_borrar1.png"
-                                        hoverImage="/common/img/ico_borrar.png"
-                                        tooltiptext="${i18n:_t('Delete')}"
-                                        onClick="assignedLabelsController.deleteLabel(self.parent.value)">
-                                </button>
-
-                            </row>
-                        </rows>
                     </newdatasortablegrid>
 
                     <!-- Assign label -->
@@ -79,7 +61,7 @@
                         <label value="${i18n:_t('Assign Label')}" />
                         <hbox sclass="margin-border">
                             <bandboxSearch id="bdLabels" finder="LabelBandboxFinder"
-                                           model="@{assignedLabelsController.allLabels}" />
+                                           model="@load(assignedLabelsController.allLabels)" />
                             <button label="${i18n:_t('Assign')}" sclass="add-button"
                                     onClick="assignedLabelsController.onAssignLabel()"
                             />

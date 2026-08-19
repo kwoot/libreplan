@@ -180,11 +180,11 @@
 
                       <row>
                         <label value="${i18n:_t('Exception Type')}" />
-                        <combobox id="exceptionTypes">
-                          <comboitem self="@{each='calendarExceptionType'}"
-                                     value="@{calendarExceptionType}"
-                                     label="@{calendarExceptionType.name}" />
-                        </combobox>
+                        <!-- Populated directly in Java (BaseCalendarEditionController#
+                             fillExceptionTypesComboAndMarkSelectedItem), which clears and rebuilds
+                             this combobox's children itself - this each-template was already dead,
+                             overwritten on every load regardless of whether "@{each=...}" worked. -->
+                        <combobox id="exceptionTypes" />
                       </row>
 
                     </rows>

@@ -146,6 +146,13 @@ public class LDAPConfiguration extends BaseEntity {
         return ldapSavePasswordsDB;
     }
 
+    // The EL Introspector only recognizes an "isX" getter when it returns primitive boolean - this
+    // one returns boxed Boolean, so "ldapSavePasswordsDB" is only resolvable as a bind property via
+    // this getX-named companion (matches getLdapAuthEnabled()/getLdapSaveRolesDB() just above).
+    public Boolean getLdapSavePasswordsDB() {
+        return isLdapSavePasswordsDB();
+    }
+
     public void setLdapSavePasswordsDB(Boolean ldapSavePasswordsDB) {
         this.ldapSavePasswordsDB = ldapSavePasswordsDB;
     }

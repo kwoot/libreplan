@@ -21,8 +21,8 @@
 <window id="${arg.id}" title="${i18n:_t('Job Scheduling List')}">
 
     <grid id="listJobSchedulings"
-          rowRenderer="@{controller.jobSchedulingRenderer}"
-          model="@{controller.jobSchedulerConfigurations}"
+          rowRenderer="@load(controller.jobSchedulingRenderer)"
+          model="@load(controller.jobSchedulerConfigurations)"
           mold="paging" pageSize="10">
 
         <columns>

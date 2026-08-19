@@ -34,8 +34,8 @@
             </hbox>
 
             <grid id="listResourcesCostCategoryAssignments"
-                  model="@{assignmentController.costCategoryAssignments}"
-                  rowRenderer="@{assignmentController.costCategoryAssignmentsRenderer}">
+                  model="@load(assignmentController.costCategoryAssignments)"
+                  rowRenderer="@load(assignmentController.costCategoryAssignmentsRenderer)">
                 <columns>
                     <column label="${i18n:_t('Category name')}" align="center"/>
                     <column label="${i18n:_t('Start date')}" align="center"/>

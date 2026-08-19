@@ -54,6 +54,8 @@ import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.ListModel;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.RowRenderer;
 import org.zkoss.zul.Window;
@@ -84,10 +86,13 @@ public class ReportAdvancesController extends GenericForwardComposer {
         window = (Window) comp;
         window.setAttribute("controller", this, true);
         messagesForUser = new MessagesForUser(messagesContainer);
+
+        Util.createBindingsFor(comp);
+        Util.reloadBindings(comp);
     }
 
-    public List<Order> getOrdersWithExternalCodeInAnyOrderElement() {
-        return reportAdvancesModel.getOrdersWithExternalCodeInAnyOrderElement();
+    public ListModel<Order> getOrdersWithExternalCodeInAnyOrderElement() {
+        return new ListModelList<>(reportAdvancesModel.getOrdersWithExternalCodeInAnyOrderElement());
     }
 
     public ReportAdvancesOrderRenderer getReportAdvancesOrderRenderer() {
