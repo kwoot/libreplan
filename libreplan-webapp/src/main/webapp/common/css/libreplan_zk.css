@@ -2040,22 +2040,22 @@ select {
 }
 
 /* Made for create buttons, because default ZK css is not work correctly for create button */
-.add-button {
+.add-button.z-button {
     background-color: #E4F3D9;
     background-image: none !important;
 }
 
-.add-button:hover {
+.add-button.z-button:hover {
     background: none;
     background-color: #C3EAAF;
 }
 
-.add-button:focus {
+.add-button.z-button:focus {
     background: none;
     background-color: #C3EAAF;
 }
 
-.add-button:disabled {
+.add-button.z-button:disabled {
     background: none;
     background-color: #C3EAAF !important;
 }
@@ -2135,8 +2135,14 @@ textarea {
     margin: 0 10px 10px 10px;
 }
 
+/* This -4px nudge (2016, pre-dates both themes) was tuned against
+ * Sapphire's original .z-groupbox-3d caption box model to visually
+ * center the label. Now that the caption's own padding/height are
+ * restored to match Sapphire exactly (see .z-groupbox-3d rules below),
+ * the caption already sits correctly centered on its own -- this old
+ * manual offset just pushes it back off-center again. */
 .more-options-label {
-    top: -4px !important;
+    top: 0 !important;
     padding-left: 6px !important;
 }
 
@@ -2346,4 +2352,970 @@ textarea {
 
 .expenses-sheet-code-wide-table table{
     width: 60%;
+}
+
+/* ----- Breeze theme compatibility fixes -----
+ * Breeze's base widget CSS (zul-*.jar, unthemed default) makes assumptions
+ * that clash with these Sapphire-era overrides:
+ *  - .z-button always sets color:#fff, assuming a saturated background.
+ *    Our pale custom button backgrounds (add-button/global-action, #E4F3D9)
+ *    need a dark text color or the label is invisible.
+ *  - .z-menu-content (the inner <a> of each top-nav item) paints its own
+ *    opaque white background, hiding the colored pill we set on the <li>.
+ */
+.add-button.z-button,
+.global-action.z-button,
+.create-button.z-button,
+.save-button.z-button,
+.saveandcontinue-button.z-button,
+.cancel-button.z-button {
+    color: #33512b;
+}
+
+.add-button.z-button:hover,
+.global-action.z-button:hover,
+.create-button.z-button:hover,
+.save-button.z-button:hover,
+.saveandcontinue-button.z-button:hover,
+.cancel-button.z-button:hover,
+.add-button.z-button:focus,
+.global-action.z-button:focus,
+.create-button.z-button:focus,
+.save-button.z-button:focus,
+.saveandcontinue-button.z-button:focus,
+.cancel-button.z-button:focus {
+    color: #33512b;
+    background-color: #d3ecc0;
+}
+
+.z-menubar-horizontal .z-menu-content {
+    background-color: transparent;
+}
+
+.current-section .z-menu-content {
+    background-color: #2a83b4;
+    border-radius: 10px 10px 0 0;
+}
+
+.z-menubar-horizontal li:not(.current-section) .z-menu-content:hover {
+    background-color: #d4e1ef;
+}
+
+/* Breeze's default text inputs are height:34px/font-size:16px (assumes a
+ * spacious modern form), vs Sapphire's ~24px/12px. Split by family instead
+ * of one blanket rule, because this app already has its own pre-existing,
+ * more-specific overrides for some of these classes (elsewhere in this
+ * file) that a blanket rule at equal specificity would silently clobber
+ * just by coming later in the file -- the same trap as the .z-button
+ * font-size bug fixed earlier in this file. Concretely:
+ *  - .z-textbox/.z-decimalbox/.z-intbox/.z-longbox/.z-doublebox/
+ *    .z-datebox-input already get font-size:11px and padding-left:2px
+ *    from an app rule several hundred lines up -- don't redeclare either.
+ *  - .z-bandbox-input already gets font-size:11px from a different app
+ *    rule -- don't redeclare it, but that rule never touches padding, so
+ *    padding still needs restoring in full.
+ *  - .z-combobox-input/.z-timebox-input have no such app override (the
+ *    app rule for this family says ".z-combobox-inp", a typo missing
+ *    "ut" that never matches the real .z-combobox-input class), so they
+ *    fall through to Breeze's font-size unless fixed here. */
+.z-textbox,
+.z-decimalbox,
+.z-intbox,
+.z-longbox,
+.z-doublebox {
+    height: 24px;
+    padding-top: 4px;
+    padding-right: 5px;
+    padding-bottom: 3px;
+}
+
+.z-datebox-input {
+    height: 24px;
+    padding-top: 4px;
+    padding-right: 5px;
+    padding-bottom: 4px;
+}
+
+.z-bandbox-input {
+    height: 24px;
+    padding: 4px 5px;
+}
+
+.z-combobox-input,
+.z-timebox-input {
+    height: 24px;
+    font-size: 12px;
+    padding: 4px 5px;
+}
+
+.z-combobox,
+.z-bandbox,
+.z-datebox,
+.z-timebox {
+    height: 24px;
+}
+
+/* Breeze's default grid/list header is a solid saturated blue (#0093f9)
+ * with white text. Restoring Sapphire's pale gradient + navy text so
+ * tables read as data (light) rather than as a heavy UI chrome band. */
+.z-listheader,
+.z-column,
+.z-treecol {
+    background: #e7f6fd;
+    background: linear-gradient(to bottom, #e7f6fd 0%, #c6e9fa 100%);
+    border-left: 1px solid #8fb9d0;
+    border-bottom: 1px solid #8fb9d0;
+}
+
+/* .z-grid-header-border is a separate, empty divider <div> both themes
+ * insert between the grid's header row and its first data row (not
+ * part of any .z-column/.z-listheader cell above). Sapphire colors it
+ * the same muted #8fb9d0 as every other grid/table border; Breeze uses
+ * a much more saturated accent blue (#0064ed), e.g. visible as a
+ * conspicuous bright line under the header on Cost > Timesheets
+ * Templates and any other sortable grid. */
+.z-grid-header-border {
+    border-bottom-color: #8fb9d0;
+}
+
+.z-listheader-content,
+.z-listheader-sorticon,
+.z-listheader-sorticon i,
+.z-column-content,
+.z-column-sorticon,
+.z-column-sorticon i,
+.z-treecol-content,
+.z-treecol-sorticon,
+.z-treecol-sorticon i {
+    color: #00547a;
+}
+
+/* Same Sapphire source (font-family:Arial,Sans-serif;font-size:12px;...)
+ * also sets font-size:12px and line-height:24px for these three
+ * header-content classes, vs Breeze's font-size:16px/line-height:1.3em.
+ * Data cells (.z-listcell-content etc.) already have their own
+ * pre-existing 11px override elsewhere and don't need this. Note:
+ * .z-column-content itself also has such a pre-existing, higher-specificity
+ * app override (div.z-column-content{font-size:11px}, near the top of
+ * this file) that already wins over the font-size:12px set here whenever
+ * the element is a literal <div> -- which it normally is. Harmless
+ * (the override was only ever redundant, never wrong), left as-is rather
+ * than removed to keep this rule's three classes symmetric. */
+.z-listheader-content,
+.z-column-content,
+.z-treecol-content {
+    font-size: 12px;
+    line-height: 24px;
+    padding: 4px 5px 3px;
+}
+
+/* Sapphire's tree.css.dsp base rule for .z-treecell-content (tree data
+ * rows, as opposed to .z-treecol-content headers just above) matches that
+ * font-size:12px, but is then narrowed further by a second, later rule
+ * scoped to .z-treecell-content alone: padding:4px 2px; line-height:14px
+ * -- much tighter than the header's line-height:24px, and unlike
+ * .z-listcell-content/.z-column-content this class was never covered by
+ * this app's own legacy font-size:11px override (div.z-column-content,
+ * ...,div.z-listcell-content{...} near the top of this file), so nothing
+ * restored it. Breeze's own default here is font-size:16px/padding:12px
+ * 16px/line-height:16px -- on pages like Resources > Calendars this both
+ * inflated row height a lot and, combined with the icon-button width fix
+ * below, was the main reason the fixed-width "Operations" column's icons
+ * no longer fit on one line and wrapped into two overlapping rows. */
+.z-treecell-content {
+    font-size: 12px;
+    padding: 4px 2px;
+    line-height: 14px;
+}
+
+/* Same Sapphire grid.css.dsp rule that covers .z-column-content also
+ * covers .z-row-content (a table data row's cell content, as opposed to
+ * its header) with the same font-size:12px/line-height:24px, but a
+ * plain padding:4px 5px (no bold, no reduced 3px bottom -- that specific
+ * tweak is column-content/header-only in the source). Font-size isn't
+ * set here for the same reason as .z-column-content above: an existing
+ * higher-specificity app rule (div.z-row-content{font-size:11px})
+ * already governs it correctly. */
+.z-row-content {
+    line-height: 24px;
+    padding: 4px 5px;
+}
+
+/* Breeze's .z-column sets position:relative on the header <td> itself,
+ * but Sapphire additionally has .z-column .z-column-content{position:
+ * relative} for the inner content <div> specifically. This app relies on
+ * that inner position:relative for .timetrackergap .z-column-content{
+ * top:-7px} (nudging date/day numbers up within their cell) to have any
+ * effect -- without it, top is simply ignored on a statically positioned
+ * element, and the numbers render too low in the gantt timeline header. */
+.z-column .z-column-content {
+    position: relative;
+}
+
+/* Breeze's base menu/tab widgets assume a spacious modern UI:
+ *  - .z-menu-text,.z-menuitem-text share one rule at font-size:18px; our
+ *    earlier fix only covered .z-menu-text (top nav), leaving dropdown
+ *    submenu items (.z-menuitem-text) oversized.
+ *  - .z-tab is font-size:18px/min-height:48px/padding:10px 16px, vs
+ *    Sapphire's font-size:12px/line-height:30px/padding-top:1px. That's
+ *    also why the narrow vertical tab strip in the scheduling-graphics
+ *    panel (forced to width:60px above) clipped/garbled its labels —
+ *    Breeze's larger text simply didn't fit the column Sapphire's did. */
+.z-menuitem-text {
+    font-size: 11px;
+}
+
+.z-tab {
+    font-size: 12px;
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    padding-top: 1px;
+    line-height: 30px;
+    border: 1px solid #8fb9d0;
+    border-width: 1px 1px 0 1px;
+    border-radius: 4px 4px 0 0;
+    background: #e7f6fd;
+    background: linear-gradient(to bottom, #e7f6fd 0%, #c6e9fa 100%);
+}
+
+/* This app's own pre-existing rule (.z-tabpanel,.z-tabbox-ver
+ * .z-tabpanels{padding:5px;border-bottom:1px solid #7EAAC6} above)
+ * already wins over Breeze for the bottom edge, but never set
+ * border-top/left/right, so Breeze's own .z-tabpanel{border-top:1px
+ * solid #d9d9d9} was left unopposed (a top border neither Sapphire
+ * -- whose .z-tabpanel is border:1px solid #8fb9d0;border-top:0 --
+ * nor this app's own rule intended), and left/right were plain
+ * missing. Zero the Breeze top border and add left/right using the
+ * same shade this app's own rule already uses for the bottom edge. */
+.z-tabpanel {
+    border-top: 0;
+    border-left: 1px solid #7EAAC6;
+    border-right: 1px solid #7EAAC6;
+}
+
+/* Breeze's .z-tabbox (the outer wrapper around .z-tabs + .z-tabpanels)
+ * adds its own border:1px solid #d9d9d9, border-radius:4px and
+ * background:#fff -- Sapphire's .z-tabbox rule is only
+ * {position:relative;overflow:hidden}, no border/radius/background at
+ * all. That extra Breeze border is what showed up as a stray gray line
+ * above (and around) the tab row. */
+.z-tabbox {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+/* Breeze's .z-tabs-content is display:flex with min-height:48px, and
+ * flexbox defaults align-items to stretch -- so every .z-tab (a flex
+ * item) gets stretched to fill that 48px regardless of its own content
+ * height, no matter what height/min-height/padding is set directly on
+ * .z-tab itself (confirmed: none of those fixes above budged the
+ * rendered height). Sapphire's .z-tabs-content is display:table, which
+ * has no such stretching behavior. Overriding align-items here is a
+ * smaller change than replicating table layout and gets the same
+ * result: each tab sized to its own (now-correct, ~32px) content
+ * height instead of being force-stretched. */
+.z-tabs-content {
+    align-items: flex-start;
+    border-bottom: 1px solid #8fb9d0;
+    min-height: 0;
+}
+
+/* .z-tabs (the outer wrapper around .z-tabs-content) has its own
+ * separate Breeze min-height:48px too -- fixing .z-tabs-content alone
+ * left this one still forcing the same empty gap below the now-correct
+ * ~32px tabs. */
+.z-tabs {
+    min-height: 0;
+}
+
+/* Inactive tabs should not change color on hover (a deliberate choice
+ * for this app, not a Sapphire restoration -- Sapphire's own
+ * .z-tab:hover actually does shift to a lighter blue gradient). Winning
+ * over Breeze's own .z-tab:hover{background:#fff} needs the same
+ * specificity re-declared with the tab's normal (non-hover) background. */
+.z-tab:not(.z-tab-selected):hover {
+    background: #e7f6fd;
+    background: linear-gradient(to bottom, #e7f6fd 0%, #c6e9fa 100%);
+}
+
+/* Breeze's tabs use a flat "underline" style: no background, no border
+ * except a 2px bottom accent on the selected tab, no rounded corners --
+ * a completely different visual language from Sapphire's boxed "folder
+ * tab" look (pale blue gradient, border on 3 sides, rounded top corners,
+ * selected tab turning white to blend into the panel below it). Restored
+ * above/here rather than patched piecemeal since every property differs. */
+.z-tab-selected {
+    background: #fff;
+    box-shadow: 0 1px 0 #fff;
+}
+
+/* Breeze's native <select> mold (.z-select, used e.g. by "Show progress")
+ * is font-size:16px vs Sapphire's 12px. */
+.z-select {
+    font-size: 12px;
+}
+
+/* Breeze's base .z-button box (font-size:16px, padding:8px 16px, border:2px)
+ * is much larger than Sapphire's (font-size:12px, padding:3px 12px, border:1px).
+ * Several icon-button groups in this app (.icono, .planner-command, etc.) use
+ * a negative margin (e.g. .icono{margin:-8px}) to pack same-size buttons
+ * edge-to-edge with no gap -- a trick calibrated against Sapphire's compact
+ * button box. Breeze's larger box breaks that math and makes adjacent
+ * buttons visibly overlap.
+ *
+ * Deliberately NOT setting font-size or horizontal padding here:
+ *  - font-size: this app already has its own global override
+ *    (.z-button{font-size:10px}, near the top of this file) that's more
+ *    specific to its intent than Sapphire's theme-level 12px default.
+ *    Setting font-size again down here, at equal selector specificity but
+ *    later in the file, would silently win and bump every button to 12px
+ *    -- exactly the bug this comment is now here to prevent a repeat of.
+ *  - horizontal padding: every icon-button group in this app (.icono,
+ *    .toolbar-box .z-button, .global-action, ...) already sets its own
+ *    left/right padding for its specific layout, and for the same
+ *    equal-specificity/source-order reason, setting it here would
+ *    silently override those more specific paddings instead of restoring
+ *    Sapphire's sizing.
+ *
+ * DOES set background/color/border-color here, unlike the properties
+ * above: Sapphire's base .z-button is a neutral light gray/white
+ * gradient with black text and a gray border (no theme ever used blue
+ * for plain buttons); Breeze's base is color:#fff on background-color:
+ * #0093f9 (blue), assuming every button is a prominent call-to-action.
+ * Icon-only button groups with no background of their own (.icono,
+ * .planner-command, .planner-icon, the >>/<< pager buttons, ...) were
+ * inheriting that Breeze blue by default. Buttons that already set their
+ * own background (.add-button/.global-action's pale green, etc.) have
+ * higher-specificity two-class selectors and are unaffected. */
+.z-button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-width: 1px;
+    line-height: 14px;
+    box-shadow: none;
+    color: #000;
+    border-color: #a9a9a9;
+    background: #fefefe;
+    background: linear-gradient(to bottom, #fefefe 0%, #eeeeee 100%);
+}
+
+/* Breeze's own .z-button:focus{border-color:#ffa516} is a modern
+ * accessibility-style amber focus ring, replacing Sapphire's
+ * .z-button:focus{border-color:#00b9ff;...} (a blue border, verified
+ * against the reference deployment). This is a generic, theme-level
+ * rule covering every button, not just pale ones like .add-button --
+ * clicking any button (which triggers :focus, easy to run into just
+ * from ordinary mouse interaction, not only keyboard tabbing) shows the
+ * wrong amber border regardless of the button's own background-color
+ * fix. Matching Breeze's own bare .z-button:focus selector so this
+ * only needs to match its specificity, not outrank it. */
+.z-button:focus {
+    border-color: #00b9ff;
+}
+
+/* Same issue, hover state: Breeze's own .z-button:hover{border-color:
+ * transparent} makes the button's border disappear on mouseover,
+ * replacing Sapphire's .z-button:hover{border-color:#8fb9d0;...} (the
+ * same blue-gray used throughout this theme for tabs/panels/etc, kept
+ * visible rather than hidden). Generic, theme-level rule covering
+ * every button, not just .add-button. */
+.z-button:hover {
+    border-color: #8fb9d0;
+}
+
+/* Sapphire's panel.css.dsp sets .z-panel-header{font-size:12px;color:
+ * #00547a;padding:3px 0 5px 0;line-height:24px;background:#b6e1ea}.
+ * Breeze's own is font-size:18px/padding:16px (all sides)/line-height:
+ * 24px/color:rgba(0,0,0,0.57), no background -- the 16px+24px+16px=56px
+ * total is exactly why .z-panel-head measured 56px tall instead of
+ * Sapphire's 3px+24px+5px=32px (this header IS the head's only child
+ * and drives its height), e.g. Quality Forms > [a form] > "Quality
+ * form items list" panel header. */
+.z-panel-header {
+    font-size: 12px;
+    color: #00547a;
+    padding: 3px 0 5px 0;
+    line-height: 24px;
+    background: #b6e1ea;
+}
+
+/* Sapphire's .z-panel itself (the outermost wrapper, one level above
+ * .z-panel-head) is bare -- {overflow:hidden;zoom:1}, no border/
+ * background/radius of its own at all. The "frame" look instead comes
+ * entirely from .z-panel-head (top-rounded border, fixed above) and
+ * .z-panel-body (bottom-rounded border) stacking together; for
+ * .z-panel-noframe specifically, Sapphire strips the body's border
+ * too (matched separately below), leaving only the head's frame
+ * visible. Breeze's own .z-panel{border:1px solid #a8a8a8;background:
+ * #f9fcff;border-radius:4px} puts a SECOND, redundant border/
+ * background/radius directly on this outer wrapper -- with no
+ * Sapphire equivalent to strip it back off for .z-panel-noframe (or
+ * any panel), it was left showing on every panel regardless of frame
+ * style, most visibly as an unwanted gray border around noframe
+ * panels that should have none. */
+.z-panel {
+    border: 0;
+    background: transparent;
+    border-radius: 0;
+}
+
+/* .z-panel-head (the outer header container -- distinct from
+ * .z-panel-header just above, which is the inner text run) carries
+ * ALL of the header's visual chrome in Sapphire: border:1px solid
+ * #8fb9d0, border-radius:4px 4px 0 0 (rounding only the top corners,
+ * to match .z-panel's own rounded frame), padding:5px 5px 1px, the
+ * same background:#b6e1ea as .z-panel-header (redundant/layered by
+ * design, both wrapper and content paint it), and an inset white
+ * box-shadow along the top edge for a subtle bevel/highlight. Breeze's
+ * own .z-panel-head{overflow:hidden} carries none of this -- only
+ * box-sizing:border-box comes from an unrelated global reset -- so the
+ * header rendered as a flat, borderless, unpadded strip. */
+.z-panel-head {
+    border: 1px solid #8fb9d0;
+    border-radius: 4px 4px 0 0;
+    padding: 5px 5px 1px;
+    background: #b6e1ea;
+    box-shadow: inset 0 1px 1px #fff;
+}
+
+/* Sapphire also has a higher-specificity .z-panel-noframe .z-panel-
+ * body{padding:0;...} (a plain-content panel variant with no visible
+ * frame/border, used by the Quality Forms items-list panel above) that
+ * beats this app's own ancient, unscoped .z-panel-body{padding:10px}
+ * rule (dates to 2011, in navalpro_zk.css -- this app's LibrePlan
+ * ancestor -- long predating both themes). Breeze has NO .z-panel-
+ * noframe styling at all, so nothing here ever opposed that old 10px
+ * rule, and it applied unopposed. Matching Sapphire's exact selector
+ * restores the win. */
+.z-panel-noframe .z-panel-body {
+    padding: 0;
+}
+
+/* Sapphire's .z-panelchildren (the actual content-holding element
+ * inside .z-panel-body) never sets padding at all -- {border:1px solid
+ * #8fb9d0;background:#fff;position:relative;overflow:hidden;zoom:1},
+ * defaulting to 0. Breeze's own adds padding:16px. Matching Sapphire's
+ * plain selector, generic app-wide like the other .z-panel* fixes
+ * above. */
+.z-panelchildren {
+    padding: 0;
+}
+
+/* Breeze's borderlayout splitters (the thin draggable handles between
+ * <west>/<east>/<north>/<south> and <center>) use a flat background-color
+ * (#f9fcff). Sapphire uses a pale blue linear-gradient instead, shared
+ * identically across all four splitter classes. */
+.z-west-splitter,
+.z-east-splitter,
+.z-north-splitter,
+.z-south-splitter {
+    background: linear-gradient(to right, #e2f4fc 0%, #cbeafb 100%);
+}
+
+/* This app's own original .icono rule (margin:-8px; padding:10px 10px;
+ * above) is a deliberate, working design: at padding:10px each icono
+ * button renders 42px wide (1px border + 10px padding + 20px icon +
+ * 10px padding + 1px border), and margin:-8px on ALL sides pulls each
+ * button's mostly-empty outer box 16px into its neighbor's -- verified
+ * pixel-for-pixel against the genuine Sapphire reference deployment,
+ * including its tightest case: Resources > Criteria > [a criterion
+ * type] > Criteria list has FIVE icono buttons (down/up/indent-right/
+ * indent-left/delete) per row in a width:150px Operations column,
+ * measured on the reference as 5*42px overlapped down to exactly 146px
+ * -- fits with 4px to spare, and the 16px overlap never touches the
+ * actual 20px icon graphics (each centered in its own 42px box, so
+ * only ~11px of transparent padding on each side ever overlaps).
+ *
+ * An earlier compat rule here (removed) shrank padding to 6px and
+ * zeroed the horizontal margin instead, misdiagnosed as a button-width
+ * problem. The real cause of that day's symptom (Resources > Calendars
+ * icons wrapping) was .z-treecell-content still carrying Breeze's
+ * oversized padding:12px 16px, fixed separately above (now Sapphire's
+ * 4px 2px). With that actually fixed, this app's original -8px/10px
+ * icono sizing already fits every known case without modification --
+ * the compat rule was not only unnecessary but broke the 5-icon case
+ * above (34px/button * 5 = 170px > 150px, wrapping the 5th button onto
+ * a visually overlapping second line via the still-present -8px
+ * vertical margin). Deleted rather than re-tuned. */
+
+/* That same 16px negative-margin overlap only looks seamless if the
+ * button itself has no opaque background to show a seam with -- and on
+ * the Sapphire reference, .icono's resting background is genuinely
+ * background:none (verified via getComputedStyle). This app's own
+ * .icono rule never set a background at all, relying on Sapphire's
+ * trendy-mold buttons rendering their actual chrome in a nested
+ * <table><tbody> that a separate app rule (.z-button.icono tbody
+ * above) already forces transparent -- so the outer element's
+ * background was always irrelevant under Sapphire. Breeze has no such
+ * tbody structure, so the plain .z-button compat rule's opaque
+ * gray/white gradient background (above, needed for normal buttons)
+ * now paints directly on .icono too, and each 16px-overlapped button
+ * shows a visible rectangular seam over its neighbor's icon.
+ * .icono.z-button (two classes) outranks the plain .z-button rule
+ * regardless of source order. */
+.icono.z-button {
+    background: transparent;
+}
+
+/* Same tbody-transparency trap, different button group: this app's own
+ * .toolbar-box .z-button tbody{background-color:transparent} (above)
+ * only ever neutralized the trendy-mold button's inner <tbody> -- dead
+ * under Breeze, which has no tbody at all -- so the plain .z-button
+ * compat rule's opaque gray/white gradient now paints directly on
+ * these buttons too. Visible e.g. on the "Create New Project" icon
+ * button (sclass "planner-icon", inside a .toolbar-box), which used to
+ * have a transparent background letting the surrounding panel color
+ * show through around the icon image, not a solid white box. */
+.toolbar-box .z-button {
+    background: transparent;
+}
+
+/* The left-hand "perspective" buttons (Projects Planning, Projects
+ * List, Resources Load, ...) are this app's own original design --
+ * .perspective/.perspective-active near the top of this file, dating
+ * well before either theme -- with a deliberate look: inactive =
+ * white background/invisible border/dark blue text (color:#005782),
+ * active = solid blue background (#71B0D4) with white text, hover on
+ * an inactive button just lightens the background (#E6F2F9), text
+ * color unchanged. All of that lived on single-class selectors
+ * (.perspective, .perspective-active), which collide at equal
+ * specificity with this file's own later .z-button compat rules
+ * (color:#000, border-color:#a9a9a9, the gray/white gradient
+ * background, and just above, .toolbar-box .z-button{background:
+ * transparent}) -- and lose, since those compat rules come later in
+ * the file. Result: active button lost its blue fill (transparent,
+ * black text instead of white), inactive buttons gained a visible
+ * gray border they never had, and -- separately -- Breeze's own
+ * .z-button:hover{color:#fff} has no same-or-higher-specificity
+ * app-level hover color rule to lose to, so hovering ANY perspective
+ * button (active or not) turns its text white, unreadable against the
+ * now-transparent/white background. Restoring with .z-button.
+ * perspective/.z-button.perspective-active (two classes, matching the
+ * real element -- outranks every single-class rule above regardless
+ * of order) and adding the hover text-color pin Sapphire never needed
+ * but Breeze does. */
+.z-button.perspective {
+    border: 1px solid #FFFFFF;
+    background-color: #FFFFFF;
+    color: #005782;
+}
+
+.z-button.perspective:hover {
+    background-color: #E6F2F9;
+    color: #005782;
+}
+
+.z-button.perspective-active,
+.z-button.perspective-active:focus,
+.z-button.perspective-active:hover,
+.z-button.perspective-active:active {
+    color: #FFFFFF;
+    background-color: #71B0D4;
+}
+
+.z-button.perspective-active {
+    border: 1px solid #CCCCCC;
+    border-color: #006699 #DFF5FE #DFF5FE #006699;
+}
+
+/* Breeze's own base .z-button:hover sets background-color:#4fb7ff (a
+ * vivid blue), part of a theme-wide assumption that buttons are
+ * prominent call-to-actions. Sapphire's trendy-mold buttons instead
+ * swapped a background-IMAGE on hover, which is why this app's own
+ * .icono:hover rule above only neutralizes background-image, not
+ * background-color -- under Sapphire there was never a background-color
+ * to neutralize. Under Breeze that leaves the vivid blue box showing
+ * through on every hover, making these small icon buttons look much
+ * larger/heavier than Sapphire ever did (where hovering just darkened
+ * the icon itself slightly, no background box at all). */
+.icono:hover {
+    background-color: transparent;
+}
+
+/* Breeze's own .z-grid-odd rule sets background:#fff (removing the
+ * alternating-row tint entirely, a flat-design choice), vs Sapphire's
+ * .z-grid-odd>.z-row-inner,.z-grid-odd>.z-cell{background:#f0faff}.
+ * Neither side of this is an app rule -- it's theme-level on both --
+ * so nothing here was already restoring it. Without the alternating
+ * tint, .z-row-inner's own border-bottom (an unrelated, pre-existing
+ * app rule below, present identically under both themes -- confirmed
+ * against the Sapphire reference deployment) reads as a much more
+ * conspicuous stray line between otherwise uniformly white rows. */
+.z-grid-odd > .z-row-inner,
+.z-grid-odd > .z-cell {
+    background: #f0faff;
+}
+
+/* .planner-command / .planner-icon buttons (the gantt toolbar's
+ * show/hide-labels/progress/reported-hours icons) get a server- or
+ * ZK-JS-computed inline style (e.g. style="width:46px; margin-right:-5px"),
+ * inconsistently -- some of these buttons have it, some don't. It's sized
+ * against Sapphire's narrower button box and, under Breeze, produces a much
+ * wider box (46px) whose negative margin then pulls each button into its
+ * neighbor. Not !important in the inline style, so a !important rule here
+ * can safely neutralize it (width:auto) and let the button size itself
+ * from its padding/border/icon content instead -- which alone comes out
+ * to ~28x25, short of Sapphire's actual ~30.67x30 target. min-width/
+ * min-height restore that floor without reintroducing the inline width's
+ * overlap. */
+.planner-command.z-button,
+.planner-icon.z-button {
+    width: auto !important;
+    min-width: 30px;
+    min-height: 30px;
+    margin-right: 0 !important;
+}
+
+/* Breeze's borderlayout region bodies (the content area of every <north>/
+ * <south>/<west>/<center>/<east>, e.g. the main page content, sidebars,
+ * toolbars) add padding:16px and line-height:16px; Sapphire's had no
+ * padding and line-height:14px. This app's layouts assume children fill
+ * 100% of the region with no inset, so the extra padding shows up as
+ * unexpected spacing/framing throughout the site, and the taller
+ * line-height quietly inflates the height of any unstyled descendant
+ * (e.g. bare <td class="z-column"> cells with no font/line-height of
+ * their own) that inherits it. */
+.z-north-body,
+.z-south-body,
+.z-west-body,
+.z-center-body,
+.z-east-body {
+    padding: 0;
+    line-height: 14px;
+}
+
+/* Breeze's base .z-menu-content is padding:6px 12px (then padding-right
+ * bumped to 32px). The existing padding-right:10px override above already
+ * restores the right side to Sapphire's value, but top/bottom/left still
+ * fall through to Breeze's larger defaults (6px/6px/12px) instead of
+ * Sapphire's (3px/3px/6px), making every top-level menu item taller and
+ * wider than it should be. */
+.z-menu-content {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 6px;
+}
+
+/* Sapphire groups .z-combobox-button/.z-bandbox-button/.z-datebox-button/
+ * .z-timebox-button/.z-spinner-button/.z-doublespinner-button (the little
+ * dropdown/calendar/search trigger button glued to the right edge of these
+ * inputs) under one rule: padding:4px, min-width:24px, height:24px (with
+ * border-box sizing that gives a 14x14 interior). Breeze's equivalent is
+ * padding:6px 8px 0 (later bumped to padding-top:8px), min-width:40px,
+ * height:34px -- a much bigger button that no longer matches the compact
+ * 22-24px inputs restored earlier in this file. */
+.z-combobox-button,
+.z-bandbox-button,
+.z-datebox-button,
+.z-timebox-button,
+.z-spinner-button,
+.z-doublespinner-button {
+    padding: 4px;
+    min-width: 24px;
+    height: 24px;
+}
+
+/* Breeze's base .z-window is padding:16px on every side, and its
+ * .z-window-noborder mold doesn't touch padding at all, so it falls
+ * through to that same 16px. Sapphire's .z-window-noborder mold instead
+ * sets padding:4px 4px 0 (top=4, right=4, bottom=0, left=4). This app
+ * already has its own higher-specificity rule
+ * (.z-window.z-window-noborder.z-window-embedded, further up in this
+ * file) overriding just padding-left to 6px, which still applies
+ * correctly on top of this -- it only needs the other three sides
+ * restored here. */
+.z-window-noborder {
+    padding: 4px 4px 0;
+}
+
+/* Breeze's base .z-window-content is padding:16px, vs Sapphire's 4px for
+ * ordinary windows (e.g. the "Projects List" page's embedded window).
+ * Sapphire uses a taller 17px/15px padding specifically for messagebox
+ * dialogs (.z-messagebox-window.z-window-modal /.z-window-highlighted),
+ * so that distinction is restored too rather than flattening every
+ * window to the same padding. */
+.z-window-content {
+    padding: 4px;
+}
+
+.z-messagebox-window.z-window-modal .z-window-content,
+.z-messagebox-window.z-window-highlighted .z-window-content {
+    padding: 17px;
+    padding-bottom: 15px;
+}
+
+/* Checkboxes have never had any theme or app CSS controlling their
+ * appearance -- Sapphire never shipped a checkbox.css.dsp (confirmed
+ * against the live reference deployment too, not just this repo's
+ * copy), so they've always rendered as bare native
+ * <input type="checkbox">, picking up whatever the OS/browser defaults
+ * to. Attempts this session to pin color/size/checkmark position via
+ * CSS kept fighting the browser's own native rendering (Chrome's
+ * accent-color checkmark doesn't rescale cleanly with width/height, its
+ * vertical centering isn't adjustable, and it draws even alongside a
+ * custom ::after checkmark meant to replace it, producing a double
+ * checkmark). Reverting to a genuinely native, unstyled checkbox:
+ * appearance:auto overrides Breeze's own appearance:none reset (Breeze
+ * sets that regardless of this file, so simply not setting our own
+ * appearance:none isn't enough to get native rendering back). Whatever
+ * this renders as is intentionally OS/browser-dependent. */
+input[type="checkbox"] {
+    -webkit-appearance: checkbox;
+    appearance: auto;
+    width: 14px;
+    height: 14px;
+    accent-color: #2a83b4;
+}
+
+/* Breeze's own radio button (a custom appearance:none widget, not
+ * native) uses its standard accent blue #0093f9 for the checked
+ * border/fill and hover border. Deliberate new styling choice (not a
+ * Sapphire restoration -- Sapphire never shipped radio styling either,
+ * same as checkboxes) to match this app's own active-menu-tab blue
+ * (#2a83b4, .current-section .z-menu-content's background) instead. */
+input[type="radio"]:checked {
+    border-color: #2a83b4;
+}
+
+input[type="radio"]:checked:before {
+    background-color: #2a83b4;
+}
+
+input[type="radio"]:hover {
+    border-color: #2a83b4;
+}
+
+/* Sapphire's window.css.dsp sets .z-label{color:#00547a} (unqualified,
+ * so it applies broadly -- effectively everywhere given this app's
+ * border-layout/window-based page structure). Breeze has no equivalent
+ * override, so labels fall through to its own generic text color
+ * (rgba(0,0,0,0.9), near-black) instead. */
+.z-label {
+    color: #00547a;
+}
+
+/* Sapphire's tabbox.css.dsp sets .z-tab-selected .z-tab-text{font-weight:
+ * bold} (only the selected tab, not the other three) -- Breeze's tab
+ * text has no font-weight override at all, so it renders at its
+ * inherited normal weight instead. */
+.z-tab-selected .z-tab-text {
+    font-weight: bold;
+    color: #00547a;
+}
+
+/* Sapphire's tabbox.css.dsp sets .z-tab-text{padding:4px 12px 2px;
+ * color:#00547a} (all four tabs, not just the selected one). Breeze has
+ * no equivalent padding (falls through to 0) and its own text color
+ * varies by tab state (blue when selected, gray otherwise) instead of
+ * this app's single consistent teal used for labels/headers elsewhere. */
+.z-tab-text {
+    padding: 4px 12px 2px;
+    color: #00547a;
+}
+
+/* Breeze's .z-tab-text:hover{color:rgba(0,0,0,0.9)} (and, for the
+ * selected tab, .z-tab-selected .z-tab-text:hover{color:#0064ed}) both
+ * change the text color on hover. Matching those selectors' specificity
+ * to keep the color unchanged, consistent with disabling the hover
+ * background change on inactive tabs already done above. */
+.z-tab-text:hover {
+    color: #00547a;
+}
+
+.z-tab-selected .z-tab-text:hover {
+    color: #00547a;
+}
+
+/* Sapphire's groupbox.css.dsp sets .z-groupbox>.z-groupbox-header{
+ * font-size:12px;color:#00547a;...}, vs Breeze's own font-size:18px/
+ * color:rgba(0,0,0,0.57) -- both properties inherit down into the
+ * header's nested .z-caption/.z-caption-content (the actual caption
+ * text span), which is why e.g. Materials > "List of materials for all
+ * categories (select one to filter)" rendered much larger and in gray
+ * instead of this app's usual teal. Same selector/specificity as
+ * Breeze's own rule, so this only needs to match it, not outrank it.
+ *
+ * That alone isn't enough, though: Breeze's .z-caption{font-size:18px}
+ * (the actual caption widget, nested inside .z-groupbox-header) sets
+ * font-size directly on itself rather than inheriting the header's, so
+ * it still overrides the fix above regardless of the header's own
+ * computed value. Sapphire's caption.css.dsp has the same bare
+ * .z-caption{font-size:12px;...} selector (color isn't set here --
+ * Sapphire's .z-caption never sets color, only the groupbox-header
+ * fix above does, and nothing on .z-caption itself competes with it). */
+.z-groupbox > .z-groupbox-header {
+    font-size: 12px;
+    color: #00547a;
+}
+
+.z-caption {
+    font-size: 12px;
+}
+
+/* The "3d" groupbox mold (.z-groupbox-3d) is used by this app for a
+ * few button-like clickable/collapsible boxes, e.g. the "More options"
+ * toggle on Cost > Timesheet Lines List's filter bar (sclass
+ * "filter-more-options"). Breeze's own .z-groupbox-3d>.z-groupbox-
+ * header .z-caption{padding:12px 16px;line-height:24px} makes the
+ * caption 12+24+12=48px tall; Sapphire's equivalent selector is
+ * padding:0 (same line-height:24px, so just 24px tall). This app's own
+ * .filter-more-options .z-groupbox-header{height:24px} rule assumed
+ * Sapphire's unpadded 24px caption would fit exactly -- under Breeze
+ * the 48px caption overflowed that fixed 24px box by half its own
+ * height, pushing the "More options" label out below the visible
+ * border instead of centering inside it. Matching Breeze's own
+ * selector so this only needs to match its specificity, not outrank
+ * it. */
+.z-groupbox-3d > .z-groupbox-header .z-caption,
+.z-groupbox-3d > .z-groupbox-header .z-groupbox-title {
+    padding: 0;
+}
+
+/* Same "3d" groupbox mold, the header box itself this time: Sapphire's
+ * .z-groupbox-3d>.z-groupbox-header sets font-weight:bold, border-
+ * bottom:1px solid #8fb9d0, and the same pale blue gradient background
+ * (#e7f6fd to #c6e9fa) used for tabs/column headers elsewhere in this
+ * theme -- reading as a proper pill-shaped button. Breeze's own sets
+ * no background at all (transparent, showing white/page background
+ * through) and a plain gray border, with normal (non-bold) text --
+ * verified against the reference deployment, where "More options"
+ * renders as a solid pale-blue pill, not the flat white/gray box seen
+ * here. */
+.z-groupbox-3d > .z-groupbox-header {
+    font-weight: bold;
+    border-bottom: 1px solid #8fb9d0;
+    background: #e7f6fd;
+    background: linear-gradient(to bottom, #e7f6fd 0%, #c6e9fa 100%);
+}
+
+/* Sapphire's .z-groupbox-content{padding:5px} (uniform), vs Breeze's
+ * own padding:8px 16px 16px. Generic, theme-level -- covers every
+ * groupbox's content area, e.g. both the "Filter timesheet lines by"
+ * box and the hidden panel "More options" expands to reveal. */
+.z-groupbox-content {
+    padding: 5px;
+}
+
+/* Breeze has a SEPARATE, more specific .z-groupbox-3d>.z-groupbox-
+ * content{padding:16px} for the 3d mold specifically (0,2,0 vs the
+ * plain .z-groupbox-content fix above at 0,1,0) -- that specificity
+ * wins over the fix above regardless of file order, so the "More
+ * options" panel (a .z-groupbox-3d) was still showing 16px. Sapphire
+ * has no such override for the 3d variant at all, so its plain
+ * .z-groupbox-content{padding:5px} was never opposed there either.
+ * Matching Breeze's own selector/specificity to close that gap. */
+.z-groupbox-3d > .z-groupbox-content {
+    padding: 5px;
+}
+
+/* Sapphire's input.css.dsp sets .z-errorbox-content{color:#900;
+ * border:1px solid #900;...} (the validation-error popup shown under
+ * an invalid input field) -- Breeze's own is color:#ff4051/border:1px
+ * solid transparent (relying on its background:#ffeaec + border-
+ * radius:4px for the "error" look instead of a solid border). Only
+ * border/color restored here, matching what was asked; Breeze's other
+ * differences (background, padding, border-radius, missing box-shadow)
+ * are left as-is. */
+.z-errorbox-content {
+    color: #900;
+    border: 1px solid #900;
+}
+
+/* Sapphire's combo.css.dsp sets .z-comboitem,.z-comboitem-button,
+ * .z-comboitem a,.z-comboitem a:visited{font-size:12px;...} (the
+ * dropdown option rows in a combobox/bandbox popup) -- Breeze's own is
+ * font-size:16px on the same selectors. Matching Breeze's selectors so
+ * this only needs to match specificity, not outrank it. */
+.z-comboitem,
+.z-comboitem-button,
+.z-comboitem a,
+.z-comboitem a:visited {
+    font-size: 12px;
+}
+
+/* Same Sapphire rule also sets .z-comboitem{padding:3px 2px;...}
+ * (3px top/bottom, 2px left/right), vs Breeze's own padding:4px 8px. */
+.z-comboitem {
+    padding: 2px 2px;
+    min-height: 18px;
+}
+
+/* Sapphire's combo.css.dsp never sets a line-height on .z-comboitem-
+ * text at all -- it just inherits the browser's normal default for a
+ * 12px font. Breeze's own explicitly sets line-height:18px, which is
+ * the actual regression. A prior version of this rule used line-
+ * height:normal to mirror "no rule at all" literally, but a direct
+ * side-by-side line count test (drawing a fixed-size box on screen:
+ * Sapphire fit 7 rows, this fit only 6) showed normal doesn't
+ * reproduce Sapphire's actual compactness -- browser-default line-
+ * height for "normal" depends on which font in the stack actually
+ * gets used, and can render taller than Sapphire's effective result
+ * if a different fallback font is picked. Pinning an explicit,
+ * deterministic value sidesteps that font-dependent variance. */
+.z-comboitem-text {
+    line-height: 13px;
+}
+
+/* Sapphire's combo.css.dsp also covers the popup container itself:
+ * .z-combobox-popup,.z-bandbox-popup,.z-datebox-popup,.z-timebox-
+ * popup{font-size:12px;border:1px solid #8fb9d0;padding:2px;...} --
+ * Breeze's own is font-size:16px/border:1px solid #0093f9/border-
+ * radius:4px/padding:4px 8px. The extra padding alone (4px+4px
+ * vertical vs 2px+2px) eats into how many rows fit in the popup's
+ * available height, compounding the per-row line-height issue above. */
+.z-combobox-popup,
+.z-bandbox-popup,
+.z-datebox-popup,
+.z-timebox-popup {
+    font-size: 12px;
+    border: 1px solid #8fb9d0;
+    border-radius: 0;
+    padding: 2px;
+}
+
+/* Sapphire's a.css.dsp sets .z-a{font-size:12px} only -- no color at
+ * all, letting a plain <a href> fall back to the browser's own native
+ * link color. Breeze's own explicitly sets font-size:16px/color:
+ * #0093f9. Visible e.g. on Configuration > Job Scheduling > Create,
+ * the "click here" link under the cron expression help text (a plain
+ * <a href> with no app-specific sclass, so nothing else styles it).
+ * color:revert (not initial/unset) specifically rolls back to the
+ * user-agent stylesheet's own :link color instead of black (initial)
+ * or the inherited surrounding text color (unset/inherit) -- matching
+ * what "simply never setting color" actually renders as in a browser. */
+.z-a {
+    font-size: 12px;
+    color: revert;
+}
+
+/* Breeze's own icon-font rule is broad: [class^="z-icon-"],[class*="
+ * z-icon-"]{font-family:ZK85Icons,FontAwesome;...}, matching every
+ * .z-icon-* class in the app via an attribute selector (specificity
+ * equivalent to one class). ZK85Icons is tried first and, having its
+ * own glyph at the same codepoint (\f073) as FontAwesome's calendar,
+ * wins over the FontAwesome fallback. Restricting the font stack to
+ * FontAwesome only for the datebox calendar icon specifically (two
+ * classes, higher specificity than the attribute-selector rule, so no
+ * need to touch other .z-icon-* icons). */
+.z-datebox-icon.z-icon-calendar {
+    font-family: FontAwesome;
+    font-size: 14px;
+}
+
+/* Breeze's .z-datebox-button relies on padding+line-height to position
+ * its icon (padding:6px 8px 0, then a later rule overrides just
+ * padding-top to 8px -- an asymmetric 8px top/0 bottom split that
+ * happened to roughly line up with the icon's original font-size:22px
+ * glyph metrics). Shrinking the icon to 14px above leaves it sitting
+ * ~3px below true center against that same asymmetric padding.
+ * Switching the button to flex centering positions the icon relative
+ * to the button's actual box instead of leftover padding math --
+ * robust regardless of icon font-size. inline-flex (not flex) to keep
+ * it sitting inline next to the datebox input as before. */
+.z-datebox-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }

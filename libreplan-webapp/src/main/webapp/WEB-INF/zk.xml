@@ -44,11 +44,6 @@
         <value>com.libreplan.java.zk.components.JFreeChartEngine</value>
     </library-property>
 
-    <library-property>
-        <name>org.zkoss.theme.preferred</name>
-        <value>sapphire</value>
-    </library-property>
-
     <!-- debug settings -->
     <library-property>
   <name>org.zkoss.zk.ui.definition.cache</name>
