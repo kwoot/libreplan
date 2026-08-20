@@ -18,9 +18,34 @@ reactor `clean install`, then the full test suite for both modules: `libreplan-b
 1217/1217 (0 failures, 0 errors, unchanged), `libreplan-webapp` 222 tests / 1 failure (the
 same pre-existing, already-confirmed-unrelated `ResourceServiceTest` failure from Phase 6 —
 nothing new). The 13 "skipped" webapp tests are pre-existing `@Ignore("Only working if you
-have a JIRA server configured")`/Tim-SOAP-server markers, unrelated to this change. `jgrapht-core`
-(0.9.2 → 1.5.3) deliberately **not** touched here — still flagged below as a real 0.x→1.x API
-break needing its own dedicated pass, not a routine bump.
+have a JIRA server configured")`/Tim-SOAP-server markers, unrelated to this change.
+
+**Update (2026-08-19, later same day): `jgrapht-core` 0.9.2 → 1.5.3 is also done.** Turned out
+smaller in scope than the caution below implied — investigated the actual breaking changes
+directly against the real 1.5.3 jar (`javap`, not just changelog reading) before touching
+anything:
+- `org.jgrapht.DirectedGraph` (deprecated since 1.1.0) is gone entirely by 1.5.3 — its methods
+  live on the base `org.jgrapht.Graph` interface now. Every declaration typed as
+  `DirectedGraph<V,E>` became `Graph<V,E>`.
+- `org.jgrapht.alg.CycleDetector` moved package to `org.jgrapht.alg.cycle.CycleDetector` — same
+  constructor shape, just the import changed.
+- `SimpleDirectedGraph`, `DirectedMultigraph` (still constructed via their `Class<? extends E>`
+  constructor), `TopologicalOrderIterator`, and the whole `Graph` interface's core methods
+  (`addVertex`, `addEdge`, `removeVertex`, `removeEdge`, `containsEdge`, `vertexSet`, `edgeSet`,
+  `inDegreeOf`, `outDegreeOf`, `incomingEdgesOf`, `outgoingEdgesOf`, `getEdge`) — all unchanged,
+  confirmed via `javap` diff against the actual 1.5.3 jar.
+
+Usage was confined to exactly the 3 files the table below already named, no test files touch
+jgrapht directly. Mechanically renamed the type in all 3 (`Graph` for `DirectedGraph`,
+`org.jgrapht.alg.cycle.CycleDetector` import) via a precision script that skipped
+`SimpleDirectedGraph`/`DirectedMultigraph` (verified afterward: zero bare `DirectedGraph<` left
+anywhere, `SimpleDirectedGraph`/`DirectedMultigraph` counts unchanged). Full reactor
+`clean install`, then both modules' full test suites — `libreplan-business` 1217/1217,
+`libreplan-webapp` 222/1 (the same pre-existing `ResourceServiceTest` failure, nothing new) — plus
+a live Playwright smoke test (logged in, opened a project's Gantt chart with task dependencies
+rendering via `GanttDiagramGraph`, opened Queue-based Resources Planning which exercises
+`QueuesState`'s graph-building/cycle-detection/topological-sort path) with zero console errors
+and zero server-side exceptions.
 
 ## Methodology
 
@@ -36,7 +61,7 @@ truth for every module's actual resolved version), checked:
 
 | Library | Installed | Latest (checked 2026-08-15) | Gap | Used where |
 |---|---|---|---|---|
-| `org.jgrapht:jgrapht-core` | 0.9.2 | 1.5.3 | ~8 years, **0.x→1.x is a real API break**, not a drop-in bump | `ganttzk/.../data/GanttDiagramGraph.java`, `libreplan-webapp/.../limitingresources/QueuesState.java`, `.../LimitingResourceQueueModel.java` |
+| `org.jgrapht:jgrapht-core` | ~~0.9.2~~ **1.5.3 [DONE, 2026-08-19]** | 1.5.3 | ~8 years, API break was smaller than expected — see update above | `ganttzk/.../data/GanttDiagramGraph.java`, `libreplan-webapp/.../limitingresources/QueuesState.java`, `.../LimitingResourceQueueModel.java` |
 | `org.apache.commons:commons-collections4` | ~~4.1~~ **4.6.0 [DONE, 2026-08-19]** | 4.6.0 | ~9 years | (not individually enumerated here — widely used utility library, standard collections helpers) |
 | `org.quartz-scheduler:quartz` | ~~2.3.2~~ **2.5.2 [DONE, 2026-08-19]** | 2.5.2 | ~5 years | Scheduled jobs (`SchedulerManager`, `JobSchedulerConfiguration`) |
 
@@ -157,10 +182,8 @@ every other phase in this migration used:
 3. **BoneCP → HikariCP** (test-scope only) — contained blast radius (only touches the two
    test Spring configs), but needs its own care since it's a real behavioral swap of the
    connection-pool implementation used by the whole test suite, not just a version bump.
-4. **`jgrapht-core` 0.9.2 → 1.5.x** — treat as its own dedicated piece of work, same rigor as any
-   other cross-major-version library bump this migration has done (Hibernate, Spring, CXF, ZK) —
-   read the changelog for breaking API changes across the 0.x→1.x boundary before touching the
-   three call sites, don't assume it's compatible.
+4. **[DONE, 2026-08-19] `jgrapht-core` 0.9.2 → 1.5.3** — see the update above; smaller than
+   feared, two type renames across three files.
 5. **Cobertura / tomcat-maven-plugin removal** — pure config cleanup, no runtime effect either way
    since neither is bound to an execution today.
 6. **BeanShell, gettext-commons, Joda-Time→java.time, commons-fileupload2 GA wait** — no action
