@@ -3333,6 +3333,50 @@ input[type="radio"]:hover {
     font-size: 14px;
 }
 
+/* Rendered every .z-icon-* glyph (all of them, reference and current app
+ * alike) side by side at matched size/color to isolate what actually
+ * differs (see doc/technical/jdk25-migration -- font comparison done
+ * 2026-08-20): ZK85Icons turns out to be a near pixel-perfect clone of
+ * the reference's real FontAwesome 4.7.0 for almost every glyph used
+ * here (carets, angles, chevrons, the search glass) -- switching font
+ * is not the fix. What actually differs everywhere is color: Breeze
+ * sets these to rgba(0,0,0,.9)/.57/.34 depending on the icon's role
+ * (full/menu/disabled-splitter opacity tiers), while the reference uses
+ * one flat rgb(99,99,99) regardless of role or disabled state. One
+ * universal override covers every icon in the app, calendar included
+ * (the fix above doesn't set color at all, so it inherits this too). */
+[class*="z-icon-"] {
+    color: rgb(99, 99, 99) !important;
+}
+
+/* Breeze also sizes each of these icon roles larger than Sapphire did
+ * (e.g. the combobox/bandbox trigger glyph at 22px here vs 16px on the
+ * reference) -- restoring the reference's own per-role sizes, measured
+ * directly against the reference deployment. The datebox calendar icon
+ * isn't listed here because its size was already fixed above (14px,
+ * already matching the reference). */
+.z-menu-content .z-icon-caret-down { font-size: 16px; }
+.z-menu-content .z-icon-caret-right { font-size: 15px; }
+.z-combobox-button .z-icon-caret-down,
+.z-bandbox-button .z-icon-caret-down { font-size: 16px; }
+.z-bandbox-button .z-icon-search { font-size: 14px; }
+.z-north-splitter-button .z-icon-ellipsis-h,
+.z-south-splitter-button .z-icon-ellipsis-h,
+.z-north-splitter-button .z-icon-caret-up,
+.z-south-splitter-button .z-icon-caret-down,
+.z-west-splitter-button .z-icon-ellipsis-v,
+.z-west-splitter-button .z-icon-caret-left { font-size: 10px; }
+.z-north-collapsed .z-icon-angle-double-down,
+.z-west-collapsed .z-icon-angle-double-right,
+.z-south-collapsed .z-icon-angle-double-up,
+.z-south-header .z-icon-angle-double-down { font-size: 14px; }
+.z-calendar-icon.z-calendar-left .z-icon-angle-left,
+.z-calendar-icon.z-calendar-right .z-icon-angle-right { font-size: 20px; }
+.z-timebox-icon.z-timebox-up .z-icon-angle-up,
+.z-timebox-icon.z-timebox-down .z-icon-angle-down { font-size: 14px; }
+.z-tabbox-icon.z-tabbox-up-scroll .z-icon-chevron-up,
+.z-tabbox-icon.z-tabbox-down-scroll .z-icon-chevron-down { font-size: 12px; }
+
 /* Breeze's .z-datebox-button relies on padding+line-height to position
  * its icon (padding:6px 8px 0, then a later rule overrides just
  * padding-top to 8px -- an asymmetric 8px top/0 bottom split that
@@ -3342,8 +3386,17 @@ input[type="radio"]:hover {
  * Switching the button to flex centering positions the icon relative
  * to the button's actual box instead of leftover padding math --
  * robust regardless of icon font-size. inline-flex (not flex) to keep
- * it sitting inline next to the datebox input as before. */
-.z-datebox-button {
+ * it sitting inline next to the datebox input as before.
+ *
+ * .z-combobox-button/.z-bandbox-button have the same root cause even
+ * though nothing here shrank their icon: the shared button-size rule
+ * further up this file (padding:4px, width/height:24px) never set
+ * line-height, so it falls through to Breeze's own 16px default, which
+ * doesn't match the icon's own 14px line-height -- 2-3px too low,
+ * measured against the reference. Same flex fix, same reasoning. */
+.z-datebox-button,
+.z-combobox-button,
+.z-bandbox-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
