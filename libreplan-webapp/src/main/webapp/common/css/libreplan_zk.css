@@ -3012,11 +3012,20 @@ textarea {
  * restores the right side to Sapphire's value, but top/bottom/left still
  * fall through to Breeze's larger defaults (6px/6px/12px) instead of
  * Sapphire's (3px/3px/6px), making every top-level menu item taller and
- * wider than it should be. */
+ * wider than it should be. Breeze's line-height (18px) is also taller than
+ * Sapphire's (12px) -- padding alone being fixed still left the top menu
+ * bar (Planning/Resources/Cost/...) and every dropdown noticeably taller
+ * than the reference, since content-box height is padding + line-height.
+ * Breeze also sets min-height:34px directly on this element (Sapphire has
+ * none, min-height:0) -- restoring padding/line-height alone has zero
+ * visible effect until that floor is removed too, since it was overriding
+ * the smaller natural content height the whole time. */
 .z-menu-content {
     padding-top: 3px;
     padding-bottom: 3px;
     padding-left: 6px;
+    line-height: 12px;
+    min-height: 0;
 }
 
 /* Sapphire groups .z-combobox-button/.z-bandbox-button/.z-datebox-button/
