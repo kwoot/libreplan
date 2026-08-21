@@ -1100,6 +1100,9 @@ public class TaskElementAdapter {
 
                     if ( taskElement.isTask() ) {
                         OrderElement orderElement = getSafeOrderElement();
+                        if ( orderElement == null ) {
+                            return ProjectStatusEnum.AS_PLANNED;
+                        }
                         orderElementDAO.reattach(orderElement);
                         return getProjectHourStatus(orderElement);
                     }
@@ -1116,6 +1119,9 @@ public class TaskElementAdapter {
                         }
 
                         OrderElement orderElement = getSafeOrderElement(child);
+                        if ( orderElement == null ) {
+                            continue;
+                        }
                         orderElementDAO.reattach(orderElement);
                         status = getProjectHourStatus(orderElement);
 
@@ -1184,6 +1190,9 @@ public class TaskElementAdapter {
 
                 if ( taskElement.isTask() ) {
                     OrderElement orderElement = getSafeOrderElement();
+                    if ( orderElement == null ) {
+                        return ProjectStatusEnum.AS_PLANNED;
+                    }
                     orderElementDAO.reattach(orderElement);
                     return getProjectBudgetStatus(orderElement);
                 }
@@ -1200,6 +1209,9 @@ public class TaskElementAdapter {
                     }
 
                     OrderElement orderElement = getSafeOrderElement(child);
+                    if ( orderElement == null ) {
+                        continue;
+                    }
                     orderElementDAO.reattach(orderElement);
                     status = getProjectBudgetStatus(orderElement);
 
@@ -1273,6 +1285,9 @@ public class TaskElementAdapter {
                 }
                 return transactionService.runOnReadOnlyTransaction(() -> {
                     OrderElement orderElement = getSafeOrderElement();
+                    if ( orderElement == null ) {
+                        return null;
+                    }
                     orderElementDAO.reattach(orderElement);
                     return buildHoursTooltipText(orderElement);
                 });
@@ -1285,6 +1300,9 @@ public class TaskElementAdapter {
                 }
                 return transactionService.runOnReadOnlyTransaction(() -> {
                     OrderElement orderElement = getSafeOrderElement();
+                    if ( orderElement == null ) {
+                        return null;
+                    }
                     orderElementDAO.reattach(orderElement);
                     return buildBudgetTooltipText(orderElement);
                 });

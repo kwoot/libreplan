@@ -63,6 +63,7 @@ import org.libreplan.business.orders.entities.OrderSyncInfo;
 import org.libreplan.business.orders.entities.OrderElement;
 import org.libreplan.business.orders.entities.OrderLineGroup;
 import org.libreplan.business.orders.entities.OrderStatusEnum;
+import org.libreplan.business.orders.entities.SchedulingDataForVersion;
 import org.libreplan.business.planner.entities.PositionConstraintType;
 import org.libreplan.business.planner.entities.TaskElement;
 import org.libreplan.business.qualityforms.daos.IQualityFormDAO;
@@ -641,7 +642,7 @@ public class OrderModel extends IntegrationEntityModel implements IOrderModel {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public OrderElementTreeModel getOrderElementsFilteredByPredicate(IPredicate predicate) {
         // Iterate through orderElements from order
         List<OrderElement> orderElements = new ArrayList<>();
@@ -649,6 +650,8 @@ public class OrderModel extends IntegrationEntityModel implements IOrderModel {
         for (OrderElement orderElement : planningState.getOrder().getAllOrderElements()) {
             if (!orderElement.isNewObject()) {
                 reattachOrderElement(orderElement);
+            } else {
+                stopPosingAsTransientOnceActuallyPersisted(orderElement);
             }
 
             // Accepts predicate, add it to list of orderElements
@@ -666,6 +669,38 @@ public class OrderModel extends IntegrationEntityModel implements IOrderModel {
 
     private void reattachOrderElement(OrderElement orderElement) {
         orderElementDAO.reattach(orderElement);
+    }
+
+    /**
+     * A sibling's reattach() above can cascade (cascade=ALL on the parent's children
+     * collection) into this still-"new" element - and the SchedulingDataForVersion and
+     * HoursGroup created together with it by a plain WBS "Add task" - and implicitly save
+     * them, handing out a real generated id right here even though nothing ever called
+     * orderElementDAO.save() on them directly. Once that's happened, getVersion() must stop
+     * lying (it returns null while isNewObject() is true - see BaseEntity.getVersion()), or
+     * the NEXT time this same long-lived object is reattached (e.g. adding another task
+     * afterwards) Hibernate can no longer tell transient from detached (non-null id, null
+     * version) and throws PropertyValueException: "uninitialized version value". Mirrors the
+     * same clean-up SaveCommandBuilder.dontPoseAsTransientObjectAnymore() already does for the
+     * explicit whole-project Save, just scoped to what this incremental reload can itself have
+     * implicitly persisted.
+     */
+    private void stopPosingAsTransientOnceActuallyPersisted(OrderElement orderElement) {
+        if (orderElement.isNewObject() && orderElement.getId() != null) {
+            orderElement.dontPoseAsTransientObjectAnymore();
+        }
+
+        for (SchedulingDataForVersion schedulingData : orderElement.getSchedulingDataForVersionFromBottomToTop()) {
+            if (schedulingData.isNewObject() && schedulingData.getId() != null) {
+                schedulingData.dontPoseAsTransientObjectAnymore();
+            }
+        }
+
+        for (HoursGroup hoursGroup : orderElement.getHoursGroups()) {
+            if (hoursGroup.isNewObject() && hoursGroup.getId() != null) {
+                hoursGroup.dontPoseAsTransientObjectAnymore();
+            }
+        }
     }
 
     @Override

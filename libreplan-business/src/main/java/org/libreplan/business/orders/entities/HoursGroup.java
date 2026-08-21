@@ -75,7 +75,11 @@ public class HoursGroup extends IntegrationEntity implements Cloneable, ICriteri
     private HoursGroup(OrderLine parentOrderLine) {
         this.parentOrderLine = parentOrderLine;
         String code = parentOrderLine.getCode();
-        this.setCode(code != null ? code : "");
+        // A blank placeholder (parentOrderLine has no code yet, e.g. a brand new task added
+        // via the WBS quick-add) would collide with any other not-yet-coded HoursGroup under
+        // hours_group's UNIQUE constraint on code the moment more than one gets flushed - see
+        // the UUID fallback HoursGroup.copyFrom() already uses for the same reason.
+        this.setCode(code != null ? code : UUID.randomUUID().toString());
         this.setOrderLineTemplate(null);
     }
 
