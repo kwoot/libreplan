@@ -60,8 +60,18 @@
                     <vbox>
                         <label value="${i18n:_t('Assign Label')}" />
                         <hbox sclass="margin-border">
-                            <bandboxSearch id="bdLabels" finder="LabelBandboxFinder"
-                                           model="@load(assignedLabelsController.allLabels)" />
+                            <!--
+                              No model= here on purpose: LabelBandboxFinder.getAll() already
+                              supplies the full label list on its own. Binding model= to
+                              assignedLabelsController.allLabels used to evaluate this binder pass
+                              before openWindow() ever runs (orderModel still null at that point),
+                              pushing an empty list into BandboxSearch.setModel() - which also
+                              calls finder.setModel(...), permanently overwriting
+                              LabelBandboxFinder's cached model (it's a Spring singleton, so this
+                              corrupted state was shared across every session, not just this page)
+                              with that empty list before the popup was ever opened.
+                            -->
+                            <bandboxSearch id="bdLabels" finder="LabelBandboxFinder" />
                             <button label="${i18n:_t('Assign')}" sclass="add-button"
                                     onClick="assignedLabelsController.onAssignLabel()"
                             />
