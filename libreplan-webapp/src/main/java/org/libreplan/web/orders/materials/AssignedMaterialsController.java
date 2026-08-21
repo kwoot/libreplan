@@ -280,9 +280,17 @@ public abstract class AssignedMaterialsController<T, A> extends GenericForwardCo
         reloadGridMaterials();
     }
 
+    /**
+     * gridMaterials' own model="@load(...)" binding gets its first (empty) value pushed
+     * eagerly during this page's whole-window tab pre-composition, before openWindow()/
+     * initializeEdition() ever runs - same root cause as AssignedLabelsController's
+     * directLabels bug. Util.reloadBindings(gridMaterials) alone never updates the client
+     * after that point, so bypass the binder and set the wrapped ListModel directly, same
+     * as refreshMaterialAssignments() above already does.
+     */
     private void reloadGridMaterials() {
         if ( gridMaterials != null ) {
-            Util.reloadBindings(gridMaterials);
+            gridMaterials.setModel(getAssignedMaterials());
         }
     }
 

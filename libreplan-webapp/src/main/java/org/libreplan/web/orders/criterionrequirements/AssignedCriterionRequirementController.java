@@ -308,8 +308,15 @@ public abstract class AssignedCriterionRequirementController<T, M> extends Gener
         }
     }
 
+    /**
+     * listingRequirements' own model="@load(...)" binding gets its first (empty) value pushed
+     * eagerly during this page's whole-window tab pre-composition, before openWindow()/init()
+     * ever runs - same root cause as AssignedLabelsController's directLabels bug.
+     * Util.reloadBindings(listingRequirements) alone never updates the client after that point,
+     * so bypass the binder and set the wrapped ListModel directly.
+     */
     public void reload() {
-        Util.reloadBindings(listingRequirements);
+        listingRequirements.setModel(getCriterionRequirementWrappersModel());
         Util.reloadBindings(orderElementTotalHours);
         if (isReadOnly()) {
             Util.reloadBindings(hoursGroupsInOrderLineGroup);
