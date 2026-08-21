@@ -101,8 +101,14 @@ public class JobSchedulerController extends BaseCRUDController<JobSchedulerConfi
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        Grid listJobSchedulings = (Grid) listWindow.getFellowIfAny("listJobSchedulings");
-        listJobSchedulings.getModel();
+
+        // BaseCRUDController.doAfterCompose() already calls showListWindow() (which reloads
+        // listWindow's bindings), but that happens before AnnotateBinderInit's own later
+        // page-level pass has created any binder at all, so it's a no-op - same fix as the other
+        // BaseCRUDController subclasses (e.g. AdvanceTypeCRUDController). Redo it here, now that
+        // the binder exists.
+        Util.createBindingsFor(comp);
+        Util.reloadBindings(listWindow);
         initCronExpressionPopup();
     }
 

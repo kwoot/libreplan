@@ -985,6 +985,13 @@ public class OrderCRUDController extends GenericForwardComposer {
     public void goToList() {
         loadComponents();
         showWindow(listWindow);
+        // listing's model="@load(controller.orders)"/rowRenderer="@load(controller.ordersRowRender)"
+        // bindings (_list.zul) get evaluated once, eagerly, well before this method ever runs, the
+        // same way directLabels/gridMaterials/listingRequirements did earlier in this investigation
+        // (see AssignedLabelsController's refreshDirectLabels() comment) - so
+        // Util.reloadBindings(...) above never pushes a further update to this component. Bypass the
+        // binder directly instead, exactly like onApplyFilter()'s showAllOrders() already does.
+        showAllOrders();
     }
 
     private void loadComponents() {
@@ -1504,11 +1511,13 @@ public class OrderCRUDController extends GenericForwardComposer {
 
     private void filterByPredicate(OrderPredicate predicate) {
         List<Order> filterOrders = orderModel.getFilterOrders(predicate);
+        listing.setRowRenderer(getOrdersRowRender());
         listing.setModel(new SimpleListModel<>(filterOrders.toArray()));
         listing.invalidate();
     }
 
     private void showAllOrders() {
+        listing.setRowRenderer(getOrdersRowRender());
         listing.setModel(new SimpleListModel<>(getOrders().toArray()));
         listing.invalidate();
     }

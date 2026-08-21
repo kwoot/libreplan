@@ -283,7 +283,11 @@ public class TaskElementDAOTest {
     @Transactional
     public void afterSavingTheVersionIsIncreased() {
         Task task = createValidTask();
-        assertNull(task.getVersion());
+        // createValidTask() already persists the task internally via
+        // TaskSource.persistTaskSources(), so it already carries a real, Hibernate-assigned id
+        // and version at this point even though isNewObject() is still true - BaseEntity.getVersion()
+        // only masks the version as null while BOTH isNewObject() and getId() are null.
+        assertNotNull(task.getVersion());
         taskElementDAO.save(task);
         task.dontPoseAsTransientObjectAnymore();
         assertNotNull(task.getVersion());
