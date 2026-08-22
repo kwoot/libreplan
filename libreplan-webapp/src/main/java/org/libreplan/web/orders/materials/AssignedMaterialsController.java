@@ -36,6 +36,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.SimpleListModel;
@@ -201,7 +202,7 @@ public abstract class AssignedMaterialsController<T, A> extends GenericForwardCo
         final String text = txtSearchMaterial.getValue();
         final MaterialCategory materialCategory = getSelectedCategory(allCategoriesTree);
         getModel().searchMaterials(text, materialCategory);
-        Util.reloadBindings(lbFoundMaterials);
+        reloadFoundMaterials();
     }
 
     /**
@@ -297,11 +298,26 @@ public abstract class AssignedMaterialsController<T, A> extends GenericForwardCo
     public void clearSelectionAllCategoriesTree() {
         allCategoriesTree.clearSelection();
         retrieveAllMaterials();
-        Util.reloadBindings(lbFoundMaterials);
+        reloadFoundMaterials();
     }
 
     private void retrieveAllMaterials() {
         getModel().searchMaterials("", null);
+    }
+
+    /**
+     * Same root cause and fix as {@link #reloadGridMaterials()}: lbFoundMaterials' own
+     * model="@load(...)" binding gets its binder set up during this window's whole-tree
+     * pre-composition, before any material search has actually run, and in the task-level
+     * (modal window) case Util.reloadBindings(lbFoundMaterials) afterwards is a silent no-op -
+     * same "AnnotateBinderInit only creates/reloads what existed at that moment" bug class.
+     * Bypass the binder and set the wrapped ListModel directly, as reloadGridMaterials() above
+     * already does for its sibling grid.
+     */
+    private void reloadFoundMaterials() {
+        if ( lbFoundMaterials != null ) {
+            lbFoundMaterials.setModel(new ListModelList<>(getModel().getMatchingMaterials()));
+        }
     }
 
     /** Should be public! */
@@ -335,7 +351,7 @@ public abstract class AssignedMaterialsController<T, A> extends GenericForwardCo
             Treecell cellName = new Treecell();
             cellName.addEventListener("onClick", event ->  {
                 getModel().searchMaterials("", materialCategory);
-                Util.reloadBindings(lbFoundMaterials);
+                reloadFoundMaterials();
             });
 
             lblName.setParent(cellName);

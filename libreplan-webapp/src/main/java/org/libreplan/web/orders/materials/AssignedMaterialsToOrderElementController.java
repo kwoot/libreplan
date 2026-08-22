@@ -153,6 +153,9 @@ public class AssignedMaterialsToOrderElementController
             row.appendChild(new Label(assignment.getMaterial().getDescription()));
 
             Datebox estimatedAvailability = new Datebox(assignment.getEstimatedAvailability());
+            // ZK's default Datebox width is a fixed, narrow size that doesn't grow with the
+            // "Reception date" column (14% of the grid) - fill the column instead.
+            estimatedAvailability.setWidth("100%");
             estimatedAvailability.addEventListener(Events.ON_CHANGE,
                     event -> assignment.setEstimatedAvailability(estimatedAvailability.getValue()));
             row.appendChild(estimatedAvailability);
