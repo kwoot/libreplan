@@ -630,8 +630,27 @@ public class SaveCommandBuilder {
 
         private void saveTaskSources(TaskElement taskElement) {
             TaskSource taskSource = taskElement.getTaskSource();
-            if (taskSource != null)
+            if (taskSource != null) {
+                // TaskSource.id is a Hibernate "foreign" generator keyed off this taskElement (see
+                // Tasks.hbm.xml/Orders.hbm.xml), so the row referenced by task_source.id must
+                // already exist in task_element before task_source's INSERT runs. Nothing else on
+                // this path explicitly persists a brand-new child taskElement before this point -
+                // saveRootTask() below is the only place that does, and it runs after this whole
+                // loop, cascading from the root via <list cascade="all">.
+                //
+                // save() alone isn't enough: it only queues the INSERT action, it doesn't execute
+                // it, so when several sibling tasks are new in the same save, Hibernate's own
+                // flush-time ordering can still interleave/reorder the queued task_element and
+                // task_source inserts across siblings and get it wrong for later ones - reproduced
+                // live, saving one brand-new project's first two new tasks worked, its third failed
+                // with the same "task_source references a task_element row that doesn't exist yet"
+                // error this whole block is fixing. flush() right after save() forces this specific
+                // task_element's INSERT to actually run before its task_source is even queued,
+                // independent of how many other siblings are pending in the same transaction.
+                taskElementDAO.save(taskElement);
+                taskElementDAO.flush();
                 taskSourceDAO.save(taskSource);
+            }
 
 
             if (taskElement.isLeaf())
