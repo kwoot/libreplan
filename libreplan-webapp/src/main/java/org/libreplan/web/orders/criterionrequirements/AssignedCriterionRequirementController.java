@@ -314,8 +314,14 @@ public abstract class AssignedCriterionRequirementController<T, M> extends Gener
      * ever runs - same root cause as AssignedLabelsController's directLabels bug.
      * Util.reloadBindings(listingRequirements) alone never updates the client after that point,
      * so bypass the binder and set the wrapped ListModel directly.
+     *
+     * rowRenderer="@load(...)" on the same tag is bypassed the same way and for the same reason -
+     * setting only the model without also re-asserting the renderer leaves rows falling back to
+     * their raw toString() in composition contexts where that binding never fired (see
+     * ManageOrderElementAdvancesController's identical editAdvances fix for the confirmed symptom).
      */
     public void reload() {
+        listingRequirements.setRowRenderer(getListingRequirementsRowRenderer());
         listingRequirements.setModel(getCriterionRequirementWrappersModel());
         Util.reloadBindings(orderElementTotalHours);
         if (isReadOnly()) {

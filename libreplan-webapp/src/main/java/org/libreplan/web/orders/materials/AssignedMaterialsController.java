@@ -39,6 +39,7 @@ import org.zkoss.zul.ListitemRenderer;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Row;
+import org.zkoss.zul.RowRenderer;
 import org.zkoss.zul.SimpleListModel;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tree;
@@ -131,6 +132,12 @@ public abstract class AssignedMaterialsController<T, A> extends GenericForwardCo
     public abstract BigDecimal getTotalUnits();
 
     public abstract BigDecimal getTotalPrice();
+
+    /**
+     * Needed by reloadGridMaterials() below to bypass gridMaterials' own
+     * rowRenderer="@load(...)" binding the same way it bypasses its model="@load(...)" binding.
+     */
+    public abstract RowRenderer getMaterialAssignmentsRenderer();
 
     /**
      * On selecting category, refresh {@link MaterialAssignment} associated with selected {@link MaterialCategory}.
@@ -288,9 +295,16 @@ public abstract class AssignedMaterialsController<T, A> extends GenericForwardCo
      * directLabels bug. Util.reloadBindings(gridMaterials) alone never updates the client
      * after that point, so bypass the binder and set the wrapped ListModel directly, same
      * as refreshMaterialAssignments() above already does.
+     *
+     * rowRenderer="@load(...)" on the same tag is bypassed the same way and for the same
+     * reason - setting only the model without also re-asserting the renderer leaves rows
+     * falling back to their raw toString() in composition contexts where that binding never
+     * fired (see ManageOrderElementAdvancesController's identical editAdvances/
+     * editAdvancesMeasurement fix for the confirmed symptom).
      */
     private void reloadGridMaterials() {
         if ( gridMaterials != null ) {
+            gridMaterials.setRowRenderer(getMaterialAssignmentsRenderer());
             gridMaterials.setModel(getAssignedMaterials());
         }
     }
@@ -312,10 +326,12 @@ public abstract class AssignedMaterialsController<T, A> extends GenericForwardCo
      * (modal window) case Util.reloadBindings(lbFoundMaterials) afterwards is a silent no-op -
      * same "AnnotateBinderInit only creates/reloads what existed at that moment" bug class.
      * Bypass the binder and set the wrapped ListModel directly, as reloadGridMaterials() above
-     * already does for its sibling grid.
+     * already does for its sibling grid - including its itemRenderer="@load(...)", for the same
+     * reason gridMaterials' rowRenderer needs the same treatment.
      */
     private void reloadFoundMaterials() {
         if ( lbFoundMaterials != null ) {
+            lbFoundMaterials.setItemRenderer(getMatchingMaterialsRenderer());
             lbFoundMaterials.setModel(new ListModelList<>(getModel().getMatchingMaterials()));
         }
     }

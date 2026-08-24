@@ -184,8 +184,15 @@ public abstract class AssignedLabelsController<T, M> extends GenericForwardCompo
      * again after this happens, even though the underlying data is correct by then). Bypassing
      * the binder for this one incremental update - the same wrapped ListModel getLabelsModel()
      * already builds for the binding - sidesteps whatever state the binder got stuck in.
+     *
+     * rowRenderer="@load(...)" on the same tag needs the identical bypass for the identical
+     * reason - setting only the model without also re-asserting the renderer leaves rows
+     * falling back to their raw toString() in composition contexts where that binding never
+     * fired (see ManageOrderElementAdvancesController's editAdvances fix for the confirmed
+     * live symptom of this exact gap).
      */
     private void refreshDirectLabels() {
+        directLabels.setRowRenderer(getDirectLabelsRenderer());
         directLabels.setModel(getLabelsModel());
     }
 
