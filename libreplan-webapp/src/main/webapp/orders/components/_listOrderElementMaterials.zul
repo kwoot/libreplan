@@ -82,9 +82,10 @@
                         <!-- Categories  -->
                         <panel title="${i18n:_t('Categories')}" border="normal" width="280px">
                             <panelchildren>
-                                <toolbarbutton style="text-decoration: none; margin-top: 5px;"
-                                               label="${i18n:_t('Unselect')}"
-                                               onClick="assignedMaterialsController.clearSelectionAllCategoriesTree()"/>
+                                <button label="${i18n:_t('Unselect')}"
+                                        style="margin-top: 5px"
+                                        sclass="add-button"
+                                        onClick="assignedMaterialsController.clearSelectionAllCategoriesTree()"/>
                                 <tree id="allCategoriesTree"
                                       rows="10"
                                       multiple="false"
