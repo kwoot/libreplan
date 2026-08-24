@@ -3410,3 +3410,100 @@ input[type="radio"]:hover {
     align-items: center;
     justify-content: center;
 }
+
+/* Sapphire's paging buttons (First/Prev/Next/Last on any paged listbox/grid, e.g. Projects
+ * List) had a light blue box - background, border, rounded corners, dimmed further when
+ * disabled - giving each arrow a clear clickable button look. Breeze's own .z-paging-button
+ * defaults to border:none/background-color:transparent plus a plain --zk-text-color-default
+ * icon, i.e. a bare icon glyph with no button chrome at all. Colors below sampled directly
+ * from a still-Sapphire v1.6.1 instance (the version this branch is migrating away from). */
+.z-paging-button {
+    color: #3079B4;
+    background-color: #D6EFFB;
+    border: 1px solid #8FB9D0;
+    border-radius: 3px;
+}
+.z-paging-button:hover {
+    background-color: #C2E4F7;
+}
+.z-paging-button[disabled] {
+    color: var(--zk-disabled-color);
+    background-color: #E4F3FB;
+    border-color: #BAD3E1;
+}
+.z-paging-button[disabled]:hover {
+    background-color: #E4F3FB;
+}
+
+/* Breeze's own button box (min-width/height:26px, padding:4px) and icon
+ * (font-size:var(--zk-paging-icon-size), ~18px) leave essentially zero slack - the icon nearly
+ * fills the whole box - and centering there relies on line-height math rather than true box
+ * centering, so it reads as oversized and slightly off-center. Sapphire's actual button was a
+ * 24x24px box holding a ~12px icon (measured directly from the v1.6.1 screenshot: an 8-9px-tall
+ * glyph centered in a 24px box). Reproduce that, and switch to flex centering for the icon the
+ * same way .z-datebox-button/.z-combobox-button/.z-bandbox-button already do above, so it's
+ * centered regardless of font metrics rather than fought via padding/line-height.
+ *
+ * Breeze's input box is also just too tall (height:36px vs Sapphire's measured 24px) even
+ * though its width (42px) already roughly matches Sapphire's (45px) - only the height needed
+ * fixing. */
+.z-paging-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0;
+}
+/* ZK forces .z-icon-angle-*{font-family:FontAwesome;font-weight:900} - the *new* bundled
+ * FontAwesome 5/6-solid font (fa-solid-900.woff2), not the old FontAwesome 4.7 the reference
+ * (and this app's whole look) was built against. This file already established (see the
+ * .z-datebox-icon.z-icon-calendar fix and its comment further up) that ZK85Icons is a proven
+ * near pixel-perfect clone of that reference FontAwesome 4.7 for exactly these glyphs (carets,
+ * angles, chevrons) - side-by-side comparison confirmed a genuinely different, larger glyph
+ * shape from the new FontAwesome, not just a sizing/centering issue. Force ZK85Icons here too.
+ *
+ * Color: this app has one universal rule further up ([class*="z-icon-"]{color:rgb(99,99,99)
+ * !important}) deliberately applied to every icon site-wide after an earlier investigation
+ * found the reference uses that flat gray for icons in general - but paging is a genuine,
+ * measured exception: the reference's own enabled paging arrows are a saturated blue, and its
+ * disabled ones are a lighter neutral gray, not the site-wide icon gray. Both colors sampled
+ * directly from the v1.6.1 reference screenshot pixel values. Higher specificity than the
+ * universal rule ([class*="z-icon-"].z-paging-icon vs plain [class*="z-icon-"]) so no need to
+ * fight source order. */
+.z-paging .z-paging-icon {
+    font-family: ZK85Icons;
+    font-size: 12px;
+}
+[class*="z-icon-"].z-paging-icon {
+    color: rgb(4, 99, 157) !important;
+}
+.z-paging-button[disabled] [class*="z-icon-"].z-paging-icon {
+    color: rgb(202, 202, 202) !important;
+}
+.z-paging-input {
+    height: 24px;
+    line-height: 22px;
+}
+
+/* Breeze's paging text/info (current-page input, "/ N" total, "[ x - y / z ]" summary) all
+ * default to --zk-paging-color/--zk-text-color-lighter (near-black/light gray) instead of this
+ * app's own established label color - the same #00547a already used site-wide for .z-label
+ * further up (Sapphire's window.css.dsp .z-label rule). Match that here too. */
+.z-paging-input,
+.z-paging-text,
+.z-paging-info {
+    color: #00547a;
+}
+
+/* .z-paging's items (First/Prev/input/Next/Last, each its own <li>) are plain
+ * display:inline list items - each one's vertical position on the line is decided
+ * independently via its own baseline/line-height metrics, not a shared center. That's why the
+ * 24px-tall button and 24px-tall input above, despite being the same height, still don't land
+ * on the same horizontal line (measured ~5px apart). Making the <ul> a flex row with
+ * align-items:center centers every child uniformly regardless of its own box/baseline
+ * quirks - the same reasoning as every other flex-centering fix in this file. */
+.z-paging ul {
+    display: inline-flex;
+    align-items: center;
+}
