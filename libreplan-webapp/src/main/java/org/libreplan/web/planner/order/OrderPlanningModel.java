@@ -524,6 +524,9 @@ public class OrderPlanningModel implements IOrderPlanningModel {
         this.earnedValueChartLegendDatebox =
                 new Datebox(initialDateForIndicatorValues.toDateTimeAtStartOfDay().toDate());
 
+        // No width was ever set here, so the box shrinks to ZK's own default (~90px) - too narrow
+        // to show a full "MMM d, yyyy" date (e.g. "Aug 25, 2026") without clipping.
+        this.earnedValueChartLegendDatebox.setWidth("110px");
         this.earnedValueChartLegendDatebox.setConstraint(dateMustBeInsideVisualizationArea(earnedValueChartFiller));
         dateHbox.appendChild(this.earnedValueChartLegendDatebox);
 

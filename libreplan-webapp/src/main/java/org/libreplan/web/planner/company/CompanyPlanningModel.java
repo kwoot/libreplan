@@ -444,6 +444,9 @@ public class CompanyPlanningModel implements ICompanyPlanningModel {
 
         LocalDate initialDate = earnedValueChartFiller.initialDateForIndicatorValues();
         Datebox datebox = new Datebox(initialDate.toDateTimeAtStartOfDay().toDate());
+        // No width was ever set here, so the box shrinks to ZK's own default (~90px) - too narrow
+        // to show a full "MMM d, yyyy" date (e.g. "Aug 25, 2026") without clipping.
+        datebox.setWidth("110px");
         dateHbox.appendChild(datebox);
 
         appendEventListenerToDateboxIndicators(earnedValueChartFiller, vbox, datebox);
