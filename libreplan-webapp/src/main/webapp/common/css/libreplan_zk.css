@@ -2582,6 +2582,20 @@ textarea {
     background: linear-gradient(to bottom, #e7f6fd 0%, #c6e9fa 100%);
 }
 
+/* The bare .z-tab rule above loses to Breeze's own
+ * .z-tabbox-left>.z-tabs .z-tab / .z-tabbox-right>.z-tabs .z-tab (higher
+ * specificity: 3 selectors vs. 1), which set padding:var(--zk-tabbox-tab-
+ * vertical-padding) (12px 8px) — exactly the widget the project-planning
+ * page's "Graphics" tabbox (Load/Earned value) uses, since ZK renders it
+ * with the -left orientation class even though it displays as a normal
+ * horizontal tab strip. Re-declaring the same padding here at matching
+ * specificity restores Sapphire's near-zero padding for that case too. */
+.z-tabbox-left > .z-tabs .z-tab,
+.z-tabbox-right > .z-tabs .z-tab {
+    padding: 0;
+    padding-top: 1px;
+}
+
 /* This app's own pre-existing rule (.z-tabpanel,.z-tabbox-ver
  * .z-tabpanels{padding:5px;border-bottom:1px solid #7EAAC6} above)
  * already wins over Breeze for the bottom edge, but never set
