@@ -26,6 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.libreplan.business.BusinessGlobalNames.BUSINESS_SPRING_CONFIG_FILE;
 import static org.libreplan.business.test.BusinessGlobalNames.BUSINESS_SPRING_CONFIG_TEST_FILE;
 
@@ -209,6 +210,115 @@ public class OrderDAOTest {
                 return null;
             }
         });
+    }
+
+    /**
+     * Regression test for a production bug (found on the v1.6.1 line, see the
+     * fix-tasksource-1.6.1 branch) where saving a project failed on the very first Save click,
+     * with no user edits, throwing:
+     * <pre>
+     * org.hibernate.NonUniqueObjectException: A different object with the same identifier value
+     * was already associated with the session : [org.libreplan.business.orders.entities.Order#...]
+     * </pre>
+     *
+     * Root cause: {@code SaveCommandBuilder.doTheSaving()} (libreplan-webapp) receives a detached
+     * {@code Order} (carried over from an earlier, already-closed request/session - the normal way
+     * ZK's long-lived planning conversation works) and calls {@code state.synchronizeTrees()} before
+     * ever reattaching it. That triggers a lazy/eager load (via
+     * {@code SchedulingDataForVersion.orderElement}, mapped {@code fetch="join"}) that resolves to a
+     * FRESH, separate {@code Order} instance for the same id, since the original detached instance
+     * was never registered in the new transaction's session. The later
+     * {@code orderDAO.save(order)} call then fails, because Hibernate finds two different Java
+     * objects claiming the same identity in one session.
+     *
+     * The fix ({@code orderDAO.reattach(order)} at the very start of {@code doTheSaving()}) makes
+     * the detached instance the session's canonical managed object first, so any later load of the
+     * same id resolves to it instead of creating a conflicting duplicate.
+     *
+     * This test reproduces the exact Hibernate mechanism directly at the DAO layer - deterministic
+     * and independent of the specific scheduling-tree shape that triggered it in production. Ported
+     * here defensively: the original crash did NOT reproduce under this branch's Hibernate 6 (which
+     * appears to treat the same fetch="join" association as genuinely lazy), but the underlying
+     * detached-order-reattachment gap is identical, so this guards against it regressing here too.
+     */
+    @Test
+    @Transactional
+    public void savingADetachedOrderAfterAnotherInstanceIsAlreadyInTheSessionThrowsNonUniqueObjectException() {
+        final Long orderId = transactionService.runOnAnotherTransaction(new IOnTransaction<Long>() {
+            @Override
+            public Long execute() {
+                Order order = createValidOrder("reattach-regression-" + UUID.randomUUID());
+                orderDAO.save(order);
+                orderDAO.flush();
+                return order.getId();
+            }
+        });
+
+        // A genuinely detached Java object: loaded in its own transaction, whose session has since
+        // closed - exactly like `state.getOrder()` in SaveCommandBuilder, carried over from an
+        // earlier ZK request.
+        final Order detachedOrder = transactionService.runOnAnotherTransaction(new IOnTransaction<Order>() {
+            @Override
+            public Order execute() {
+                try {
+                    return orderDAO.find(orderId);
+                } catch (InstanceNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        // Without reattaching first: once something else has loaded a DIFFERENT instance for the
+        // same id into the session, saving the original detached reference must fail - this is the
+        // original bug, reproduced directly.
+        try {
+            transactionService.runOnAnotherTransaction(new IOnTransaction<Void>() {
+                @Override
+                public Void execute() {
+                    try {
+                        orderDAO.find(orderId); // loads a fresh, different Order instance
+                    } catch (InstanceNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                    orderDAO.save(detachedOrder); // same id, different instance -> must fail
+                    return null;
+                }
+            });
+            fail("Expected saving a stale detached Order after a different instance for the same id "
+                    + "was already loaded in the session to throw a NonUniqueObjectException, "
+                    + "reproducing the original v1.6.1 production bug.");
+        } catch (RuntimeException expected) {
+            assertNonUniqueObjectExceptionSomewhereInCauseChain(expected);
+        }
+
+        // The fix: reattaching first makes the detached instance the session's managed instance, so
+        // a later load of the same id resolves to it instead of conflicting.
+        transactionService.runOnAnotherTransaction(new IOnTransaction<Void>() {
+            @Override
+            public Void execute() {
+                orderDAO.reattach(detachedOrder);
+                try {
+                    orderDAO.find(orderId);
+                } catch (InstanceNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                orderDAO.save(detachedOrder);
+                orderDAO.flush();
+                return null;
+            }
+        });
+    }
+
+    private static void assertNonUniqueObjectExceptionSomewhereInCauseChain(Throwable t) {
+        Throwable current = t;
+        while (current != null) {
+            if (current instanceof org.hibernate.NonUniqueObjectException) {
+                return;
+            }
+            current = current.getCause();
+        }
+        throw new AssertionError(
+                "Expected a NonUniqueObjectException somewhere in the cause chain of: " + t, t);
     }
 
     /*
