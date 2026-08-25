@@ -3600,9 +3600,22 @@ input[type="radio"]:hover {
  *    (extracted from the live reference deployment's own sapphire.jar, same file this app's own
  *    dependency once bundled) into common/img/msgbox/ and pointed these same class names at them -
  *    .z-messagebox-icon is already sized exactly 32x32 (matching these PNGs 1:1), so no size
- *    adjustment is needed. */
+ *    adjustment is needed.
+ *  - The whole dialog's outer edge is blue on Sapphire, not Breeze's plain gray - confirmed via
+ *    computed style on the live reference: it's .z-window-content (not the outer .z-messagebox-window,
+ *    which is gray on both) that carries `border: 1px solid #8fb9d0` - the same blue already used
+ *    for the close button above. That alone isn't enough though: the reference window also has
+ *    `padding: 4px` on .z-messagebox-window itself, which is what makes the blue border visible at
+ *    all - it opens a 4px gap between the outer gray border and the inner blue one so both show as
+ *    two distinct nested boxes. Without that padding (Breeze's default is 0), the blue border sits
+ *    immediately flush against the gray one and is effectively invisible. */
 .z-messagebox-window {
     background-color: #b6e1ea;
+    padding: 4px;
+}
+
+.z-messagebox-window .z-window-content {
+    border: 1px solid #8fb9d0;
 }
 
 .z-messagebox-window .z-window-close {
