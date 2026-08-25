@@ -3119,6 +3119,16 @@ input[type="checkbox"] {
     width: 14px;
     height: 14px;
     accent-color: #2a83b4;
+    /* Follow-up to the appearance:auto fix above: Breeze's own base rule for
+     * this same selector sets font-family:ZK85Icons,FontAwesome (needed for
+     * ITS custom-drawn glyph under appearance:none) and that declaration
+     * isn't cleared just by switching appearance back to auto. Left in
+     * place, it makes Chromium's native checkbox paint corrupt itself into
+     * a doubled/ghosted checkmark (confirmed by isolating this one
+     * property - toggling it alone reproduces/fixes the doubling with
+     * every other property unchanged). Resetting it here removes the
+     * second, garbled render and leaves a single clean native tick. */
+    font-family: inherit;
 }
 
 /* Breeze's own radio button (a custom appearance:none widget, not
