@@ -360,6 +360,19 @@ public class SaveCommandBuilder {
 
         private void doTheSaving() {
             Order order = state.getOrder();
+
+            // `order` can be a detached instance carried over from an earlier, already-closed
+            // request (ZK's planning conversation spans many requests). Reattach it to this
+            // transaction's session before anything else touches the scheduling tree: otherwise
+            // state.synchronizeTrees() (via calculateSynchronizationsNeeded(), walking
+            // TaskSource -> SchedulingDataForVersion -> OrderElement, mapped fetch="join") can load
+            // a second, independent Order instance for the same id, and the later orderDAO.save(order)
+            // below then fails with NonUniqueObjectException - this was a real production bug (first
+            // Save on a project always failed, even with no edits). Reattaching first makes `order`
+            // the session's canonical managed instance, so any later load of the same id resolves to
+            // it instead of conflicting. See OrderDAOTest for a regression test of this mechanism.
+            orderDAO.reattach(order);
+
             generateOrderElementCodes(order);
             createAdvancePercentagesIfRequired(order);
             order.calculateAndSetTotalHours();
