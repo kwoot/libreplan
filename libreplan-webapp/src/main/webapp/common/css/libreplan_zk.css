@@ -331,7 +331,8 @@ h4.message_WARNING {
 .z-label,.z-radio-content,.z-checkbox-content,.z-slider-pp,input.button,input.file,.z-loading,.z-errbox,
 div.z-tree-footer-content, div.z-tree-cell-content, div.z-tree-col-content, .z-listbox,
 div.z-footer-content, div.z-row-content, div.z-group-content, div.z-group-foot-content,
-div.z-column-content, div.z-listfooter-content, div.z-listcell-content, .z-bandbox, .z-bandbox-input {
+div.z-column-content, div.z-listfooter-content, div.z-listcell-content, .z-bandbox, .z-bandbox-input,
+div.z-auxheader-content {
     font-family: Tahoma, Arial, Helvetica, sans-serif;
     font-size: 11px;
     font-weight: normal;
@@ -447,7 +448,8 @@ tr.z-treerow td.z-treerow-focus {
     background-image: none;
 }
 
-div.z-footer-content,div.z-row-content,div.z-group-content,div.z-group-foot-content,div.z-column-content,div.z-tree-col-content {
+div.z-footer-content,div.z-row-content,div.z-group-content,div.z-group-foot-content,div.z-column-content,div.z-tree-col-content,
+div.z-auxheader-content {
     font-family: Tahoma, Arial, Helvetica, sans-serif;
     font-size: 11px;
     font-weight: bold;
@@ -2474,14 +2476,36 @@ textarea {
 
 /* Breeze's default grid/list header is a solid saturated blue (#0093f9)
  * with white text. Restoring Sapphire's pale gradient + navy text so
- * tables read as data (light) rather than as a heavy UI chrome band. */
+ * tables read as data (light) rather than as a heavy UI chrome band.
+ * .z-auxheader/.z-auxhead-bar (a <auxhead> row, used e.g. by the Monte
+ * Carlo critical-path grid to group columns under a merged label) and
+ * .z-columns-bar are separate elements from .z-column but paint the same
+ * raw var(--zk-mesh-title-background-color) blue in grid.css.dsp/
+ * auxhead.css.dsp - included here so every header row in a table looks
+ * the same regardless of which of these it happens to be built from. */
 .z-listheader,
 .z-column,
-.z-treecol {
+.z-treecol,
+.z-auxheader,
+.z-auxhead-bar,
+.z-columns-bar {
     background: #e7f6fd;
     background: linear-gradient(to bottom, #e7f6fd 0%, #c6e9fa 100%);
     border-left: 1px solid #8fb9d0;
     border-bottom: 1px solid #8fb9d0;
+}
+
+/* Belt-and-suspenders for the fix above: redefine the CSS custom property
+ * itself (Breeze's own _default.less sets --zk-mesh-title-background-color:
+ * var(--zk-color-primary) at :root, i.e. the same raw accent blue) so any
+ * other mesh/grid header element that reads this variable directly - not
+ * just the three selectors above - also gets this app's usual pale header
+ * tone instead of ZK's default. Kept as a flat color (the solid midpoint of
+ * the gradient above) rather than a gradient: several rules that consume
+ * this variable (e.g. .z-auxheader) do so via the `background-color`
+ * shorthand, which silently ignores an invalid (gradient) value. */
+:root {
+    --zk-mesh-title-background-color: #d7effc;
 }
 
 /* .z-grid-header-border is a separate, empty divider <div> both themes
@@ -2503,8 +2527,22 @@ textarea {
 .z-column-sorticon i,
 .z-treecol-content,
 .z-treecol-sorticon,
-.z-treecol-sorticon i {
+.z-treecol-sorticon i,
+.z-auxheader-content {
     color: #00547a;
+}
+
+/* Same belt-and-suspenders reasoning as --zk-mesh-title-background-color
+ * above: .z-auxheader-content's own base rule (auxhead.css.dsp) sets
+ * color:var(--zk-mesh-title-color), which Breeze's _default.less defines
+ * as --zk-text-color-default3 (near-white) - fine against Breeze's own
+ * saturated header background, unreadable against the pale one restored
+ * above (e.g. "Optimistic"/"Normal"/"Pessimistic" on the Monte Carlo
+ * critical-path grid). The explicit selector above already fixes every
+ * *known* consumer; this covers any other one that reads the variable
+ * directly. */
+:root {
+    --zk-mesh-title-color: #00547a;
 }
 
 /* Same Sapphire source (font-family:Arial,Sans-serif;font-size:12px;...)
