@@ -2272,16 +2272,30 @@ textarea {
 .z-messagebox-btn {
     background-color: #E4F3D9;
     background-image: none !important;
+    /* Breeze's base .z-button always sets color:#fff, assuming a saturated
+     * background - invisible against this pale green. Confirmed against the
+     * live reference deployment (computed style of its OK button): plain
+     * black, not the app's usual link-blue. */
+    color: #000;
 }
 
 .z-messagebox-button:hover,
 .z-messagebox-btn:hover {
     background: #C3EAAF none;
+    /* Breeze's own .z-button:hover{color:...} matches this button too and
+     * has equal specificity (one class + one pseudo-class each) - without
+     * repeating the override here it wins on source order and the OK label
+     * goes back to unreadable white on this pale background. */
+    color: #000;
 }
 
 .z-messagebox-button:focus,
 .z-messagebox-btn:focus {
     background: #C3EAAF none;
+    /* Same issue as :hover above, but for Breeze's .z-button:focus - this is
+     * the state that actually matters most here, since the messagebox's OK
+     * button is focused by default. */
+    color: #000;
 }
 
 .z-messagebox-button:disabled,
@@ -3530,4 +3544,91 @@ input[type="radio"]:hover {
 .z-paging ul {
     display: inline-flex;
     align-items: center;
+}
+
+/* Breeze's messagebox (the "Information"/"Confirm" popup shown after actions like Save) uses
+ * the same "spacious modern UI" sizing seen elsewhere in this file, but never got restored:
+ *  - .z-messagebox-window is a fixed width:480px (--zk-messagebox-window-width) regardless of
+ *    message length, vs Sapphire's much narrower fixed width:350px (confirmed against the live
+ *    reference deployment).
+ *  - .z-window-header inside it is height:61px/padding:18px 16px/font-size:18px, vs Sapphire's
+ *    compact height:32px/padding:3px 0 5px 6px/font-size:12px.
+ *  - .z-messagebox itself gets a wide fixed width via calc() derived from that same 480px
+ *    window width, and .z-messagebox-viewport wrapping it has overflow:auto + white-space:nowrap.
+ *    Since the wide fixed-width text container ends up a few px wider than the viewport even
+ *    for a one-line message like "Project saved", this reliably shows a bogus, purely
+ *    decorative horizontal scrollbar on every single info dialog - there is never actually
+ *    enough content to need scrolling. Sapphire's own messagebox (an older ZK DOM structure
+ *    with no such viewport/scroll wrapper at all) sizes its message span to its literal content
+ *    width instead. Switching to overflow:visible + width:auto (with a max-width so a genuinely
+ *    long message - e.g. a multi-line validation error list - still wraps instead of stretching
+ *    the dialog arbitrarily wide) reproduces that same "size to content, never scroll" behavior
+ *    within Breeze's DOM. */
+.z-messagebox-window {
+    width: 350px;
+}
+
+.z-messagebox-window .z-window-header {
+    height: 32px;
+    padding: 3px 0 5px 6px;
+    font-size: 12px;
+}
+
+.z-messagebox-viewport {
+    overflow: visible;
+    white-space: normal;
+}
+
+.z-messagebox {
+    width: auto;
+    max-width: 300px;
+}
+
+/* Remaining messagebox polish, after the width/scrollbar fix above:
+ *  - .z-messagebox-window's own background is a light blue (confirmed against the live
+ *    reference deployment: rgb(182, 225, 234)) that only shows through behind the header, since
+ *    the content area below paints its own opaque white background over it (see .z-window-content
+ *    fix further up). Breeze's window background is plain white throughout, including behind the
+ *    header, which is why ours looked flat/colorless there.
+ *  - Sapphire's close button is a bordered square (1px solid #8fb9d0 - the same border blue used
+ *    site-wide in this file), vs Breeze's plain borderless icon.
+ *  - Sapphire's own messagebox icons (information/exclamation/question/error) are glossy raster
+ *    PNGs (web/sapphire/zul/img/msgbox/*.png inside the old ZK 8.6 Sapphire theme jar), not the
+ *    flat CSS-drawn glyph Breeze uses. Breeze's own zk.wcs already references PNGs at these exact
+ *    same class names/relative filenames (zul/img/msgbox/info-btn.png etc.) - it just never shipped
+ *    them, relying on a different (flat, CSS-only) icon instead. Vendored the actual Sapphire PNGs
+ *    (extracted from the live reference deployment's own sapphire.jar, same file this app's own
+ *    dependency once bundled) into common/img/msgbox/ and pointed these same class names at them -
+ *    .z-messagebox-icon is already sized exactly 32x32 (matching these PNGs 1:1), so no size
+ *    adjustment is needed. */
+.z-messagebox-window {
+    background-color: #b6e1ea;
+}
+
+.z-messagebox-window .z-window-close {
+    border: 1px solid #8fb9d0;
+    /* The close icon (an 18px icon-font glyph, vertical-align:baseline) doesn't
+     * sit centered in this 28x24 button under Breeze's own padding/line-height
+     * math - most visible once the border above eats into the same box.
+     * Force true centering with flex instead of fighting that box model. */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.z-messagebox-information {
+    background-image: url("/common/img/msgbox/info-btn.png");
+}
+
+.z-messagebox-exclamation {
+    background-image: url("/common/img/msgbox/warning-btn.png");
+}
+
+.z-messagebox-question {
+    background-image: url("/common/img/msgbox/question-btn.png");
+}
+
+.z-messagebox-error {
+    background-image: url("/common/img/msgbox/stop-btn.png");
 }
