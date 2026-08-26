@@ -37,4 +37,5 @@ doc/src/user/*/html/
 doc/src/user/*/index.rst
 
 #ignore files that need ignoring
-*.ignore
+*.ignorelp-full-build.log
+*.log
