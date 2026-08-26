@@ -5,7 +5,7 @@ export DH_OPTIONS
 export CURDIR
 
 MAKEFLAGS  += s
-JAVA_HOME  := /usr/lib/jvm/java-6-openjdk
+JAVA_HOME  := /usr/lib/jvm/java-11-openjdk-amd64
 
 MAVEN_REPO := $(CURDIR)/debian/maven-repo
 MAVEN_OPTS := -Pprod,postgresql,-liquibase-update \
